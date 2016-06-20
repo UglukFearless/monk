@@ -1,0 +1,32 @@
+TASK net.uglukfearless.monk id=4
+  ACTIVITY net.uglukfearless.monk/.AndroidLauncher 853138a pid=5441
+    Local Activity 23d28207 State:
+      mResumed=true mStopped=false mFinished=false
+      mLoadersStarted=true
+      mChangingConfigurations=false
+      mCurrentConfig={1.0 310mcc260mnc en_US ldltr sw320dp w491dp h294dp 240dpi nrml land finger qwerty/v/v dpad/v s.11}
+    FragmentManager misc state:
+      mActivity=net.uglukfearless.monk.AndroidLauncher@23d28207
+      mContainer=android.app.Activity$1@44b105f
+      mCurState=5 mStateSaved=false mDestroyed=false
+    ViewRoot:
+      mAdded=true mRemoved=false
+      mConsumeBatchedInputScheduled=false
+      mConsumeBatchedInputImmediatelyScheduled=false
+      mPendingInputEventCount=0
+      mProcessInputEventsScheduled=false
+      mTraversalScheduled=false
+      android.view.ViewRootImpl$NativePreImeInputStage: mQueueLength=0
+      android.view.ViewRootImpl$ImeInputStage: mQueueLength=0
+      android.view.ViewRootImpl$NativePostImeInputStage: mQueueLength=0
+    Choreographer:
+      mFrameScheduled=false
+      mLastFrameTime=1655583 (205341 ms ago)
+    View Hierarchy:
+      com.android.internal.policy.impl.PhoneWindow$DecorView{3b6d1aac V.E..... R....... 0,0-737,480}
+        android.widget.LinearLayout{189cf375 V.E..... ........ 0,0-737,480}
+          android.view.ViewStub{e7f7f0a G.E..... ......I. 0,0-0,0 #102036e}
+          android.widget.FrameLayout{10ba537b V.E..... ........ 0,0-737,480 #1020002 android:id/content}
+            com.badlogic.gdx.backends.android.surfaceview.GLSurfaceView20{30e73598 VFE..... .F...... 0,0-737,480}
+    Looper (main, tid 1) {105651f1}
+      (Total messages: 0, idling=false, quitting=false)
