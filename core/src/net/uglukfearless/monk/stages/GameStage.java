@@ -159,7 +159,7 @@ public class GameStage extends Stage {
 
         bodies.clear();
 
-        ObstaclesMap.update(delta);
+//        ObstaclesMap.update(delta);
     }
 
     private void update(Body body) {

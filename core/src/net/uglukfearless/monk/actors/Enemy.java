@@ -68,26 +68,15 @@ public class Enemy extends GameActor {
     public void act(float delta) {
         super.act(delta);
 
-        point = ObstaclesMap.checkPlacing(body.getPosition().x - getUserData().getWidth()/2,
-                body.getPosition().y - getUserData().getHeight()/2);
-        if (!(point[0]==-1)) {
-            short code = ObstaclesMap.getObstacleCode(point[0],point[1]);
-            if (((code & FilterConstants.CATEGORY_OBSTACLE_TRAP)!=0)
-                    |((code & FilterConstants.CATEGORY_OBSTACLE_SIMPLE)!=0)| point[0]==0 | point[0]==4) {
-
-                if (getUserData().isJumper()) {
-                    jumpTime +=delta;
-                    if (jumpTime>0.01f&&!getUserData().isJumping()) {
-                        body.applyLinearImpulse(getUserData().getJumpingImpulse()
-                                , body.getWorldCenter(), true);
-                        jumpTime = 0;
-                        getUserData().setJumping(true);
-                    }
-                }
-            }
-        }
-
-
+//        if (getUserData().isJumper()) {
+//            jumpTime +=delta;
+//            if (jumpTime>0.01f&&!getUserData().isJumping()) {
+//                body.applyLinearImpulse(getUserData().getJumpingImpulse()
+//                        , body.getWorldCenter(), true);
+//                jumpTime = 0;
+//                getUserData().setJumping(true);
+//            }
+//        }
 
 
         if (body.getPosition().x < Constants.GROUND_WIDTH/2&&!starting) {

@@ -67,11 +67,11 @@ public class DangersHandler {
 
     public void createDangers(boolean pit, float startX) {
 
-        ObstaclesMap.leaf();
+//        ObstaclesMap.leaf();
 
         if(pit==true) {
 
-            ObstaclesMap.pit();
+//            ObstaclesMap.pit();
 
             for (int j=0;j<2;j++) {
                 resolvedDangers.clear();
@@ -122,8 +122,8 @@ public class DangersHandler {
                                 startX + net.uglukfearless.monk.constants.Constants.GROUND_PIT/2, 0
                                         + net.uglukfearless.monk.constants.Constants.LAYOUT_Y_STEP*j + offset_y_blades,obstacleType));
 
-                        ObstaclesMap.setObstacle(0,j, obstacle.getBody()
-                                .getFixtureList().get(0).getFilterData().categoryBits, true);
+//                        ObstaclesMap.setObstacle(0,j, obstacle.getBody()
+//                                .getFixtureList().get(0).getFilterData().categoryBits, true);
 
                         prohibitionsMap[0][j+1] = (short) (prohibitionsMap[0][j+1]
                                 |obstacleType.getProhibitionsMap()[0][1]);
@@ -190,8 +190,8 @@ public class DangersHandler {
                                 startX + obstacleType.getWidth() / 2 + net.uglukfearless.monk.constants.Constants.STEP_OF_DANGERS * i, 0
                                         + net.uglukfearless.monk.constants.Constants.LAYOUT_Y_STEP * j + offset_y_blades, obstacleType));
 
-                        ObstaclesMap.setObstacle(i,j, obstacle.getBody()
-                                .getFixtureList().get(0).getFilterData().categoryBits, false);
+//                        ObstaclesMap.setObstacle(i,j, obstacle.getBody()
+//                                .getFixtureList().get(0).getFilterData().categoryBits, false);
 
                         prohibitionsMap[i][j + 1] = (short) (prohibitionsMap[i][j + 1]
                                 | obstacleType.getProhibitionsMap()[0][1]);
@@ -217,14 +217,14 @@ public class DangersHandler {
         prohibitionsMap[3][0] = 0;
         prohibitionsMap[3][1] = 0;
 
-        System.out.println("[0][0] - " + ObstaclesMap.map[0][0] + " | " + "[1][0] - " + ObstaclesMap.map[1][0] + " | " +
-                "[2][0] - " + ObstaclesMap.map[2][0] + " | " + "[3][0] - " + ObstaclesMap.map[3][0] + " | " +
-                "[4][0] - " + ObstaclesMap.map[4][0] + " | "+ "[5][0] - " + ObstaclesMap.map[5][0] + " | " +
-                "[6][0] - " + ObstaclesMap.map[6][0] + " | " + "[7][0] - " + ObstaclesMap.map[7][0] + " | ");
-        System.out.println("[0][1] - " + ObstaclesMap.map[0][1] + " | " + "[1][1] - " + ObstaclesMap.map[1][1] + " | " +
-                "[2][1] - " + ObstaclesMap.map[2][1] + " | " + "[3][1] - " + ObstaclesMap.map[3][1] + " | " +
-                "[4][1] - " + ObstaclesMap.map[4][1] + " | "+ "[5][0] - " + ObstaclesMap.map[5][1] + " | " +
-                "[6][1] - " + ObstaclesMap.map[6][1] + " | " + "[7][1] - " + ObstaclesMap.map[7][1] + " | ");
+//        System.out.println("[0][0] - " + ObstaclesMap.map[0][0] + " | " + "[1][0] - " + ObstaclesMap.map[1][0] + " | " +
+//                "[2][0] - " + ObstaclesMap.map[2][0] + " | " + "[3][0] - " + ObstaclesMap.map[3][0] + " | " +
+//                "[4][0] - " + ObstaclesMap.map[4][0] + " | "+ "[5][0] - " + ObstaclesMap.map[5][0] + " | " +
+//                "[6][0] - " + ObstaclesMap.map[6][0] + " | " + "[7][0] - " + ObstaclesMap.map[7][0] + " | ");
+//        System.out.println("[0][1] - " + ObstaclesMap.map[0][1] + " | " + "[1][1] - " + ObstaclesMap.map[1][1] + " | " +
+//                "[2][1] - " + ObstaclesMap.map[2][1] + " | " + "[3][1] - " + ObstaclesMap.map[3][1] + " | " +
+//                "[4][1] - " + ObstaclesMap.map[4][1] + " | "+ "[5][0] - " + ObstaclesMap.map[5][1] + " | " +
+//                "[6][1] - " + ObstaclesMap.map[6][1] + " | " + "[7][1] - " + ObstaclesMap.map[7][1] + " | ");
 
     }
 }
