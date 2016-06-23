@@ -10,12 +10,15 @@ import net.uglukfearless.monk.constants.PlacingCategory;
  * Created by Ugluk on 07.06.2016.
  */
 public enum ObstacleType implements Danger {
-    BOX(4f, 4f, 25f, Constants.GROUND_Y + Constants.GROUND_HEIGHT, 0.5f,new String[] { "box.png"},
-            Constants.WORLD_STATIC_VELOCITY, 1, false, false, false),
-    STONE(4f, 4f, 25f, Constants.GROUND_Y + Constants.GROUND_HEIGHT, 6f, new String[] { "stone.png"},
-            Constants.WORLD_STATIC_VELOCITY, 2, true, false, false),
-    BLADES(4f, 4f, 25f, Constants.GROUND_Y + Constants.GROUND_HEIGHT/2, 1f, null,
-            Constants.WORLD_STATIC_VELOCITY, 0, true, true, true);
+    BOX(4f, 4f, 0, 0.5f,new String[] { "box.png"},
+            Constants.WORLD_STATIC_VELOCITY, 1, false, false, false,
+            Constants.DANGERS_PRIORITY_NORMAL),
+    STONE(4f, 4f, 0, 6f, new String[] { "stone.png"},
+            Constants.WORLD_STATIC_VELOCITY, 2, true, false, false,
+            Constants.DANGERS_PRIORITY_NORMAL),
+    BLADES(4f, 4f, -2, 1f, null,
+            Constants.WORLD_STATIC_VELOCITY, 0, true, true, true,
+            Constants.DANGERS_PRIORITY_NORMAL);
 
 
     private float width;
@@ -32,14 +35,15 @@ public enum ObstacleType implements Danger {
 
     public short categoryBit = 0;
     public short[][] prohibitionsMap = new short[2][2];
+    public int priority = 0;
 
-    ObstacleType(float width, float height, float x, float y, float density, String[] regions,
+    ObstacleType(float width, float height, float y, float density, String[] regions,
                  Vector2 linearVelocity, int gravityScale, boolean armour, boolean isTrap,
-                 boolean isSphere) {
+                 boolean isSphere, int prior) {
 
         this.width = width;
         this.height = height;
-        this.x = x;
+
         this.y = y;
         this.density = density;
         this.regions = regions;
@@ -82,6 +86,12 @@ public enum ObstacleType implements Danger {
 
         this.isSphere = isSphere;
 
+        priority = prior;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
     }
 
     @Override

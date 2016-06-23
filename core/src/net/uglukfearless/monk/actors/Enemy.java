@@ -29,7 +29,6 @@ public class Enemy extends GameActor {
 
     private boolean starting;
 
-    private int point[] = new int[2];
 
     public Enemy(Body body) {
         super(body);
@@ -68,22 +67,10 @@ public class Enemy extends GameActor {
     public void act(float delta) {
         super.act(delta);
 
-//        if (getUserData().isJumper()) {
-//            jumpTime +=delta;
-//            if (jumpTime>0.01f&&!getUserData().isJumping()) {
-//                body.applyLinearImpulse(getUserData().getJumpingImpulse()
-//                        , body.getWorldCenter(), true);
-//                jumpTime = 0;
-//                getUserData().setJumping(true);
-//            }
-//        }
-
-
         if (body.getPosition().x < Constants.GROUND_WIDTH/2&&!starting) {
             body.setLinearVelocity(getUserData().getLinearVelocity());
             starting = true;
         }
-
 
         if (getUserData().isDead()) {
             dead(delta);

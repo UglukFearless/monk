@@ -12,24 +12,30 @@ import net.uglukfearless.monk.constants.PlacingCategory;
  */
 public enum EnemyType implements Danger {
 
-    RUNNING_SMALL(1f,1f, Constants.ENEMY_X, Constants.RUNNING_SHORT_ENEMY_Y, Constants.ENEMY_DENSITY,
+    RUNNING_SMALL(1f,1f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.RUNNING_SMALL_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 1,
-            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE),
-    RUNNING_WIDE(2f,1f, Constants.ENEMY_X, Constants.RUNNING_SHORT_ENEMY_Y, Constants.ENEMY_DENSITY,
+            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
+            Constants.DANGERS_PRIORITY_NORMAL),
+    RUNNING_WIDE(2f,1f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.RUNNING_WIDE_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 1,
-            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE),
-    RUNNING_LONG(1f,2f, Constants.ENEMY_X, Constants.RUNNING_LONG_ENEMY_Y, Constants.ENEMY_DENSITY,
+            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
+            Constants.DANGERS_PRIORITY_NORMAL),
+    RUNNING_LONG(1f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.RUNNING_LONG_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 1,
-            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE),
-    RUNNING_BIG(2f,2f, Constants.ENEMY_X, Constants.RUNNING_LONG_ENEMY_Y, Constants.ENEMY_DENSITY,
+            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
+            Constants.DANGERS_PRIORITY_NORMAL),
+    RUNNING_BIG(2f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.RUNNING_BIG_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 1,
-            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE),
-    FLYING_SMALL(1f,1f, Constants.ENEMY_X, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
+            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
+            Constants.DANGERS_PRIORITY_NORMAL),
+    FLYING_SMALL(1f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.FLYING_SMALL_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 0,
-            false, false, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE),
-    FLYING_WIDE(2f,1f, Constants.ENEMY_X, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
+            false, false, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
+            Constants.DANGERS_PRIORITY_SELDOM),
+    FLYING_WIDE(2f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.FLYING_WIDE_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 0,
-            false, false, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE);
+            false, false, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
+            Constants.DANGERS_PRIORITY_NORMAL);
 
     private float width;
     private float height;
@@ -47,15 +53,15 @@ public enum EnemyType implements Danger {
 
     public short categoryBit = 0;
     public short[][] prohibitionsMap = new short[2][2];
+    public int priority = 0;
 
 
-    EnemyType(float width, float height,  float x, float y,  float density, String [] regions
+    EnemyType(float width, float height, float y,  float density, String [] regions
             , Vector2 linearVelocity, int gravityScale, boolean armour, boolean jumper,
-              boolean shouter, boolean striker, Vector2 jumpingImpulse) {
+              boolean shouter, boolean striker, Vector2 jumpingImpulse, int prior) {
         setupProhibitionMap();
         this.density = density;
         this.y = y;
-        this.x = x;
         this.height = height;
         this.width = width;
         this.regions = regions;
@@ -82,11 +88,18 @@ public enum EnemyType implements Danger {
         this.shouter = shouter;
         this.striker = striker;
         this.jumpingImpulse = jumpingImpulse;
+
+        priority = prior;
     }
 
     private void setupProhibitionMap() {
         prohibitionsMap[0][1] = PlacingCategory.CATEGORY_PLACING_ENEMY_OVERLAND
                 | PlacingCategory.CATEGORY_PLACING_OBSTACLE_OVERLAND;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
     }
 
     @Override

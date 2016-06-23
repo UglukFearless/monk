@@ -28,7 +28,6 @@ import net.uglukfearless.monk.utils.AssetLoader;
 import net.uglukfearless.monk.utils.BodyUtils;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.utils.DangersHandler;
-import net.uglukfearless.monk.utils.ObstaclesMap;
 import net.uglukfearless.monk.utils.ScoreCounter;
 import net.uglukfearless.monk.utils.WorldUtils;
 
@@ -96,13 +95,13 @@ public class GameStage extends Stage {
 
     private void setUpWorld() {
         world = WorldUtils.createWorld();
+        world.QueryAABB(null, -150, -150, 150, 150); //странное дело, добавил строчку, но ничего не измениловь! ))
         gameContactListener = new GameContactListener(this);
         world.setContactListener(gameContactListener);
         setUpBackground();
         setUpGround();
         setUpRunner();
         setUpRunnerStrike();
-//        createDanger();
         setUpDangersHandler();
     }
 
@@ -143,7 +142,6 @@ public class GameStage extends Stage {
     public void act(float delta) {
         super.act(delta);
 
-//        Array<Body> bodies = new Array<Body>(world.getBodyCount());
         bodies.clear();
         world.getBodies(bodies);
 

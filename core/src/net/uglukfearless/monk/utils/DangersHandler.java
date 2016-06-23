@@ -4,6 +4,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import net.uglukfearless.monk.actors.Enemy;
 import net.uglukfearless.monk.actors.Obstacle;
+import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.constants.PlacingCategory;
 import net.uglukfearless.monk.enums.EnemyType;
 import net.uglukfearless.monk.enums.ObstacleType;
 import net.uglukfearless.monk.stages.GameStage;
@@ -54,11 +56,19 @@ public class DangersHandler {
     public void init() {
 
         for (EnemyType enemyType: enemyTypes) {
-            allEnemies.add(enemyType);
+            if (enemyType.getPriority()>0) {
+                for (int i=0; i<enemyType.getPriority();i++) {
+                    allEnemies.add(enemyType);
+                }
+            }
         }
 
         for (ObstacleType obstacleType: obstacleTypes) {
-            allObstacles.add(obstacleType);
+            if (obstacleType.getPriority()>0) {
+                for (int i=0; i<obstacleType.getPriority();i++) {
+                    allObstacles.add(obstacleType);
+                }
+            }
         }
 
         allDangers.addAll(allEnemies);
@@ -77,8 +87,8 @@ public class DangersHandler {
                 resolvedDangers.clear();
 
                 prohibitionsMap[0][j] = (short) (prohibitionsMap[0][j]
-                        | net.uglukfearless.monk.constants.PlacingCategory.CATEGORY_PLACING_ENEMY_OVERLAND
-                        | net.uglukfearless.monk.constants.PlacingCategory.CATEGORY_PLACING_OBSTACLE_OVERLAND);
+                        | PlacingCategory.CATEGORY_PLACING_ENEMY_OVERLAND
+                        | PlacingCategory.CATEGORY_PLACING_OBSTACLE_OVERLAND);
 
                 for (Danger danger: allDangers) {
 
@@ -94,8 +104,8 @@ public class DangersHandler {
 
                         EnemyType enemyType = (EnemyType)typeDanger;
                         Enemy enemy = new Enemy(WorldUtils.createEnemy(world,
-                                startX + net.uglukfearless.monk.constants.Constants.GROUND_PIT/2, 0
-                                        + net.uglukfearless.monk.constants.Constants.LAYOUT_Y_STEP*j, enemyType));
+                                startX + Constants.GROUND_PIT/2, Constants.LAYOUT_Y_ONE
+                                        + Constants.LAYOUT_Y_STEP*j, enemyType));
 
                         prohibitionsMap[0][j+1] = (short) (prohibitionsMap[0][j+1]
                                 |enemyType.getProhibitionsMap()[0][1]);
@@ -119,8 +129,8 @@ public class DangersHandler {
                         }
 
                         Obstacle obstacle = new Obstacle(WorldUtils.createObstacle(world,
-                                startX + net.uglukfearless.monk.constants.Constants.GROUND_PIT/2, 0
-                                        + net.uglukfearless.monk.constants.Constants.LAYOUT_Y_STEP*j + offset_y_blades,obstacleType));
+                                startX + Constants.GROUND_PIT/2, Constants.LAYOUT_Y_ONE
+                                        + Constants.LAYOUT_Y_STEP*j + offset_y_blades,obstacleType));
 
 //                        ObstaclesMap.setObstacle(0,j, obstacle.getBody()
 //                                .getFixtureList().get(0).getFilterData().categoryBits, true);
@@ -138,7 +148,7 @@ public class DangersHandler {
                 }
             }
 
-            startX += net.uglukfearless.monk.constants.Constants.GROUND_PIT*1.5f;
+            startX += Constants.GROUND_PIT*1.5f;
             prohibitionsMap[0][0] = prohibitionsMap[1][0];
             prohibitionsMap[0][1] = prohibitionsMap[1][1];
         }
@@ -162,8 +172,8 @@ public class DangersHandler {
 
                         EnemyType enemyType = (EnemyType) typeDanger;
                         Enemy enemy = new Enemy(WorldUtils.createEnemy(world,
-                                startX + enemyType.getWidth() + net.uglukfearless.monk.constants.Constants.STEP_OF_DANGERS * i, 0
-                                        + net.uglukfearless.monk.constants.Constants.LAYOUT_Y_STEP * j, enemyType));
+                                startX + enemyType.getWidth() + Constants.STEP_OF_DANGERS * i,
+                                Constants.LAYOUT_Y_ONE + Constants.LAYOUT_Y_STEP*j, enemyType));
 
                         prohibitionsMap[i][j + 1] = (short) (prohibitionsMap[i][j + 1]
                                 | enemyType.getProhibitionsMap()[0][1]);
@@ -187,8 +197,8 @@ public class DangersHandler {
                         }
 
                         Obstacle obstacle = new Obstacle(WorldUtils.createObstacle(world,
-                                startX + obstacleType.getWidth() / 2 + net.uglukfearless.monk.constants.Constants.STEP_OF_DANGERS * i, 0
-                                        + net.uglukfearless.monk.constants.Constants.LAYOUT_Y_STEP * j + offset_y_blades, obstacleType));
+                                startX + obstacleType.getWidth() / 2 + Constants.STEP_OF_DANGERS * i,
+                                Constants.LAYOUT_Y_ONE   + Constants.LAYOUT_Y_STEP * j + offset_y_blades, obstacleType));
 
 //                        ObstaclesMap.setObstacle(i,j, obstacle.getBody()
 //                                .getFixtureList().get(0).getFilterData().categoryBits, false);

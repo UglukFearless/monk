@@ -14,6 +14,8 @@ import net.uglukfearless.monk.box2d.LumpUserData;
 import net.uglukfearless.monk.box2d.ObstacleUserData;
 import net.uglukfearless.monk.box2d.RunnerStrikeUserData;
 import net.uglukfearless.monk.box2d.RunnerUserData;
+import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.enums.EnemyType;
 import net.uglukfearless.monk.enums.ObstacleType;
 
@@ -27,27 +29,28 @@ public class WorldUtils {
     private static Random rand = new Random();
 
     public static World createWorld() {
-        return new World(net.uglukfearless.monk.constants.Constants.WORLD_GRAVITY, false);
+
+        return new World(Constants.WORLD_GRAVITY, false);
     }
 
     public static Body createGround(World world, boolean isSecond) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         if (isSecond==true) {
-            bodyDef.position.set(new Vector2(net.uglukfearless.monk.constants.Constants.GROUND_X + net.uglukfearless.monk.constants.Constants.GROUND_WIDTH,
-                    net.uglukfearless.monk.constants.Constants.GROUND_Y));
+            bodyDef.position.set(new Vector2(Constants.GROUND_X + Constants.GROUND_WIDTH,
+                    Constants.GROUND_Y));
         } else {
-            bodyDef.position.set(new Vector2(net.uglukfearless.monk.constants.Constants.GROUND_X, net.uglukfearless.monk.constants.Constants.GROUND_Y));
+            bodyDef.position.set(new Vector2(Constants.GROUND_X, Constants.GROUND_Y));
         }
         Body body =  world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(net.uglukfearless.monk.constants.Constants.GROUND_WIDTH / 2, net.uglukfearless.monk.constants.Constants.GROUND_HEIGHT / 2);
-        body.createFixture(shape, net.uglukfearless.monk.constants.Constants.GROUND_DENSITY);
+        shape.setAsBox(Constants.GROUND_WIDTH / 2, Constants.GROUND_HEIGHT / 2);
+        body.createFixture(shape, Constants.GROUND_DENSITY);
         body.setGravityScale(0);
         body.getFixtureList().get(0).setFriction(0);
-        body.getFixtureList().get(0).setFilterData(net.uglukfearless.monk.constants.FilterConstants.FILTER_STATIC);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_STATIC);
         body.resetMassData();
-        body.setUserData(new GroundUserData(net.uglukfearless.monk.constants.Constants.GROUND_WIDTH, net.uglukfearless.monk.constants.Constants.GROUND_HEIGHT));
+        body.setUserData(new GroundUserData(Constants.GROUND_WIDTH, Constants.GROUND_HEIGHT));
         shape.dispose();
         return body;
     }
@@ -55,17 +58,17 @@ public class WorldUtils {
     public static Body createRunner(World world) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(new Vector2(net.uglukfearless.monk.constants.Constants.RUNNER_X, net.uglukfearless.monk.constants.Constants.RUNNER_Y));
+        bodyDef.position.set(new Vector2(Constants.RUNNER_X, Constants.RUNNER_Y + Constants.RUNNER_HEIGHT/2));
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(net.uglukfearless.monk.constants.Constants.RUNNER_WIDTH / 2, net.uglukfearless.monk.constants.Constants.RUNNER_HEIGHT / 2);
+        shape.setAsBox(Constants.RUNNER_WIDTH / 2, Constants.RUNNER_HEIGHT / 2);
         Body body = world.createBody(bodyDef);
-        body.setGravityScale(net.uglukfearless.monk.constants.Constants.RUNNER_GRAVITY_SCALE);
-        body.createFixture(shape, net.uglukfearless.monk.constants.Constants.RUNNER_DENSITY);
+        body.setGravityScale(Constants.RUNNER_GRAVITY_SCALE);
+        body.createFixture(shape, Constants.RUNNER_DENSITY);
         body.getFixtureList().get(0).setFriction(0);
         body.setFixedRotation(true);
-        body.getFixtureList().get(0).setFilterData(net.uglukfearless.monk.constants.FilterConstants.FILTER_RUNNER);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
         body.resetMassData();
-        body.setUserData(new RunnerUserData(net.uglukfearless.monk.constants.Constants.RUNNER_WIDTH, net.uglukfearless.monk.constants.Constants.RUNNER_HEIGHT));
+        body.setUserData(new RunnerUserData(Constants.RUNNER_WIDTH, Constants.RUNNER_HEIGHT));
         shape.dispose();
         return body;
     }
@@ -80,7 +83,7 @@ public class WorldUtils {
         shape.setAsBox(userData.getWidth() / 2, userData.getHeight() / 2);
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, userData.getDensity());
-        body.getFixtureList().get(0).setFilterData(net.uglukfearless.monk.constants.FilterConstants.FILTER_ENEMY);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY);
         body.setGravityScale(userData.getGravityScale());
         body.setFixedRotation(true);
         body.resetMassData();
@@ -93,12 +96,12 @@ public class WorldUtils {
         EnemyUserData userData = new EnemyUserData(enemyType);
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(new Vector2(x, enemyType.getY() + y));
+        bodyDef.position.set(new Vector2(x, enemyType.getY() + y + enemyType.getHeight()/2));
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(userData.getWidth() / 2, userData.getHeight() / 2);
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, userData.getDensity());
-        body.getFixtureList().get(0).setFilterData(net.uglukfearless.monk.constants.FilterConstants.FILTER_ENEMY);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY);
         body.setGravityScale(userData.getGravityScale());
         body.setFixedRotation(true);
         body.resetMassData();
@@ -132,9 +135,9 @@ public class WorldUtils {
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, userData.getDensity());
         if (userData.isTrap()||userData.isArmour()) {
-            body.getFixtureList().get(0).setFilterData(net.uglukfearless.monk.constants.FilterConstants.FILTER_OBSTACLE_TRAP);
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_TRAP);
         } else {
-            body.getFixtureList().get(0).setFilterData(net.uglukfearless.monk.constants.FilterConstants.FILTER_OBSTACLE_SIMPLE);
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_SIMPLE);
         }
         body.setGravityScale(userData.getGravityScale());
         body.resetMassData();
@@ -154,7 +157,7 @@ public class WorldUtils {
             bodyDef.type = BodyDef.BodyType.DynamicBody;
         }
 
-        bodyDef.position.set(new Vector2(x, userData.getY() + y));
+        bodyDef.position.set(new Vector2(x, userData.getY() + y + obstacleType.getHeight()/2));
 
         Shape shape;
         if (userData.isSphere()) {
@@ -168,9 +171,9 @@ public class WorldUtils {
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, userData.getDensity());
         if (userData.isTrap()||userData.isArmour()) {
-            body.getFixtureList().get(0).setFilterData(net.uglukfearless.monk.constants.FilterConstants.FILTER_OBSTACLE_TRAP);
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_TRAP);
         } else {
-            body.getFixtureList().get(0).setFilterData(net.uglukfearless.monk.constants.FilterConstants.FILTER_OBSTACLE_SIMPLE);
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_SIMPLE);
         }
         body.setGravityScale(userData.getGravityScale());
         body.resetMassData();
@@ -183,13 +186,13 @@ public class WorldUtils {
     public static Body createRunnerStrike(World world) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(new Vector2(net.uglukfearless.monk.constants.Constants.RUNNER_X, -10));
+        bodyDef.position.set(new Vector2(Constants.RUNNER_X, -10));
         CircleShape shape = new CircleShape();
-        shape.setRadius(net.uglukfearless.monk.constants.Constants.RUNNER_WIDTH * 1.2f);
+        shape.setRadius(Constants.RUNNER_WIDTH * 1.2f);
         Body body = world.createBody(bodyDef);
-        body.createFixture(shape, net.uglukfearless.monk.constants.Constants.RUNNER_DENSITY);
+        body.createFixture(shape, Constants.RUNNER_DENSITY);
         body.setGravityScale(0);
-        body.getFixtureList().get(0).setFilterData(net.uglukfearless.monk.constants.FilterConstants.FILTER_RUNNER_STRIKE);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_STRIKE);
         body.resetMassData();
         body.setUserData(new RunnerStrikeUserData());
         shape.dispose();
@@ -203,9 +206,9 @@ public class WorldUtils {
         CircleShape shape = new CircleShape();
         shape.setRadius(0.4f); ///!!!!
         Body body = world.createBody(bodyDef);
-        body.setGravityScale(net.uglukfearless.monk.constants.Constants.LUMP_GRAVITY_SCALE);
-        body.createFixture(shape, net.uglukfearless.monk.constants.Constants.ENEMY_DENSITY);
-        body.getFixtureList().get(0).setFilterData(net.uglukfearless.monk.constants.FilterConstants.FILTER_LUMP);
+        body.setGravityScale(Constants.LUMP_GRAVITY_SCALE);
+        body.createFixture(shape,Constants.ENEMY_DENSITY);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_LUMP);
         body.getFixtureList().get(0).setRestitution(0.7f);
         body.setLinearVelocity(new Vector2(rand.nextFloat() * 15 - 8, rand.nextFloat() * 15 + 1));
         body.resetMassData();

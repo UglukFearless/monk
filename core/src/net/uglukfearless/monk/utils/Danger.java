@@ -13,5 +13,6 @@ public interface Danger {
 
     public boolean checkResolve(short codeOfForbidden);
 
+    public int getPriority();
 
 }

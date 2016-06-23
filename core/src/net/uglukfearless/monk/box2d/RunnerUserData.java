@@ -16,8 +16,6 @@ public class RunnerUserData extends UserData {
     private boolean striking;
 
     private final Vector2 runningPosition = new Vector2(Constants.RUNNER_X, Constants.RUNNER_Y);
-    private final Vector2 dodgePosition = new Vector2(Constants.RUNNER_DODGE_X,
-            Constants.RUNNER_DODGE_Y);
     private Vector2 jumpingLinearImpulse;
 
     public RunnerUserData() {
@@ -48,9 +46,6 @@ public class RunnerUserData extends UserData {
         return runningPosition;
     }
 
-    public Vector2 getDodgePosition() {
-        return dodgePosition;
-    }
 
     public float getHitAngularImpulse() {
         return Constants.RUNNER_HIT_ANGULAR_IMPULSE;

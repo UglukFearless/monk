@@ -25,27 +25,29 @@ public class Constants {
     public static final Vector2 GROUND_LINEAR_VELOCITY = WORLD_STATIC_VELOCITY;
 
     public static final float LAYOUT_Y_STEP = 4;
-    public static final float LAYOUT_Y_ONE = GROUND_Y + GROUND_HEIGHT;
-    public static final float LAYOUT_Y_TWO = GROUND_Y + GROUND_HEIGHT + LAYOUT_Y_STEP;
+    public static final float LAYOUT_Y_ONE = GROUND_Y + GROUND_HEIGHT/2;
+    public static final float LAYOUT_Y_TWO = LAYOUT_Y_ONE + LAYOUT_Y_STEP;
     public static final float STEP_OF_DANGERS = GROUND_WIDTH/3f;
 
     public static final float GROUND_PIT = 6f;
 
     public static final float RUNNER_X = 4;
-    public static final float RUNNER_Y = GROUND_Y + GROUND_HEIGHT - 0.4f;
+    public static final float RUNNER_Y = GROUND_Y + GROUND_HEIGHT/2; // - 1f;
     public static final float RUNNER_WIDTH = 1.5f;
     public static final float RUNNER_HEIGHT = 3f;
     public static final float RUNNER_DENSITY = 0.5f;
-    public static final float RUNNER_DODGE_X = 3f;
-    public static final float RUNNER_DODGE_Y = 2.8f;
     public static final float RUNNER_GRAVITY_SCALE = 5f;
     public static final Vector2 RUNNER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 40f);
     public static final float RUNNER_HIT_ANGULAR_IMPULSE = 20f;
 
-    public static final float ENEMY_X = 25f;
-    public static final float RUNNING_SHORT_ENEMY_Y = 3f;
-    public static final float RUNNING_LONG_ENEMY_Y = 3f;
-    public static final float FLYING_ENEMY_Y = 5f;
+    public static final float DANDER_X = 25f;
+
+    public static final int DANGERS_PRIORITY_SELDOM = 1;
+    public static final int DANGERS_PRIORITY_NORMAL = 3;
+    public static final int DANGERS_PRIORITY_OFTEN = 5;
+
+    public static final float OVERLAND_ENEMY_Y = 0f;
+    public static final float FLYING_ENEMY_Y = 2.6f;
     public static final float ENEMY_DENSITY = RUNNER_DENSITY;
     public static final Vector2 ENEMY_LINEAR_VELOCITY = new Vector2(-20f,0);
     public static final Vector2 ENEMY_JUMPING_LINEAR_IMPULSE = new Vector2(0, 15f);;
