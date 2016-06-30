@@ -19,15 +19,27 @@ public class Constants {
 
     public static final float GROUND_X = 0;
     public static final float GROUND_Y = 0;
-    public static final float GROUND_WIDTH = 50f;
-    public static final float GROUND_HEIGHT = 4f;
+    public static final float GROUND_WIDTH = 36f;
+    public static final float GROUND_HEIGHT = 6f;
     public static final float GROUND_DENSITY = 10f;
     public static final Vector2 GROUND_LINEAR_VELOCITY = WORLD_STATIC_VELOCITY;
+
+    public static final int PRIORITY_GROUND = 15;
+    public static final int PRIORITY_PIT = 20;
+    public static final int PRIORITY_COLUMNS = 12;
+
+    public static final float COLUMNS_Y = GROUND_Y + 2;
+    public static final float COLUMNS_WIDTH = 1f;
+    public static final float COLUMNS_PIT = 2f;
+    public static final float COLUMNS_HEIGHT = GROUND_HEIGHT;
+    public static final float COLUMNS_DENSITY = GROUND_DENSITY;
+    public static final Vector2 COLUMNS_LINEAR_VELOCITY = WORLD_STATIC_VELOCITY;
+    public static final int COLUMNS_QUANTITY = 4;
 
     public static final float LAYOUT_Y_STEP = 4;
     public static final float LAYOUT_Y_ONE = GROUND_Y + GROUND_HEIGHT/2;
     public static final float LAYOUT_Y_TWO = LAYOUT_Y_ONE + LAYOUT_Y_STEP;
-    public static final float STEP_OF_DANGERS = GROUND_WIDTH/3f;
+    public static final float STEP_OF_DANGERS = GROUND_WIDTH/2f;
 
     public static final float GROUND_PIT = 6f;
 
@@ -42,9 +54,10 @@ public class Constants {
 
     public static final float DANDER_X = 25f;
 
+    public static final int DANGERS_PRIORITY_NEVER = 0;
     public static final int DANGERS_PRIORITY_SELDOM = 1;
-    public static final int DANGERS_PRIORITY_NORMAL = 3;
-    public static final int DANGERS_PRIORITY_OFTEN = 5;
+    public static final int DANGERS_PRIORITY_NORMAL = 4;
+    public static final int DANGERS_PRIORITY_OFTEN = 6;
 
     public static final float OVERLAND_ENEMY_Y = 0f;
     public static final float FLYING_ENEMY_Y = 2.6f;

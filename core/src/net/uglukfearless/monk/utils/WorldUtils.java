@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 
+import net.uglukfearless.monk.box2d.ColumnsUserData;
 import net.uglukfearless.monk.box2d.EnemyUserData;
 import net.uglukfearless.monk.box2d.GroundUserData;
 import net.uglukfearless.monk.box2d.LumpUserData;
@@ -207,12 +208,29 @@ public class WorldUtils {
         shape.setRadius(0.4f); ///!!!!
         Body body = world.createBody(bodyDef);
         body.setGravityScale(Constants.LUMP_GRAVITY_SCALE);
-        body.createFixture(shape,Constants.ENEMY_DENSITY);
+        body.createFixture(shape, Constants.ENEMY_DENSITY);
         body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_LUMP);
         body.getFixtureList().get(0).setRestitution(0.7f);
         body.setLinearVelocity(new Vector2(rand.nextFloat() * 15 - 8, rand.nextFloat() * 15 + 1));
         body.resetMassData();
         body.setUserData(new LumpUserData(0.8f, 0.8f));
+        shape.dispose();
+        return body;
+    }
+
+    public static Body createColumns(World world, float startX) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
+        bodyDef.position.set(new Vector2(startX + Constants.COLUMNS_WIDTH/2, Constants.COLUMNS_Y));
+        Body body =  world.createBody(bodyDef);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(Constants.COLUMNS_WIDTH / 2, Constants.COLUMNS_HEIGHT / 2);
+        body.createFixture(shape, Constants.COLUMNS_DENSITY);
+        body.setGravityScale(0);
+        body.getFixtureList().get(0).setFriction(0);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_STATIC);
+        body.resetMassData();
+        body.setUserData(new ColumnsUserData(Constants.COLUMNS_WIDTH, Constants.COLUMNS_HEIGHT));
         shape.dispose();
         return body;
     }

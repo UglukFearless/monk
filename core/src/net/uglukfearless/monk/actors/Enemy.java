@@ -67,7 +67,7 @@ public class Enemy extends GameActor {
     public void act(float delta) {
         super.act(delta);
 
-        if (body.getPosition().x < Constants.GROUND_WIDTH/2&&!starting) {
+        if (body.getPosition().x < Constants.GAME_WIDTH&&!starting) {
             body.setLinearVelocity(getUserData().getLinearVelocity());
             starting = true;
         }

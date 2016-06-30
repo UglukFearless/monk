@@ -53,7 +53,7 @@ public enum EnemyType implements Danger {
 
     public short categoryBit = 0;
     public short[][] prohibitionsMap = new short[2][2];
-    public int priority = 0;
+    public int priority = Constants.DANGERS_PRIORITY_NEVER;
 
 
     EnemyType(float width, float height, float y,  float density, String [] regions

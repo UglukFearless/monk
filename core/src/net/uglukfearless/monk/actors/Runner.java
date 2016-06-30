@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 import net.uglukfearless.monk.box2d.RunnerUserData;
 import net.uglukfearless.monk.box2d.UserData;
+import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.AssetLoader;
 import net.uglukfearless.monk.utils.ScoreCounter;
@@ -54,7 +55,7 @@ public class Runner extends GameActor {
 
         if (data.isStriking()==true) {
             strikeTime +=delta;
-            if (strikeTime > 0.3f) {
+            if (strikeTime > 0.2f) {
                 data.setStriking(false);
             }
         }
@@ -63,6 +64,14 @@ public class Runner extends GameActor {
             dead(delta);
         } else {
             body.setLinearVelocity(0,body.getLinearVelocity().y);
+        }
+
+        if (!body.getWorld().isLocked()) {
+            if (body.getUserData()!=null&&!getUserData().isDead()&&
+                    body.getPosition().y - Constants.RUNNER_HEIGHT/2>=
+                            Constants.GROUND_Y + Constants.GROUND_HEIGHT/2 + 2) {
+                body.setTransform(Constants.RUNNER_X, body.getPosition().y, 0);
+            }
         }
     }
 

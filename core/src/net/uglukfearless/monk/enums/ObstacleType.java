@@ -35,7 +35,7 @@ public enum ObstacleType implements Danger {
 
     public short categoryBit = 0;
     public short[][] prohibitionsMap = new short[2][2];
-    public int priority = 0;
+    public int priority = Constants.DANGERS_PRIORITY_NEVER;
 
     ObstacleType(float width, float height, float y, float density, String[] regions,
                  Vector2 linearVelocity, int gravityScale, boolean armour, boolean isTrap,

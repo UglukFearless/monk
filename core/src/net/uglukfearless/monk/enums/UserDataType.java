@@ -9,5 +9,6 @@ public enum UserDataType {
     ENEMY,
     RUNNER_STRIKE,
     LUMP,
-    OBSTACLE
+    OBSTACLE,
+    COLUMNS
 }

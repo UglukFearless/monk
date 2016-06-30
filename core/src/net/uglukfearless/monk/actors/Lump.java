@@ -24,7 +24,7 @@ public class Lump extends GameActor {
         runTime += delta;
 
         if (runTime>0.5f&&body.getLinearVelocity().x>-10) {
-            body.setLinearVelocity(body.getLinearVelocity().add(-0.5f, 0));
+                body.setLinearVelocity(body.getLinearVelocity().add(-0.5f, 0));
         }
 
         if (body.getPosition().y<-5f||body.getPosition().x<-5f) {

@@ -17,6 +17,7 @@ public class BodyUtils {
             case ENEMY:
             case RUNNER:
             case OBSTACLE:
+            case COLUMNS:
                 return (body.getPosition().x + userData.getWidth()/2 > 0)
                         &&(body.getPosition().y + userData.getHeight()/2 > 0);
             case LUMP:
@@ -63,5 +64,11 @@ public class BodyUtils {
         UserData userData = (UserData) body.getUserData();
 
         return userData != null && userData.getUserDataType() == UserDataType.OBSTACLE;
+    }
+
+    public static boolean bodyIsColumns(Body body) {
+        UserData userData = (UserData) body.getUserData();
+
+        return userData != null && userData.getUserDataType() == UserDataType.COLUMNS;
     }
 }

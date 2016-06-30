@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import net.uglukfearless.monk.actors.Background;
+import net.uglukfearless.monk.actors.Columns;
 import net.uglukfearless.monk.actors.Enemy;
 import net.uglukfearless.monk.actors.GameActor;
 import net.uglukfearless.monk.actors.Ground;
@@ -142,6 +143,13 @@ public class GameStage extends Stage {
     public void act(float delta) {
         super.act(delta);
 
+        float time = 1f / delta;
+        if (time<50) {
+            System.out.println("###########################################");
+            System.out.println(time);
+        }
+
+
         bodies.clear();
         world.getBodies(bodies);
 
@@ -162,7 +170,8 @@ public class GameStage extends Stage {
 
     private void update(Body body) {
         if (!BodyUtils.bodyInBounds(body)) {
-            if (BodyUtils.bodyIsEnemy(body)||BodyUtils.bodyIsObstacle(body)) {
+            if (BodyUtils.bodyIsEnemy(body)||BodyUtils.bodyIsObstacle(body)
+                    ||BodyUtils.bodyIsColumns(body)) {
                 ((UserData)body.getUserData()).setDestroy(true);
             } else if (BodyUtils.bodyIsRunner(body)) {
                 ((RunnerUserData) body.getUserData()).setDead(true);
@@ -183,37 +192,11 @@ public class GameStage extends Stage {
     }
 
     private void repositionGround() {
-        float pitLength = 0;
-        float startX;
-        pit = rand.nextInt(2)==1;
-        if (pit) {
-            pitLength = Constants.GROUND_PIT;
-        } else {
-            pitLength = 0;
-        }
 
-        if (ground1.getBody().getPosition().x < ground2.getBody().getPosition().x) {
-            ground1.getBody().setTransform(ground2.getBody().getPosition().x +
-                    Constants.GROUND_WIDTH + pitLength, Constants.GROUND_Y, 0f);
-            startX = ground2.getBody().getPosition().x + Constants.GROUND_WIDTH/2;
-        } else {
-            ground2.getBody().setTransform(ground1.getBody().getPosition().x +
-                    Constants.GROUND_WIDTH + pitLength, Constants.GROUND_Y, 0f);
-            startX = ground1.getBody().getPosition().x + Constants.GROUND_WIDTH/2;
-        }
+        dangersHandler.createDangers(ground1, ground2);
 
-        dangersHandler.createDangers(pit, startX);
     }
 
-    public void createDanger() {
-        GameActor hostile;
-        if (rand.nextInt(5)<3) {
-            hostile = new Enemy(WorldUtils.createEnemy(world));
-        } else {
-            hostile = new Obstacle(WorldUtils.createObstacle(world));
-        }
-        addActor(hostile);
-    }
 
     public void createLump(Body parent) {
         Lump lump = new Lump(WorldUtils.createLupm(world, parent));

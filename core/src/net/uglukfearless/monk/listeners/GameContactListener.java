@@ -45,8 +45,10 @@ public class GameContactListener implements ContactListener {
             }
             stage.getRunner().hit();
         } else if ((BodyUtils.bodyIsRunner(a)&&BodyUtils.bodyIsGround(b))
-                ||(BodyUtils.bodyIsGround(a)&&BodyUtils.bodyIsRunner(b))) {
-            //Обработка столкновений монаха и земли
+                ||(BodyUtils.bodyIsGround(a)&&BodyUtils.bodyIsRunner(b))
+                ||(BodyUtils.bodyIsRunner(a)&&BodyUtils.bodyIsColumns(b))
+                ||(BodyUtils.bodyIsColumns(a)&&BodyUtils.bodyIsRunner(b))) {
+            //Обработка столкновений монаха и земли|столбов
             stage.getRunner().landed();
         } else if (BodyUtils.bodyIsRunnerStrike(a)&&BodyUtils.bodyIsEnemy(b)) {
             //Обработка столкновений противников с ударом монаха
@@ -85,7 +87,7 @@ public class GameContactListener implements ContactListener {
                         >(a.getPosition().y + ((UserData)a.getUserData()).getHeight()/2) - 0.1f)
                         &&!((ObstacleUserData)a.getUserData()).isTrap()) {
                     stage.getRunner().landed();
-            } else {
+            } else if (!((ObstacleUserData)a.getUserData()).isDead()) {
                     stage.getRunner().hit();
                     if (((ObstacleUserData)a.getUserData()).isBlades()) {
                         b.setLinearVelocity(a.getLinearVelocity().add(40,10));
@@ -96,7 +98,7 @@ public class GameContactListener implements ContactListener {
                     >(b.getPosition().y + ((UserData)b.getUserData()).getHeight()/2)  - 0.1f)
                     &&!((ObstacleUserData)b.getUserData()).isTrap()){
                 stage.getRunner().landed();
-            } else {
+            } else if (!((ObstacleUserData)b.getUserData()).isDead()){
                 stage.getRunner().hit();
                 if (((ObstacleUserData)b.getUserData()).isBlades()) {
                     a.setLinearVelocity(a.getLinearVelocity().add(40, 10));
