@@ -14,7 +14,7 @@ import net.uglukfearless.monk.utils.ScoreCounter;
 /**
  * Created by Ugluk on 18.05.2016.
  */
-public class Runner extends GameActor {
+public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
 
     private RunnerUserData data;
@@ -22,6 +22,7 @@ public class Runner extends GameActor {
     private float stateTime;
     private float strikeTime;
     private float deadTime;
+    private boolean hasDied = false;
 
     public Runner(Body body) {
         super(body);
@@ -40,6 +41,8 @@ public class Runner extends GameActor {
         if (data.isDead()) {
             batch.draw(AssetLoader.playerHit,x, y, width*0.5f, data.getHeight()*0.5f, width,
                     data.getHeight(), 1f, 1f,(float) Math.toDegrees(body.getAngle()));
+        }  else if (data.isStriking()) {
+            batch.draw(AssetLoader.playerStrike, x + width/3.3f, y, width*1.5f, data.getHeight()*1.05f);
         } else if (data.isJumping1()) {
             batch.draw(AssetLoader.playerJump, x, y, width, data.getHeight());
         } else {
@@ -83,6 +86,7 @@ public class Runner extends GameActor {
             stage.createLump(body);
             stage.createLump(body);
             stage.createLump(body);
+            hasDied = true;
             ((UserData)body.getUserData()).setDestroy(true);
             this.remove();
             ScoreCounter.checkScore();
@@ -126,4 +130,7 @@ public class Runner extends GameActor {
         data.setDead(true);
     }
 
+    public boolean isHasDied() {
+        return hasDied;
+    }
 }

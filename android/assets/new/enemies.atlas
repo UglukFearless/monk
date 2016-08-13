@@ -1,0 +1,19 @@
+
+enemies.png
+format: RGBA4444
+filter: Linear,Linear
+repeat: none
+enemy1_run1
+  rotate: false
+  xy: 1, 1
+  size: 327, 407
+  orig: 327, 407
+  offset: 0, 0
+  index: -1
+enemy1_run2
+  rotate: false
+  xy: 330, 1
+  size: 327, 407
+  orig: 327, 407
+  offset: 0, 0
+  index: -1

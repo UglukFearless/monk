@@ -12,13 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-import net.uglukfearless.monk.actors.Background;
-import net.uglukfearless.monk.actors.Columns;
-import net.uglukfearless.monk.actors.Enemy;
-import net.uglukfearless.monk.actors.GameActor;
-import net.uglukfearless.monk.actors.Ground;
-import net.uglukfearless.monk.actors.Lump;
-import net.uglukfearless.monk.actors.Obstacle;
+import net.uglukfearless.monk.actors.gameplay.Background;
+import net.uglukfearless.monk.actors.gameplay.Ground;
+import net.uglukfearless.monk.actors.gameplay.Lump;
 import net.uglukfearless.monk.actors.Runner;
 import net.uglukfearless.monk.actors.RunnerStrike;
 import net.uglukfearless.monk.box2d.RunnerUserData;
@@ -31,6 +27,7 @@ import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.utils.DangersHandler;
 import net.uglukfearless.monk.utils.ScoreCounter;
 import net.uglukfearless.monk.utils.WorldUtils;
+import net.uglukfearless.monk.utils.sort.ActorComparator;
 
 import java.util.Random;
 
@@ -70,10 +67,14 @@ public class GameStage extends Stage {
     private GameContactListener gameContactListener;
     private DangersHandler dangersHandler;
 
-    public GameStage(GameScreen screen) {
+    private ActorComparator mActorComparator;
 
-        super(new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT,
-                new OrthographicCamera(VIEWPORT_WIDTH, VIEWPORT_HEIGHT)));
+    float timeMid;
+
+    public GameStage(GameScreen screen, float yViewportHeight) {
+
+        super(new FitViewport(VIEWPORT_WIDTH, yViewportHeight,
+                new OrthographicCamera(VIEWPORT_WIDTH, yViewportHeight)));
 
         this.screen = screen;
 
@@ -83,6 +84,8 @@ public class GameStage extends Stage {
         setupCamera();
         setupTouchControlAreas();
         renderer = new Box2DDebugRenderer();
+
+        mActorComparator = new ActorComparator();
 
     }
 
@@ -149,6 +152,13 @@ public class GameStage extends Stage {
             System.out.println(time);
         }
 
+        if (timeMid==0) {
+            timeMid = time;
+        } else {
+            timeMid = (timeMid + time)/2f;
+        }
+
+
 
         bodies.clear();
         world.getBodies(bodies);
@@ -206,8 +216,10 @@ public class GameStage extends Stage {
 
     @Override
     public void draw() {
+//        ground1.setZIndex(100);
+//        ground2.setZIndex(100);
         super.draw();
-        renderer.render(world, camera.combined);
+//        renderer.render(world, camera.combined);
 
         this.getBatch().begin();
         AssetLoader.font.draw(this.getBatch(),String.valueOf(ScoreCounter.getScore()), 0, Constants.GAME_HEIGHT);
@@ -218,6 +230,13 @@ public class GameStage extends Stage {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+
+        if (runner.isHasDied()) {
+            System.out.println("***********************************");
+            System.out.println(timeMid);
+            System.out.println("***********************************");
+            screen.newGame();
+        }
 
         translateScreenToWorldCoordinates(screenX, screenY);
 
@@ -263,6 +282,9 @@ public class GameStage extends Stage {
         if (keyCode== Input.Keys.SPACE) {
             runner.jump();
         } else if (keyCode==Input.Keys.N) {
+            System.out.println("***********************************");
+            System.out.println(timeMid);
+            System.out.println("***********************************");
             screen.newGame();
         }  else if (keyCode==Input.Keys.SHIFT_LEFT) {
             runner.strike();

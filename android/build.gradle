@@ -16,10 +16,17 @@ android {
     }
     defaultConfig {
         applicationId "net.uglukfearless.monk"
-        minSdkVersion 8
+        minSdkVersion 9
         targetSdkVersion 14
     }
     productFlavors {
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+        }
     }
 }
 // called every time gradle gets executed, takes the native dependencies of

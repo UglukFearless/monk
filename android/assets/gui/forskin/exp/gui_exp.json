@@ -1,0 +1,27 @@
+{
+com.badlogic.gdx.graphics.g2d.BitmapFont: { 
+    default-font:       { file: digital-dream-bold-24.fnt },
+    normal-font:        { file: digital-dream-bold-24.fnt },
+    title-font:        { file: digital-dream-bold-64.fnt },
+  	angry-font:			{ file: angry-bird-font.fnt }
+},
+com.badlogic.gdx.graphics.Color: {
+	green: { a: 1, b: 0, g: 1, r: 0 },
+	white: { a: 1, b: 1, g: 1, r: 1 },
+	red: { a: 1, b: 0, g: 0, r: 1 },
+	black: { a: 1, b: 0, g: 0, r: 0 }
+},
+com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+	default: { down: button_on, up: button_off, font: default-font, fontColor: white, downFontColor: red},
+	crazy: { down: button_on, up: button_off, font: angry-font, fontColor: white, downFontColor: red}
+},
+com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
+	default: { down: button_on, up: button_off},
+	back: { down: back_on, up: back_off},
+  	check: {  up: radio_off, checked: radio_check}
+},
+com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
+	default: { font: default-font, fontColor: green },
+	title: { font: title-font, fontColor: green }
+}
+}

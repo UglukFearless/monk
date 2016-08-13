@@ -8,7 +8,7 @@ import net.uglukfearless.monk.constants.Constants;
 /**
  * Created by Ugluk on 01.06.2016.
  */
-public class RunnerStrike extends GameActor {
+public class RunnerStrike extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     private Runner runner;
 

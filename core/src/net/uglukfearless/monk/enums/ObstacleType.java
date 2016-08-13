@@ -12,10 +12,10 @@ import net.uglukfearless.monk.constants.PlacingCategory;
 public enum ObstacleType implements Danger {
     BOX(4f, 4f, 0, 0.5f,new String[] { "box.png"},
             Constants.WORLD_STATIC_VELOCITY, 1, false, false, false,
-            Constants.DANGERS_PRIORITY_NORMAL),
+            Constants.DANGERS_PRIORITY_OFTEN),
     STONE(4f, 4f, 0, 6f, new String[] { "stone.png"},
             Constants.WORLD_STATIC_VELOCITY, 2, true, false, false,
-            Constants.DANGERS_PRIORITY_NORMAL),
+            Constants.DANGERS_PRIORITY_OFTEN),
     BLADES(4f, 4f, -2, 1f, null,
             Constants.WORLD_STATIC_VELOCITY, 0, true, true, true,
             Constants.DANGERS_PRIORITY_NORMAL);
@@ -45,6 +45,7 @@ public enum ObstacleType implements Danger {
         this.height = height;
 
         this.y = y;
+
         this.density = density;
         this.regions = regions;
         this.linearVelocity = linearVelocity;

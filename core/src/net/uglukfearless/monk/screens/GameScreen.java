@@ -3,7 +3,9 @@ package net.uglukfearless.monk.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.AssetLoader;
 import net.uglukfearless.monk.utils.ScoreCounter;
@@ -13,11 +15,16 @@ import net.uglukfearless.monk.utils.ScoreCounter;
  */
 public class GameScreen implements Screen{
 
-    private GameStage stage;
+    private Stage stage;
+    private float mYViewportHeight;
 
     public GameScreen() {
         AssetLoader.init();
-        stage = new GameStage(this);
+        mYViewportHeight = Constants.GAME_WIDTH / ((float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight());
+        stage = new GameStage(this, mYViewportHeight);
+        AssetLoader.levelOneMusic.setLooping(true);
+        AssetLoader.levelOneMusic.setVolume(0.1f);
+        AssetLoader.levelOneMusic.play();
     }
 
     @Override
@@ -38,7 +45,7 @@ public class GameScreen implements Screen{
     public void newGame() {
         ScoreCounter.resetScore();
         stage.dispose();
-        stage = new GameStage(this);
+        stage = new GameStage(this, mYViewportHeight);
     }
 
     @Override
@@ -63,6 +70,8 @@ public class GameScreen implements Screen{
 
     @Override
     public void dispose() {
+        AssetLoader.levelOneMusic.stop();
         AssetLoader.dispose();
+        System.out.print("GameScreenDispose");
     }
 }

@@ -2,10 +2,10 @@ package net.uglukfearless.monk.utils;
 
 import com.badlogic.gdx.physics.box2d.World;
 
-import net.uglukfearless.monk.actors.Columns;
-import net.uglukfearless.monk.actors.Enemy;
-import net.uglukfearless.monk.actors.Ground;
-import net.uglukfearless.monk.actors.Obstacle;
+import net.uglukfearless.monk.actors.gameplay.Columns;
+import net.uglukfearless.monk.actors.gameplay.Enemy;
+import net.uglukfearless.monk.actors.gameplay.Ground;
+import net.uglukfearless.monk.actors.gameplay.Obstacle;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PlacingCategory;
 import net.uglukfearless.monk.enums.EnemyType;
@@ -24,7 +24,7 @@ public class DangersHandler {
     private Random rand;
 
     //лажа
-    private float offset_y_blades;
+    private float offset_y;
 
     private GameStage stage;
     private World world;
@@ -110,36 +110,40 @@ public class DangersHandler {
 
         for (int i = 0;i<prohibitionsMap.length-1;i++) {
             for (int j = 0; j < prohibitionsMap[0].length-1; j++) {
-                resolvedDangers.clear();
 
-                for (Danger danger : allDangers) {
+                if (fillingCell()) {
+                    resolvedDangers.clear();
 
-                    if (danger.checkResolve(prohibitionsMap[i][j])) {
-                        resolvedDangers.add(danger);
+                    for (Danger danger : allDangers) {
+
+                        if (danger.checkResolve(prohibitionsMap[i][j])) {
+                            resolvedDangers.add(danger);
+                        }
+                    }
+
+                    if (resolvedDangers.size() > 0) {
+
+                        Danger typeDanger = resolvedDangers.get(rand.nextInt(resolvedDangers.size()));
+
+                        if (typeDanger instanceof EnemyType) {
+
+                            EnemyType enemyType = (EnemyType) typeDanger;
+
+                            createEnemy(enemyType,i,j,false);
+
+
+                        } else if (typeDanger instanceof ObstacleType) {
+
+
+                            ObstacleType obstacleType = (ObstacleType) typeDanger;
+
+                            createObstacle(obstacleType, i, j,false);
+
+                        }
+
                     }
                 }
 
-                if (resolvedDangers.size() > 0) {
-
-                    Danger typeDanger = resolvedDangers.get(rand.nextInt(resolvedDangers.size()));
-
-                    if (typeDanger instanceof EnemyType) {
-
-                        EnemyType enemyType = (EnemyType) typeDanger;
-
-                        createEnemy(enemyType,i,j,false);
-
-
-                    } else if (typeDanger instanceof ObstacleType) {
-
-
-                        ObstacleType obstacleType = (ObstacleType) typeDanger;
-
-                        createObstacle(obstacleType, i, j,false);
-
-                    }
-
-                }
             }
         }
 
@@ -157,37 +161,41 @@ public class DangersHandler {
     private void fillPit() {
 
         for (int j=0;j<2;j++) {
-            resolvedDangers.clear();
 
-            prohibitionsMap[0][j] = (short) (prohibitionsMap[0][j]
-                    | PlacingCategory.CATEGORY_PLACING_ENEMY_OVERLAND
-                    | PlacingCategory.CATEGORY_PLACING_OBSTACLE_OVERLAND);
+            if (fillingCell()) {
+                resolvedDangers.clear();
 
-            for (Danger danger: allDangers) {
+                prohibitionsMap[0][j] = (short) (prohibitionsMap[0][j]
+                        | PlacingCategory.CATEGORY_PLACING_ENEMY_OVERLAND
+                        | PlacingCategory.CATEGORY_PLACING_OBSTACLE_OVERLAND);
 
-                if (danger.checkResolve(prohibitionsMap[0][j])) {
-                    resolvedDangers.add(danger);
+                for (Danger danger: allDangers) {
+
+                    if (danger.checkResolve(prohibitionsMap[0][j])) {
+                        resolvedDangers.add(danger);
+                    }
+                }
+
+                if (resolvedDangers.size()>0) {
+                    Danger typeDanger = resolvedDangers.get(rand.nextInt(resolvedDangers.size()));
+
+                    if (typeDanger instanceof EnemyType) {
+
+                        EnemyType enemyType = (EnemyType)typeDanger;
+
+                        createEnemy(enemyType, 0, j, true);
+
+                    } else if (typeDanger instanceof ObstacleType) {
+
+                        ObstacleType obstacleType = (ObstacleType)typeDanger;
+
+                        createObstacle(obstacleType, 0, j, true);
+
+                    }
+
                 }
             }
 
-            if (resolvedDangers.size()>0) {
-                Danger typeDanger = resolvedDangers.get(rand.nextInt(resolvedDangers.size()));
-
-                if (typeDanger instanceof EnemyType) {
-
-                    EnemyType enemyType = (EnemyType)typeDanger;
-
-                    createEnemy(enemyType, 0, j, true);
-
-                } else if (typeDanger instanceof ObstacleType) {
-
-                    ObstacleType obstacleType = (ObstacleType)typeDanger;
-
-                    createObstacle(obstacleType, 0, j, true);
-
-                }
-
-            }
         }
 
         startX += Constants.GROUND_PIT*1.5f;
@@ -195,13 +203,17 @@ public class DangersHandler {
         prohibitionsMap[0][1] = prohibitionsMap[1][1];
     }
 
+    private boolean fillingCell() {
+        return rand.nextInt(Constants.DANGERS_PROBABILITY_LIMIT) < Constants.DANGERS_PROBABILITY;
+    }
+
     private void createObstacle(ObstacleType obstacleType, int i, int j, boolean overPit) {
 
         //это нужно будет переписать!
-        if (j==1&&obstacleType.isTrap()) {
-            offset_y_blades = 2;
+        if (j==1&&obstacleType.getY()<0) {
+            offset_y = obstacleType.getY()*(-1);
         } else {
-            offset_y_blades = 0;
+            offset_y = 0;
         }
 
         Obstacle obstacle;
@@ -209,11 +221,11 @@ public class DangersHandler {
         if (overPit) {
             obstacle = new Obstacle(WorldUtils.createObstacle(world,
                     startX - Constants.GROUND_PIT/2, Constants.LAYOUT_Y_ONE
-                            + Constants.LAYOUT_Y_STEP*j + offset_y_blades,obstacleType));
+                            + Constants.LAYOUT_Y_STEP*j + offset_y,obstacleType));
         } else {
             obstacle = new Obstacle(WorldUtils.createObstacle(world,
                     startX + obstacleType.getWidth() / 2 + Constants.STEP_OF_DANGERS * i,
-                    Constants.LAYOUT_Y_ONE   + Constants.LAYOUT_Y_STEP * j + offset_y_blades, obstacleType));
+                    Constants.LAYOUT_Y_ONE   + Constants.LAYOUT_Y_STEP * j + offset_y, obstacleType));
         }
 
 //                        ObstaclesMap.setObstacle(0,j, obstacle.getBody()

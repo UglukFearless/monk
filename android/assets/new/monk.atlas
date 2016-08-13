@@ -1,0 +1,40 @@
+
+monk.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+monk_kick
+  rotate: false
+  xy: 1, 1
+  size: 511, 407
+  orig: 511, 407
+  offset: 0, 0
+  index: -1
+monk_hit
+  rotate: false
+  xy: 514, 1
+  size: 283, 407
+  orig: 283, 407
+  offset: 0, 0
+  index: -1
+monk_jump
+  rotate: false
+  xy: 799, 1
+  size: 283, 407
+  orig: 283, 407
+  offset: 0, 0
+  index: -1
+monk_run1
+  rotate: false
+  xy: 1084, 1
+  size: 283, 407
+  orig: 283, 407
+  offset: 0, 0
+  index: -1
+monk_run2
+  rotate: false
+  xy: 1369, 1
+  size: 283, 407
+  orig: 283, 407
+  offset: 0, 0
+  index: -1

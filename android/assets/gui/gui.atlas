@@ -1,0 +1,33 @@
+
+gui.png
+format: RGBA4444
+filter: Linear,Linear
+repeat: none
+back_off
+  rotate: false
+  xy: 1, 1
+  size: 148, 105
+  orig: 148, 105
+  offset: 0, 0
+  index: -1
+back_on
+  rotate: false
+  xy: 151, 1
+  size: 148, 105
+  orig: 148, 105
+  offset: 0, 0
+  index: -1
+button_off
+  rotate: false
+  xy: 301, 62
+  size: 120, 44
+  orig: 120, 44
+  offset: 0, 0
+  index: -1
+button_on
+  rotate: false
+  xy: 301, 16
+  size: 120, 44
+  orig: 120, 44
+  offset: 0, 0
+  index: -1

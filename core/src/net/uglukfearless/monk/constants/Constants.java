@@ -1,5 +1,6 @@
 package net.uglukfearless.monk.constants;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -10,12 +11,14 @@ public class Constants {
     public static final int APP_HEIGHT = 480;
     public static final int GAME_WIDTH = 25;
     public static final int GAME_HEIGHT = APP_HEIGHT/(APP_WIDTH/GAME_WIDTH);
-    public static final float WORLD_TO_SCREEN = (APP_WIDTH/GAME_WIDTH);
+
+    public static final int BUTTON_MENU_WIDTH = 160;
+    public static final int BUTTON_MENU_HEIGHT = 90;
 
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
     public static final Vector2 WORLD_STATIC_VELOCITY = new Vector2(-15f,0);
 
-    public static final int BACKGROUND_OFFSET_Y = 1;
+    public static final int BACKGROUND_OFFSET_Y = 0;
 
     public static final float GROUND_X = 0;
     public static final float GROUND_Y = 0;
@@ -55,9 +58,21 @@ public class Constants {
     public static final float DANDER_X = 25f;
 
     public static final int DANGERS_PRIORITY_NEVER = 0;
-    public static final int DANGERS_PRIORITY_SELDOM = 1;
-    public static final int DANGERS_PRIORITY_NORMAL = 4;
-    public static final int DANGERS_PRIORITY_OFTEN = 6;
+    public static final int DANGERS_PRIORITY_VERY_SELDOM = 1;
+    public static final int DANGERS_PRIORITY_SELDOM = 3;
+    public static final int DANGERS_PRIORITY_NORMAL = 6;
+    public static final int DANGERS_PRIORITY_OFTEN = 12;
+    public static final int DANGERS_PRIORITY_VERY_OFTEN = 18;
+
+//    public static final int DANGERS_PRIORITY_NEVER = 0;
+//    public static final int DANGERS_PRIORITY_VERY_SELDOM = 0;
+//    public static final int DANGERS_PRIORITY_SELDOM = 0;
+//    public static final int DANGERS_PRIORITY_NORMAL = 0;
+//    public static final int DANGERS_PRIORITY_OFTEN = 0;
+//    public static final int DANGERS_PRIORITY_VERY_OFTEN = 0;
+
+    public static final int DANGERS_PROBABILITY = 80;
+    public static final int DANGERS_PROBABILITY_LIMIT = 100;
 
     public static final float OVERLAND_ENEMY_Y = 0f;
     public static final float FLYING_ENEMY_Y = 2.6f;
@@ -71,9 +86,10 @@ public class Constants {
     public static final String GROUND_IMAGE_PATH = "ground.png";
     public static final String CHARACTERS_ATLAS_PATH = "characters.atlas";
     public static final String [] RUNNER_RUNNING_REGION_NAMES = new String []
-            {"alienGreen_run1", "alienGreen_run2"};
-    public static final String RUNNER_HIT_REGION_NAME = "alienGreen_hit";
-    public static final String RUNNER_JUMPING_REGION_NAME = "alienGreen_jump";
+            {"monk_run1", "monk_run2"};
+    public static final String RUNNER_HIT_REGION_NAME = "monk_hit";
+    public static final String RUNNER_JUMPING_REGION_NAME = "monk_jump";
+    public static final String RUNNER_STRIKING_REGION_NAME = "monk_kick";
 
     public static final String [] RUNNING_SMALL_ENEMY_REGION_NAMES = new String []
             {"ladyBug_walk1", "ladyBug_walk2"};
@@ -87,4 +103,10 @@ public class Constants {
             {"bee_fly1", "bee_fly2"};
     public static final String [] FLYING_WIDE_ENEMY_REGION_NAMES = new String[]
             {"fly_fly1", "fly_fly2"};
+
+    public static final String [] ENEMY1_REGION_NAMES = new String []
+            {"enemy1_run1", "enemy1_run2"};
+
+    public static final String BUTTON_MENU_ON = "button_on";
+    public static final String BUTTON_MENU_OFF = "button_off";
 }

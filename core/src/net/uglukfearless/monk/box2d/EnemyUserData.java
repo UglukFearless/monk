@@ -29,6 +29,14 @@ public class EnemyUserData extends UserData {
     private boolean jumping;
     private boolean doll;
 
+    private float scaleX;
+    private float scaleY;
+    private float offsetX;
+    private float offsetY;
+
+    //временное
+    public boolean atlas;
+
     public EnemyUserData(EnemyType type) {
         super(type.getWidth(), type.getHeight());
         userDataType = UserDataType.ENEMY;
@@ -48,6 +56,13 @@ public class EnemyUserData extends UserData {
         dead = false;
         jumping = false;
         doll = false;
+
+        scaleX = type.getTextureScaleX();
+        scaleY = type.getTextureScaleY();
+        offsetX = type.getTextureOffsetX();
+        offsetY = type.getTextureOffsetY();
+
+        atlas = type.isNewAtlas();
     }
 
     public Vector2 getLinearVelocity() {
@@ -148,5 +163,37 @@ public class EnemyUserData extends UserData {
 
     public void setDoll(boolean doll) {
         this.doll = doll;
+    }
+
+    public float getScaleX() {
+        return scaleX;
+    }
+
+    public void setScaleX(float scaleX) {
+        this.scaleX = scaleX;
+    }
+
+    public float getScaleY() {
+        return scaleY;
+    }
+
+    public void setScaleY(float scaleY) {
+        this.scaleY = scaleY;
+    }
+
+    public float getOffsetX() {
+        return offsetX;
+    }
+
+    public void setOffsetX(float offsetX) {
+        this.offsetX = offsetX;
+    }
+
+    public float getOffsetY() {
+        return offsetY;
+    }
+
+    public void setOffsetY(float offsetY) {
+        this.offsetY = offsetY;
     }
 }
