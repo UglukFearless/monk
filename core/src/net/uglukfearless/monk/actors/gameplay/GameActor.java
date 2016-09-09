@@ -13,7 +13,6 @@ public abstract class GameActor extends Actor {
 
     protected Body body;
     protected UserData userData;
-//    protected int zLayout = 0;
 
 
     public GameActor(Body body) {

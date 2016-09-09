@@ -3,8 +3,10 @@ package net.uglukfearless.monk.enums;
 import com.badlogic.gdx.math.Vector2;
 
 import net.uglukfearless.monk.constants.Constants;
-import net.uglukfearless.monk.utils.Danger;
+import net.uglukfearless.monk.utils.gameplay.Danger;
 import net.uglukfearless.monk.constants.PlacingCategory;
+
+import java.util.Random;
 
 
 /**
@@ -12,39 +14,45 @@ import net.uglukfearless.monk.constants.PlacingCategory;
  */
 public enum EnemyType implements Danger {
 
-    RUNNING_SMALL(1.3f,3f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
-            Constants.ENEMY1_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 1,
-            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
-            Constants.DANGERS_PRIORITY_VERY_OFTEN, true,1.8f, 1.1f,-0.2f,0),
-    RUNNING_WIDE(2f,1f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
-            Constants.RUNNING_WIDE_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 1,
-            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
-            Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0),
-    RUNNING_LONG(1f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
-            Constants.RUNNING_LONG_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 1,
-            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
-            Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0),
-    RUNNING_BIG(2f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
-            Constants.RUNNING_BIG_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 1,
-            false, true, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
-            Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0),
-    FLYING_SMALL(1f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
+    ENEMY_1(1.3f,3f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
+            Constants.ENEMY1_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
+            false, true, false, true, Constants.ENEMY_JUMPING_COFF,
+            Constants.DANGERS_PRIORITY_OFTEN, true,1.8f, 1.1f,-0.2f,0, 1),
+
+    ENEMY_2(1.5f,3.2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
+            Constants.RUNNING_WIDE_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
+            false, true, true, true, Constants.ENEMY_JUMPING_COFF,
+            Constants.DANGERS_PRIORITY_OFTEN, true,1.43f, 1.05f,0,0, 2),
+
+    ENEMY_3(1f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
+            Constants.RUNNING_LONG_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
+            false, false, false, true, Constants.ENEMY_JUMPING_COFF,
+            Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0, 3),
+
+    ENEMY_4(2f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
+            Constants.RUNNING_BIG_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
+            false, false, false, true, Constants.ENEMY_JUMPING_COFF,
+            Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0, 4),
+
+    ENEMY_5(1f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.FLYING_SMALL_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 0,
-            false, false, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
-            Constants.DANGERS_PRIORITY_VERY_SELDOM, false,1.2f, 1.1f,0,0),
-    FLYING_WIDE(2f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
+            false, false, false, true, Constants.ENEMY_JUMPING_COFF,
+            Constants.DANGERS_PRIORITY_VERY_SELDOM, false,1.2f, 1.1f,0,0, 5),
+
+    ENEMY_6(2f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.FLYING_WIDE_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 0,
-            false, false, false, false, Constants.ENEMY_JUMPING_LINEAR_IMPULSE,
-            Constants.DANGERS_PRIORITY_VERY_SELDOM, false,1.2f, 1.1f,0,0);
+            false, false, false, true, Constants.ENEMY_JUMPING_COFF,
+            Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0, 6);
+
+    private Random rand = new Random();
 
     private float width;
     private float height;
-    private float x;
     private float y;
     private float density;
     private String [] regions;
     private Vector2 linearVelocity;
-    private Vector2 jumpingImpulse;
+    private float jumpingImpulse;
     private int gravityScale;
     private boolean armour;
     private boolean jumper;
@@ -60,14 +68,17 @@ public enum EnemyType implements Danger {
     public short[][] prohibitionsMap = new short[2][2];
     public int priority = Constants.DANGERS_PRIORITY_NEVER;
 
+    private int mCurrentPriority = 0;
+
     //временное
     private boolean newAtlas = false;
+    public int number = 0;
 
 
     EnemyType(float width, float height, float y,  float density, String [] regions
             , Vector2 linearVelocity, int gravityScale, boolean armour, boolean jumper,
-              boolean shouter, boolean striker, Vector2 jumpingImpulse, int prior, boolean newAtlas,
-                float scaleX, float scaleY, float offsetX, float offsetY) {
+              boolean shouter, boolean striker, float jumpingImpulse, int prior, boolean newAtlas,
+                float scaleX, float scaleY, float offsetX, float offsetY, int number) {
         setupProhibitionMap();
         this.density = density;
         this.y = y;
@@ -107,12 +118,22 @@ public enum EnemyType implements Danger {
 
         //временное
         this.newAtlas = newAtlas;
+        this.number = number;
     }
 
     private void setupProhibitionMap() {
         prohibitionsMap[0][1] = PlacingCategory.CATEGORY_PLACING_ENEMY_OVERLAND
                 | PlacingCategory.CATEGORY_PLACING_OBSTACLE_OVERLAND;
     }
+
+    public void calcPriority() {
+        mCurrentPriority = ((rand.nextInt(priority)));
+    }
+
+    public int getCurrentPriority() {
+        return mCurrentPriority;
+    }
+
 
     @Override
     public int getPriority() {
@@ -140,10 +161,6 @@ public enum EnemyType implements Danger {
 
     public float getHeight() {
         return height;
-    }
-
-    public float getX() {
-        return x;
     }
 
     public float getY() {
@@ -188,7 +205,7 @@ public enum EnemyType implements Danger {
     }
 
 
-    public Vector2 getJumpingImpulse() {
+    public float getJumpingImpulse() {
         return jumpingImpulse;
     }
 

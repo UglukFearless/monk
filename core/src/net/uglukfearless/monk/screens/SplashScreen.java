@@ -7,7 +7,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import net.uglukfearless.monk.RunningMonk;
-import net.uglukfearless.monk.utils.AssetLoader;
+import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.SoundSystem;
 import net.uglukfearless.monk.utils.fortween.SpriteAccessor;
 
 import aurelienribon.tweenengine.BaseTween;
@@ -36,7 +37,7 @@ public class SplashScreen implements Screen {
 
     @Override
     public void show() {
-        AssetLoader.logoSound.play();
+        AssetLoader.logoSound.play(SoundSystem.getSoundValue());
 
         mSprite = new Sprite(AssetLoader.logoPicture);
         mSprite.setColor(1,1,1,0);
@@ -62,7 +63,7 @@ public class SplashScreen implements Screen {
             @Override
             public void onEvent(int type, BaseTween<?> source) {
                 mSplashScreen.dispose();
-                mGame.setScreen(new MainMenu(mGame));
+                mGame.setScreen(new MainMenuScreen(mGame));
             }
         };
 

@@ -1,51 +1,88 @@
 package net.uglukfearless.monk.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.enums.GameState;
+import net.uglukfearless.monk.stages.GameGuiStage;
 import net.uglukfearless.monk.stages.GameStage;
-import net.uglukfearless.monk.utils.AssetLoader;
-import net.uglukfearless.monk.utils.ScoreCounter;
+import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.ScoreCounter;
+import net.uglukfearless.monk.utils.file.SoundSystem;
 
 /**
  * Created by Ugluk on 17.05.2016.
  */
-public class GameScreen implements Screen{
+public class GameScreen implements Screen {
 
-    private Stage stage;
+    private GameStage mGameStage;
     private float mYViewportHeight;
+    private Game mGame;
+    private GameGuiStage mGuiStage;
 
-    public GameScreen() {
+    InputMultiplexer mMultiplexer;
+
+    public GameScreen(Game game) {
         AssetLoader.init();
         mYViewportHeight = Constants.GAME_WIDTH / ((float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight());
-        stage = new GameStage(this, mYViewportHeight);
-        AssetLoader.levelOneMusic.setLooping(true);
-        AssetLoader.levelOneMusic.setVolume(0.1f);
-        AssetLoader.levelOneMusic.play();
+        ScoreCounter.resetStats();
+        mGameStage = new GameStage(this, mYViewportHeight);
+        mGame = game;
+        mGuiStage = new GameGuiStage(this, mGameStage, mYViewportHeight*(Constants.APP_WIDTH/Constants.GAME_WIDTH));
+
+        mMultiplexer = new InputMultiplexer();
+        mMultiplexer.addProcessor(new InputAdapter(){
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                System.out.println("click regist");
+                return super.touchDown(screenX, screenY, pointer, button);
+            }
+        });
+        mMultiplexer.addProcessor(mGuiStage);
+        mMultiplexer.addProcessor(mGameStage);
+
+        Gdx.input.setInputProcessor(mMultiplexer);
     }
 
     @Override
     public void show() {
-
+        AssetLoader.levelOneMusic.setVolume(SoundSystem.getMusicValue());
+        SoundSystem.registrationMusic(AssetLoader.levelOneMusic);
+        AssetLoader.levelOneMusic.setLooping(true);
+        AssetLoader.levelOneMusic.play();
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0,0,0,1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        stage.draw();
-        stage.act(delta);
+        mGameStage.getViewport().apply();
+        mGameStage.draw();
+        mGameStage.act(delta);
+
+        mGuiStage.getViewport().apply();
+        mGuiStage.draw();
+        mGuiStage.act(delta);
 
     }
 
     public void newGame() {
-        ScoreCounter.resetScore();
-        stage.dispose();
-        stage = new GameStage(this, mYViewportHeight);
+        ScoreCounter.saveCalcStats();
+        ScoreCounter.resetStats();
+        ScoreCounter.getNewAchieve().clear();
+        mMultiplexer.removeProcessor(mGameStage);
+        mGameStage.dispose();
+        mGameStage = new GameStage(this, mYViewportHeight);
+        mMultiplexer.addProcessor(mGuiStage);
+        mMultiplexer.addProcessor(mGameStage);
+        Gdx.input.setInputProcessor(mMultiplexer);
+        mGuiStage.setGameStage(mGameStage);
     }
 
     @Override
@@ -71,7 +108,18 @@ public class GameScreen implements Screen{
     @Override
     public void dispose() {
         AssetLoader.levelOneMusic.stop();
+        SoundSystem.removeMusic(AssetLoader.levelOneMusic);
         AssetLoader.dispose();
+        if (((GameStage) mGameStage).getState()== GameState.RUN) {
+            ScoreCounter.saveCalcStats();
+            ScoreCounter.checkAchieve();
+            ScoreCounter.resetStats();
+        }
         System.out.print("GameScreenDispose");
+    }
+
+    public void setMenu() {
+        this.dispose();
+        mGame.setScreen(new MainMenuScreen(mGame));
     }
 }

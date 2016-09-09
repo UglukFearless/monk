@@ -10,24 +10,17 @@ import net.uglukfearless.monk.enums.UserDataType;
  */
 public class EnemyUserData extends UserData {
 
-    private Vector2 jumpingImpulse;
+
     private Vector2 linearVelocity;
-    private String[] textureRegions;
 
     private int gravityScale;
-
-    private float density;
-    private float basicY;
-
-    private boolean armour;
-    private boolean jumper;
-    private boolean shouter;
-    private boolean striker;
 
 
     private boolean dead;
     private boolean jumping;
     private boolean doll;
+    private boolean mStrike;
+    private boolean mShoot;
 
     private float scaleX;
     private float scaleY;
@@ -36,26 +29,24 @@ public class EnemyUserData extends UserData {
 
     //временное
     public boolean atlas;
+    public EnemyType  enemyType;
+
 
     public EnemyUserData(EnemyType type) {
         super(type.getWidth(), type.getHeight());
         userDataType = UserDataType.ENEMY;
-        this.textureRegions = type.getRegions();
+
+        width = type.getWidth();
+        height = type.getHeight();
+
         linearVelocity = type.getLinearVelocity();
-        jumpingImpulse = type.getJumpingImpulse();
         gravityScale = type.getGravityScale();
-
-        density = type.getDensity();
-        basicY = type.getY();
-
-        armour = type.isArmour();
-        jumper = type.isJumper();
-        shouter = type.isShouter();
-        striker = type.isStriker();
 
         dead = false;
         jumping = false;
         doll = false;
+        mStrike = false;
+        mShoot = false;
 
         scaleX = type.getTextureScaleX();
         scaleY = type.getTextureScaleY();
@@ -63,6 +54,7 @@ public class EnemyUserData extends UserData {
         offsetY = type.getTextureOffsetY();
 
         atlas = type.isNewAtlas();
+        this.enemyType = type;
     }
 
     public Vector2 getLinearVelocity() {
@@ -74,7 +66,7 @@ public class EnemyUserData extends UserData {
     }
 
     public String[] getTextureRegions() {
-        return textureRegions;
+        return enemyType.getRegions();
     }
 
     public boolean isDead() {
@@ -93,12 +85,8 @@ public class EnemyUserData extends UserData {
         this.jumping = jumping;
     }
 
-    public Vector2 getJumpingImpulse() {
-        return jumpingImpulse;
-    }
-
-    public void setJumpingImpulse(Vector2 jumpingImpulse) {
-        this.jumpingImpulse = jumpingImpulse;
+    public float getJumpingImpulse() {
+        return enemyType.getJumpingImpulse();
     }
 
     public int getGravityScale() {
@@ -110,52 +98,30 @@ public class EnemyUserData extends UserData {
     }
 
     public float getDensity() {
-        return density;
-    }
-
-    public void setDensity(float density) {
-        this.density = density;
+        return enemyType.getDensity();
     }
 
     public float getBasicY() {
-        return basicY;
-    }
-
-    public void setBasicY(float basicY) {
-        this.basicY = basicY;
+        return enemyType.getY();
     }
 
     public boolean isArmour() {
-        return armour;
-    }
-
-    public void setArmour(boolean armour) {
-        this.armour = armour;
+        return enemyType.isArmour();
     }
 
     public boolean isJumper() {
-        return jumper;
-    }
-
-    public void setJumper(boolean jumper) {
-        this.jumper = jumper;
+        return enemyType.isJumper();
     }
 
     public boolean isShouter() {
-        return shouter;
+        return enemyType.isShouter();
     }
 
-    public void setShouter(boolean shouter) {
-        this.shouter = shouter;
-    }
 
     public boolean isStriker() {
-        return striker;
+        return enemyType.isStriker();
     }
 
-    public void setStriker(boolean striker) {
-        this.striker = striker;
-    }
 
     public boolean isDoll() {
         return doll;
@@ -195,5 +161,21 @@ public class EnemyUserData extends UserData {
 
     public void setOffsetY(float offsetY) {
         this.offsetY = offsetY;
+    }
+
+    public void setStrike(boolean strike) {
+        mStrike = strike;
+    }
+
+    public boolean isStrike() {
+        return mStrike;
+    }
+
+    public boolean isShoot() {
+        return mShoot;
+    }
+
+    public void setShoot(boolean shoot) {
+        mShoot = shoot;
     }
 }

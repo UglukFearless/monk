@@ -1,15 +1,15 @@
 package net.uglukfearless.monk.listeners.baction;
 
-import net.uglukfearless.monk.screens.MainMenu;
+import net.uglukfearless.monk.screens.MainMenuScreen;
 
 /**
  * Created by Ugluk on 05.08.2016.
  */
 public class MenuPlayAction implements ButtonAction {
 
-    MainMenu mScreen;
+    MainMenuScreen mScreen;
 
-    public MenuPlayAction(MainMenu screen) {
+    public MenuPlayAction(MainMenuScreen screen) {
         mScreen = screen;
     }
 

@@ -3,23 +3,30 @@ gui_exp.png
 format: RGBA4444
 filter: Linear,Linear
 repeat: none
+slider
+  rotate: false
+  xy: 1, 61
+  size: 366, 58
+  orig: 366, 58
+  offset: 0, 0
+  index: -1
 back_off
   rotate: false
-  xy: 1, 1
+  xy: 369, 14
   size: 148, 105
   orig: 148, 105
   offset: 0, 0
   index: -1
 back_on
   rotate: false
-  xy: 151, 1
+  xy: 519, 14
   size: 148, 105
   orig: 148, 105
   offset: 0, 0
   index: -1
 button_off
   rotate: false
-  xy: 301, 62
+  xy: 1, 15
   size: 120, 44
   split: 9, 10, 9, 11
   orig: 120, 44
@@ -27,7 +34,7 @@ button_off
   index: -1
 button_on
   rotate: false
-  xy: 301, 16
+  xy: 669, 75
   size: 120, 44
   split: 9, 10, 9, 10
   orig: 120, 44
@@ -35,15 +42,22 @@ button_on
   index: -1
 radio_check
   rotate: false
-  xy: 423, 42
+  xy: 669, 9
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 radio_off
   rotate: false
-  xy: 489, 42
+  xy: 735, 9
   size: 64, 64
   orig: 64, 64
+  offset: 0, 0
+  index: -1
+knob
+  rotate: false
+  xy: 123, 1
+  size: 58, 58
+  orig: 58, 58
   offset: 0, 0
   index: -1

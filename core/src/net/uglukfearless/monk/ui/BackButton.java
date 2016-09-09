@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import net.uglukfearless.monk.screens.MainMenu;
+import net.uglukfearless.monk.screens.MainMenuScreen;
 
 /**
  * Created by Ugluk on 08.08.2016.
@@ -14,9 +14,9 @@ import net.uglukfearless.monk.screens.MainMenu;
 
 public class BackButton extends Button {
 
-   MainMenu mScreen;
+   MainMenuScreen mScreen;
 
-    public BackButton(Skin skin, MainMenu screen) {
+    public BackButton(Skin skin, MainMenuScreen screen) {
         super(skin, "back");
         this.mScreen = screen;
 

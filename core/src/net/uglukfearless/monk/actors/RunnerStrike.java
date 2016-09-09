@@ -2,13 +2,14 @@ package net.uglukfearless.monk.actors;
 
 import com.badlogic.gdx.physics.box2d.Body;
 
+import net.uglukfearless.monk.actors.gameplay.GameActor;
 import net.uglukfearless.monk.box2d.RunnerStrikeUserData;
 import net.uglukfearless.monk.constants.Constants;
 
 /**
  * Created by Ugluk on 01.06.2016.
  */
-public class RunnerStrike extends net.uglukfearless.monk.actors.gameplay.GameActor {
+public class RunnerStrike extends GameActor {
 
     private Runner runner;
 

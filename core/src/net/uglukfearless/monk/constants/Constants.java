@@ -3,6 +3,8 @@ package net.uglukfearless.monk.constants;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.HashMap;
+
 /**
  * Created by Ugluk on 17.05.2016.
  */
@@ -12,17 +14,25 @@ public class Constants {
     public static final int GAME_WIDTH = 25;
     public static final int GAME_HEIGHT = APP_HEIGHT/(APP_WIDTH/GAME_WIDTH);
 
+
     public static final int BUTTON_MENU_WIDTH = 160;
     public static final int BUTTON_MENU_HEIGHT = 90;
 
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
     public static final Vector2 WORLD_STATIC_VELOCITY = new Vector2(-15f,0);
+    public static final Vector2 NULL_VELOCITY = new Vector2(0, 0);
+    public static final float BACKGROUND_VELOCITY_COFF = 0.67f;
 
     public static final int BACKGROUND_OFFSET_Y = 0;
 
+    public static final float BACKGROUND_WIDTH = 50;
+    public static final float BACKGROUND_HEIGHT = 13;
+    public static final float BACKGROUND_X = BACKGROUND_WIDTH/2;
+    public static final float BACKGROUND_Y = BACKGROUND_HEIGHT/2;
+
     public static final float GROUND_X = 0;
     public static final float GROUND_Y = 0;
-    public static final float GROUND_WIDTH = 36f;
+    public static final float GROUND_WIDTH = 38f;
     public static final float GROUND_HEIGHT = 6f;
     public static final float GROUND_DENSITY = 10f;
     public static final Vector2 GROUND_LINEAR_VELOCITY = WORLD_STATIC_VELOCITY;
@@ -30,6 +40,10 @@ public class Constants {
     public static final int PRIORITY_GROUND = 15;
     public static final int PRIORITY_PIT = 20;
     public static final int PRIORITY_COLUMNS = 12;
+
+//    public static final int PRIORITY_GROUND = 1;
+//    public static final int PRIORITY_PIT = 0;
+//    public static final int PRIORITY_COLUMNS = 0;
 
     public static final float COLUMNS_Y = GROUND_Y + 2;
     public static final float COLUMNS_WIDTH = 1f;
@@ -53,16 +67,17 @@ public class Constants {
     public static final float RUNNER_DENSITY = 0.5f;
     public static final float RUNNER_GRAVITY_SCALE = 5f;
     public static final Vector2 RUNNER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 40f);
+    public static final Vector2 RUNNER_JUMPING_LINEAR_IMPULSE_ONE = new Vector2(0, 50f);
     public static final float RUNNER_HIT_ANGULAR_IMPULSE = 20f;
 
     public static final float DANDER_X = 25f;
 
     public static final int DANGERS_PRIORITY_NEVER = 0;
-    public static final int DANGERS_PRIORITY_VERY_SELDOM = 1;
-    public static final int DANGERS_PRIORITY_SELDOM = 3;
-    public static final int DANGERS_PRIORITY_NORMAL = 6;
-    public static final int DANGERS_PRIORITY_OFTEN = 12;
-    public static final int DANGERS_PRIORITY_VERY_OFTEN = 18;
+    public static final int DANGERS_PRIORITY_VERY_SELDOM = 3;
+    public static final int DANGERS_PRIORITY_SELDOM = 5;
+    public static final int DANGERS_PRIORITY_NORMAL = 7;
+    public static final int DANGERS_PRIORITY_OFTEN = 9;
+    public static final int DANGERS_PRIORITY_VERY_OFTEN = 11;
 
 //    public static final int DANGERS_PRIORITY_NEVER = 0;
 //    public static final int DANGERS_PRIORITY_VERY_SELDOM = 0;
@@ -77,8 +92,8 @@ public class Constants {
     public static final float OVERLAND_ENEMY_Y = 0f;
     public static final float FLYING_ENEMY_Y = 2.6f;
     public static final float ENEMY_DENSITY = RUNNER_DENSITY;
-    public static final Vector2 ENEMY_LINEAR_VELOCITY = new Vector2(-20f,0);
-    public static final Vector2 ENEMY_JUMPING_LINEAR_IMPULSE = new Vector2(0, 15f);;
+    public static final Vector2 ENEMY_LINEAR_VELOCITY = new Vector2(-25f,0);
+    public static final float ENEMY_JUMPING_COFF = 8f;
 
     public static final float LUMP_GRAVITY_SCALE = 5f;
 
@@ -107,6 +122,16 @@ public class Constants {
     public static final String [] ENEMY1_REGION_NAMES = new String []
             {"enemy1_run1", "enemy1_run2"};
 
+    public static final String [] ENEMY_ANIMATION_GROUP_NAMES = new String[]
+            {"_stay", "_run", "_jump", "_strike", "_hit"};
+
+    public static final String [] ACHIEVE_NAMES = new String []
+            {"mushroom", "hands_in_blood",
+            "neophyte_kung_fu", "adept_kung_fu", "master_kung_fu",
+            "neophyte_tamesivari", "adept_tamesivari", "master_tamesivari",
+            "mortal", "bound_in_flesh", "wheel_of_samsara", "lock"};
+
     public static final String BUTTON_MENU_ON = "button_on";
     public static final String BUTTON_MENU_OFF = "button_off";
+
 }

@@ -50,4 +50,5 @@ public abstract class UserData {
     public void setDestroy(boolean destroy) {
         this.destroy = destroy;
     }
+
 }

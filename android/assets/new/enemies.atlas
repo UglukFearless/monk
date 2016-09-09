@@ -5,15 +5,62 @@ filter: Linear,Linear
 repeat: none
 enemy1_run1
   rotate: false
-  xy: 1, 1
+  xy: 1, 531
   size: 327, 407
   orig: 327, 407
   offset: 0, 0
   index: -1
 enemy1_run2
   rotate: false
-  xy: 330, 1
+  xy: 1, 122
   size: 327, 407
   orig: 327, 407
+  offset: 0, 0
+  index: -1
+enemy2_hit1
+  rotate: false
+  xy: 330, 531
+  size: 283, 407
+  orig: 283, 407
+  offset: 0, 0
+  index: -1
+enemy2_jump1
+  rotate: false
+  xy: 330, 122
+  size: 283, 407
+  orig: 283, 407
+  offset: 0, 0
+  index: -1
+enemy2_run1
+  rotate: false
+  xy: 615, 531
+  size: 283, 407
+  orig: 283, 407
+  offset: 0, 0
+  index: -1
+enemy2_run2
+  rotate: false
+  xy: 615, 122
+  size: 283, 407
+  orig: 283, 407
+  offset: 0, 0
+  index: -1
+enemy2_shell
+  rotate: false
+  xy: 1, 1
+  size: 105, 119
+  orig: 105, 119
+  offset: 0, 0
+  index: -1
+
+enemies2.png
+format: RGBA4444
+filter: Linear,Linear
+repeat: none
+enemy2_strike1
+  rotate: false
+  xy: 1, 1
+  size: 283, 407
+  orig: 283, 407
   offset: 0, 0
   index: -1

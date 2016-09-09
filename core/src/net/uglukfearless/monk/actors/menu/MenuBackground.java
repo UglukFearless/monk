@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import net.uglukfearless.monk.constants.Constants;
-import net.uglukfearless.monk.utils.AssetLoader;
+import net.uglukfearless.monk.utils.file.AssetLoader;
 
 /**
  * Created by Ugluk on 30.06.2016.

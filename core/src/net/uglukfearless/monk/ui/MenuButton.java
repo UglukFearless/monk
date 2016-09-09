@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 
 import net.uglukfearless.monk.listeners.baction.ButtonAction;
-import net.uglukfearless.monk.utils.AssetLoader;
+import net.uglukfearless.monk.utils.file.AssetLoader;
 
 /**
  * Created by Ugluk on 05.08.2016.

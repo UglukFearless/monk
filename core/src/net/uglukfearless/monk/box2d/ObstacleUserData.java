@@ -10,45 +10,43 @@ import net.uglukfearless.monk.enums.UserDataType;
  */
 public class ObstacleUserData extends UserData {
 
-    private float width;
-    private float height;
-    private float x;
-    private float y;
-    private float density;
-    private String [] regions;
     private Vector2 linearVelocity;
     private int gravityScale;
 
-    private boolean armour;
-    private boolean isTrap;
-    private boolean isSphere;
     private final boolean isBlades;
 
     private boolean dead;
 
+    private float scaleX;
+    private float scaleY;
+    private float offsetX;
+    private float offsetY;
+
+    public ObstacleType  obstacleType;
+
     public ObstacleUserData(ObstacleType type) {
         width = type.getWidth();
         height = type.getHeight();
-        x = type.getX();
-        y = type.getY();
 
-        density = type.getDensity();
         linearVelocity = type.getLinearVelocity();
         gravityScale = type.getGravityScale();
 
-        regions = type.getRegions();
-
-        armour = type.isArmour();
-        isTrap = type.isTrap();
-        isSphere = type.isSphere();
 
         userDataType = UserDataType.OBSTACLE;
 
+        //С этим нужно что-то сделать
         if (type==ObstacleType.BLADES) {
             isBlades=true;
         } else {
             isBlades=false;
         }
+
+        scaleX = type.getTextureScaleX();
+        scaleY = type.getTextureScaleY();
+        offsetX = type.getTextureOffsetX();
+        offsetY = type.getTextureOffsetY();
+
+        obstacleType = type;
     }
 
     @Override
@@ -71,37 +69,21 @@ public class ObstacleUserData extends UserData {
         this.height = height;
     }
 
-    public float getX() {
-        return x;
-    }
-
-    public void setX(float x) {
-        this.x = x;
-    }
 
     public float getY() {
-        return y;
+        return obstacleType.getY();
     }
 
-    public void setY(float y) {
-        this.y = y;
-    }
 
     public float getDensity() {
-        return density;
+        return obstacleType.getDensity();
     }
 
-    public void setDensity(float density) {
-        this.density = density;
-    }
 
     public String[] getRegions() {
-        return regions;
+        return obstacleType.getRegions();
     }
 
-    public void setRegions(String[] regions) {
-        this.regions = regions;
-    }
 
     public Vector2 getLinearVelocity() {
         return linearVelocity;
@@ -120,28 +102,18 @@ public class ObstacleUserData extends UserData {
     }
 
     public boolean isArmour() {
-        return armour;
-    }
-
-    public void setArmour(boolean armour) {
-        this.armour = armour;
+        return obstacleType.isArmour();
     }
 
     public boolean isTrap() {
-        return isTrap;
+        return obstacleType.isTrap();
     }
 
-    public void setIsTrap(boolean isTrap) {
-        this.isTrap = isTrap;
-    }
 
     public boolean isSphere() {
-        return isSphere;
+        return obstacleType.isSphere();
     }
 
-    public void setIsSphere(boolean isSphere) {
-        this.isSphere = isSphere;
-    }
 
     public boolean isDead() {
         return dead;
@@ -153,5 +125,37 @@ public class ObstacleUserData extends UserData {
 
     public boolean isBlades() {
         return isBlades;
+    }
+
+    public float getScaleX() {
+        return scaleX;
+    }
+
+    public void setScaleX(float scaleX) {
+        this.scaleX = scaleX;
+    }
+
+    public float getScaleY() {
+        return scaleY;
+    }
+
+    public void setScaleY(float scaleY) {
+        this.scaleY = scaleY;
+    }
+
+    public float getOffsetX() {
+        return offsetX;
+    }
+
+    public void setOffsetX(float offsetX) {
+        this.offsetX = offsetX;
+    }
+
+    public float getOffsetY() {
+        return offsetY;
+    }
+
+    public void setOffsetY(float offsetY) {
+        this.offsetY = offsetY;
     }
 }
