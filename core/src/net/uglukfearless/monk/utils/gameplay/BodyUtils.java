@@ -20,18 +20,19 @@ public class BodyUtils {
             case RUNNER:
             case OBSTACLE:
             case COLUMNS:
-                return (body.getPosition().x + userData.getWidth()/2 > 0)
-                        &&(body.getPosition().y + userData.getHeight()/2 > 0);
+                return (body.getPosition().x + userData.getWidth()/2f > 0)
+                        &&(body.getPosition().y + userData.getHeight()/2f > 0);
             case LUMP:
-                return (body.getPosition().x + userData.getWidth()/2 + 4 > 0)
-                        &&(body.getPosition().y + userData.getHeight()/2 > 0);
+                return (body.getPosition().x + userData.getWidth()/2f + 4f > 0)
+                        &&(body.getPosition().y + userData.getHeight()/2f > 0);
             case GROUND:
             case PIT:
-                return (body.getPosition().x + userData.getWidth()/2 > 0);
+                return (body.getPosition().x + userData.getWidth()/2f > 0);
+            case RUNNER_STRIKE:
             case SHELL:
-                return (body.getPosition().x + userData.getWidth()/2 > 0
-                        &&body.getPosition().x - userData.getWidth()/2 < Constants.GAME_WIDTH + 5
-                        &&body.getPosition().y + userData.getHeight()/2 > 0);
+                return (body.getPosition().x + userData.getWidth()/2f > 0
+                        &&body.getPosition().x - userData.getWidth()/2f < Constants.GAME_WIDTH + 5f
+                        &&body.getPosition().y + userData.getHeight()/2f > 0);
         }
 
         return true;
@@ -90,4 +91,11 @@ public class BodyUtils {
 
         return userData != null && userData.getUserDataType() == UserDataType.SHELL;
     }
+
+    public static boolean bodyIsBuddha(Body body) {
+        UserData userData = (UserData) body.getUserData();
+
+        return userData != null && userData.getUserDataType() == UserDataType.BUDDHA;
+    }
+
 }

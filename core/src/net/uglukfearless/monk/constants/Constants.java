@@ -41,9 +41,9 @@ public class Constants {
     public static final int PRIORITY_PIT = 20;
     public static final int PRIORITY_COLUMNS = 12;
 
-//    public static final int PRIORITY_GROUND = 1;
+//    public static final int PRIORITY_GROUND = 0;
 //    public static final int PRIORITY_PIT = 0;
-//    public static final int PRIORITY_COLUMNS = 0;
+//    public static final int PRIORITY_COLUMNS = 1;
 
     public static final float COLUMNS_Y = GROUND_Y + 2;
     public static final float COLUMNS_WIDTH = 1f;
@@ -67,7 +67,7 @@ public class Constants {
     public static final float RUNNER_DENSITY = 0.5f;
     public static final float RUNNER_GRAVITY_SCALE = 5f;
     public static final Vector2 RUNNER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 40f);
-    public static final Vector2 RUNNER_JUMPING_LINEAR_IMPULSE_ONE = new Vector2(0, 50f);
+    public static final Vector2 RUNNER_JUMPING_LINEAR_IMPULSE_ONE = new Vector2(0, 65f);
     public static final float RUNNER_HIT_ANGULAR_IMPULSE = 20f;
 
     public static final float DANDER_X = 25f;
@@ -92,10 +92,12 @@ public class Constants {
     public static final float OVERLAND_ENEMY_Y = 0f;
     public static final float FLYING_ENEMY_Y = 2.6f;
     public static final float ENEMY_DENSITY = RUNNER_DENSITY;
-    public static final Vector2 ENEMY_LINEAR_VELOCITY = new Vector2(-25f,0);
+    public static final float ENEMY_LINEAR_VELOCITY =  -10f;
     public static final float ENEMY_JUMPING_COFF = 8f;
 
     public static final float LUMP_GRAVITY_SCALE = 5f;
+
+    public static final float BONUS_RADIUS = 1f;
 
     public static final String BACKGROUND_IMAGE_PATH = "background.png";
     public static final String GROUND_IMAGE_PATH = "ground.png";
@@ -133,5 +135,4 @@ public class Constants {
 
     public static final String BUTTON_MENU_ON = "button_on";
     public static final String BUTTON_MENU_OFF = "button_off";
-
 }

@@ -13,5 +13,6 @@ public enum UserDataType {
     OBSTACLE,
     PIT,
     SHELL,
+    BUDDHA,
     COLUMNS
 }

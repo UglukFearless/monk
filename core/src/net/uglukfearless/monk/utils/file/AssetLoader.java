@@ -3,17 +3,20 @@ package net.uglukfearless.monk.utils.file;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.I18NBundle;
 
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Created by Ugluk on 13.06.2016.
@@ -32,13 +35,8 @@ public class AssetLoader {
     public static TextureAtlas monkAtlas;
     public static TextureAtlas guiAtlas;
     public static TextureAtlas achieveAtlas;
+    public static TextureAtlas bonusesAtlas;
     public static TextureAtlas lumpsAtlas;
-
-//    public static Animation playerRun;
-//    public static TextureRegion [] playerFrames;
-//    public static TextureRegion playerJump;
-//    public static TextureRegion playerHit;
-//    public static TextureRegion playerStrike;
 
     public static Animation playerStay;
     public static Animation playerRun;
@@ -46,6 +44,7 @@ public class AssetLoader {
     public static Animation playerJump;
     public static Animation playerHit;
     public static Animation playerStrike;
+    public static Texture playerShell;
 
     public static Texture stoneTexture;
     public static TextureRegion stone;
@@ -77,8 +76,28 @@ public class AssetLoader {
     public static Sound logoSound;
 
     public static Sound monkStrike;
+    public static Sound getBonus;
+    public static Sound balanceBonus;
+    public static Sound retributionBonus;
 
-    public static void init() {
+    public static I18NBundle sBundle;
+
+    public static void initBundle() {
+        FileHandle baseFileHandle = Gdx.files.internal("i18n/Bundle");
+        if (PreferencesManager.getLanguage()=="") {
+            sBundle = I18NBundle.createBundle(baseFileHandle);
+            PreferencesManager.setLanguage(Locale.getDefault().getLanguage());
+        } else {
+            sBundle = I18NBundle.createBundle(baseFileHandle, new Locale(PreferencesManager.getLanguage()));
+        }
+    }
+
+    public static void changeLanguage() {
+        FileHandle baseFileHandle = Gdx.files.internal("i18n/Bundle");
+        sBundle = I18NBundle.createBundle(baseFileHandle, new Locale(PreferencesManager.getLanguage()));
+    }
+
+    public static void initGame() {
 
         backgroundTexture = new Texture(Gdx.files.internal(Constants.BACKGROUND_IMAGE_PATH));
         background = new TextureRegion(backgroundTexture);
@@ -89,16 +108,8 @@ public class AssetLoader {
         enemiesAtlas = new TextureAtlas(Gdx.files.internal("new/enemies.atlas"));
         monkAtlas = new TextureAtlas(Gdx.files.internal("new/monk.atlas"));
         achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
+        bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
         lumpsAtlas = new TextureAtlas(Gdx.files.internal("lumps.atlas"));
-
-//        playerFrames = new TextureRegion[Constants.RUNNER_RUNNING_REGION_NAMES.length];
-//        for (int i=0;i< Constants.RUNNER_RUNNING_REGION_NAMES.length;i++) {
-//            playerFrames[i] = monkAtlas.findRegion(Constants.RUNNER_RUNNING_REGION_NAMES[i]);
-//        }
-//        playerRun = new Animation(0.12f, playerFrames);
-//        playerJump = monkAtlas.findRegion(Constants.RUNNER_JUMPING_REGION_NAME);
-//        playerHit = monkAtlas.findRegion(Constants.RUNNER_HIT_REGION_NAME);
-//        playerStrike = monkAtlas.findRegion(Constants.RUNNER_STRIKING_REGION_NAME);
 
         playerStay  = new Animation(0.12f ,monkAtlas.findRegion(Constants.RUNNER_RUNNING_REGION_NAMES[0]));
         playerFrames = new TextureRegion[Constants.RUNNER_RUNNING_REGION_NAMES.length];
@@ -109,6 +120,7 @@ public class AssetLoader {
         playerJump = new Animation(0.12f ,monkAtlas.findRegion(Constants.RUNNER_JUMPING_REGION_NAME));
         playerHit = new Animation(0.12f ,monkAtlas.findRegion(Constants.RUNNER_HIT_REGION_NAME));
         playerStrike = new Animation(0.12f ,monkAtlas.findRegion(Constants.RUNNER_STRIKING_REGION_NAME));
+        playerShell = new Texture(Gdx.files.internal("monkShell.png"));
 
         stoneTexture = new Texture(Gdx.files.internal("stone.png"));
         stone = new TextureRegion(stoneTexture);
@@ -129,6 +141,9 @@ public class AssetLoader {
         levelOneMusic = Gdx.audio.newMusic(Gdx.files.internal("music/level1.mp3"));
 
         monkStrike = Gdx.audio.newSound(Gdx.files.internal("sound/kiya.wav"));
+        getBonus = Gdx.audio.newSound(Gdx.files.internal("sound/coin.wav"));
+        balanceBonus = Gdx.audio.newSound(Gdx.files.internal("sound/beep.wav"));
+        retributionBonus = Gdx.audio.newSound(Gdx.files.internal("sound/beat.wav"));
 
         font = new BitmapFont(Gdx.files.internal("text.fnt"));
         font.getData().setScale(.25f, .25f);
@@ -193,6 +208,8 @@ public class AssetLoader {
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal("music/mainTheme.mp3"));
         menuMusic.setVolume(SoundSystem.getMusicValue());
 
+        monkStrike = Gdx.audio.newSound(Gdx.files.internal("sound/kiya.wav"));
+
         menuBackgroundTexture = new Texture(Gdx.files.internal("menuBackground.png"));
         guiAtlas = new TextureAtlas(Gdx.files.internal("gui/gui.atlas"));
         achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
@@ -211,6 +228,8 @@ public class AssetLoader {
 
         sGuiSkin = new Skin(Gdx.files.internal("gui/forskin/exp/gui_exp.json"));
 
+        //**********************************************************
+        //!!!!!!!!!!!! ВОТ ТУТ СОМНИТЕЛЬНЫЙ ХОД!!!!!!!!!!!
         sAchieveRegions = new HashMap<String, TextureRegion>(Constants.ACHIEVE_NAMES.length);
         for (int i=0; i<Constants.ACHIEVE_NAMES.length - 1;i++) {
             sAchieveRegions.put(PreferencesConstants.ALL_ACHIEVE_KEYS[i]
@@ -230,6 +249,7 @@ public class AssetLoader {
 
     public static void disposeMenu() {
         menuMusic.dispose();
+        monkStrike.dispose();
         menuBackgroundTexture.dispose();
         guiAtlas.dispose();
         sAchieveRegions.clear();
@@ -241,12 +261,13 @@ public class AssetLoader {
         sGuiSkin.dispose();
     }
 
-    public static void dispose() {
+    public static void disposeGame() {
         charactersAtlas.dispose();
         monkAtlas.dispose();
         enemiesAtlas.dispose();
         sAchieveRegions.clear();
         achieveAtlas.dispose();
+        bonusesAtlas.dispose();
         lumpsAtlas.dispose();
         stoneTexture.dispose();
         boxTexture.dispose();
@@ -256,6 +277,10 @@ public class AssetLoader {
         broadbordTexture.dispose();
         groundTexture.dispose();
         levelOneMusic.dispose();
+        monkStrike.dispose();
+        getBonus.dispose();
+        balanceBonus.dispose();
+        retributionBonus.dispose();
         font.dispose();
     }
 }

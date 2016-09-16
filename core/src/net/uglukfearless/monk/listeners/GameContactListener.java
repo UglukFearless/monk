@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 import net.uglukfearless.monk.box2d.EnemyUserData;
 import net.uglukfearless.monk.box2d.ObstacleUserData;
+import net.uglukfearless.monk.box2d.RunnerStrikeUserData;
 import net.uglukfearless.monk.box2d.RunnerUserData;
 import net.uglukfearless.monk.box2d.ShellUserData;
 import net.uglukfearless.monk.box2d.UserData;
@@ -16,15 +17,19 @@ import net.uglukfearless.monk.utils.gameplay.BodyUtils;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
 
+import java.util.Random;
+
 /**
  * Created by Ugluk on 01.06.2016.
  */
 public class GameContactListener implements ContactListener {
 
     private GameStage stage;
+    private Random mRandom;
 
     public GameContactListener(GameStage stage) {
         this.stage = stage;
+        mRandom = new Random();
     }
 
     @Override
@@ -73,6 +78,12 @@ public class GameContactListener implements ContactListener {
             if (b.getGravityScale()==0) {
                 b.setGravityScale(10);
             }
+
+            if (((RunnerStrikeUserData)a.getUserData()).isShell()) {
+                ((RunnerStrikeUserData)a.getUserData()).setDead(true);
+                a.setGravityScale(3);
+                a.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
+            }
         } else if (BodyUtils.bodyIsRunnerStrike(b)&&BodyUtils.bodyIsEnemy(a)) {
 
             if (!((EnemyUserData)a.getUserData()).isDead()) {
@@ -86,6 +97,12 @@ public class GameContactListener implements ContactListener {
             a.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_DEAD);
             if (a.getGravityScale()==0) {
                 a.setGravityScale(10);
+            }
+
+            if (((RunnerStrikeUserData)b.getUserData()).isShell()) {
+                ((RunnerStrikeUserData)b.getUserData()).setDead(true);
+                b.setGravityScale(3);
+                b.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
             }
 
 
@@ -128,24 +145,38 @@ public class GameContactListener implements ContactListener {
             }
         } else if (BodyUtils.bodyIsRunnerStrike(a)&&BodyUtils.bodyIsObstacle(b)) {
             //Обработка столкновений препятствий с ударом монаха
-            if (!((ObstacleUserData)b.getUserData()).isArmour()) {
 
-                if (!((ObstacleUserData)b.getUserData()).isDead()) {
+                if (!((ObstacleUserData)b.getUserData()).isDead()
+                        &&!(((ObstacleUserData)b.getUserData()).isArmour()
+                        &&((RunnerStrikeUserData)a.getUserData()).isShell())) {
                     ScoreCounter.increaseScore(1);
                     ScoreCounter.increaseDestroyed();
+                    ((ObstacleUserData)b.getUserData()).setDead(true);
                 }
 
-                ((ObstacleUserData)b.getUserData()).setDead(true);
+
+
+            if (((RunnerStrikeUserData)a.getUserData()).isShell()) {
+                ((RunnerStrikeUserData)a.getUserData()).setDead(true);
+                a.setGravityScale(3);
+                a.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
             }
+
         } else if (BodyUtils.bodyIsRunnerStrike(b)&&BodyUtils.bodyIsObstacle(a)) {
-            if (!((ObstacleUserData)a.getUserData()).isArmour()) {
-                if (!((ObstacleUserData)a.getUserData()).isDead()) {
+
+                if (!((ObstacleUserData)a.getUserData()).isDead()
+                        &&!(((ObstacleUserData)a.getUserData()).isArmour()
+                            &&((RunnerStrikeUserData)b.getUserData()).isShell())) {
                     ScoreCounter.increaseScore(1);
                     ScoreCounter.increaseDestroyed();
+                    ((ObstacleUserData)a.getUserData()).setDead(true);
                 }
 
-                ((ObstacleUserData)a.getUserData()).setDead(true);
 
+            if (((RunnerStrikeUserData)b.getUserData()).isShell()) {
+                ((RunnerStrikeUserData)b.getUserData()).setDead(true);
+                b.setGravityScale(3);
+                b.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
             }
 
         } else if (BodyUtils.bodyIsEnemy(a)&&BodyUtils.bodyIsObstacle(b)) {
@@ -167,6 +198,51 @@ public class GameContactListener implements ContactListener {
             }
 
 
+        } else if (BodyUtils.bodyIsRunnerStrike(a)) {
+            if (((RunnerStrikeUserData)a.getUserData()).isShell()) {
+                ((RunnerStrikeUserData)a.getUserData()).setDead(true);
+                a.setGravityScale(3);
+                a.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
+            }
+        } else if (BodyUtils.bodyIsRunnerStrike(b)) {
+            if (((RunnerStrikeUserData)b.getUserData()).isShell()) {
+                ((RunnerStrikeUserData)b.getUserData()).setDead(true);
+                b.setGravityScale(3);
+                b.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
+            }
+        } else if (BodyUtils.bodyIsBuddha(a)) {
+            buddhaContact(b);
+        } else if (BodyUtils.bodyIsBuddha(b)) {
+            buddhaContact(a);
+        }
+    }
+
+    private void buddhaContact(Body another) {
+
+        switch (((UserData)another.getUserData()).getUserDataType()) {
+            case GROUND:
+            case COLUMNS:
+            case RUNNER_STRIKE:
+            case RUNNER:
+                break;
+            case OBSTACLE:
+                if (!((ObstacleUserData)another.getUserData()).isDead()) {
+                    ScoreCounter.increaseScore(1);
+                    ScoreCounter.increaseDestroyed();
+                    ((ObstacleUserData)another.getUserData()).setDead(true);
+                    another.setLinearVelocity(another.getLinearVelocity().add(mRandom.nextInt(10) + 20
+                            , mRandom.nextInt(10)));
+                }
+                break;
+            case ENEMY:
+                if (!((EnemyUserData)another.getUserData()).isDead()) {
+                    ScoreCounter.increaseScore(1);
+                    ScoreCounter.increaseKilled();
+                    ((EnemyUserData)another.getUserData()).setDead(true);
+                    another.setLinearVelocity(another.getLinearVelocity().add(mRandom.nextInt(10) + 20
+                            , mRandom.nextInt(10)));
+                }
+                break;
         }
     }
 
@@ -219,6 +295,11 @@ public class GameContactListener implements ContactListener {
                 ((ShellUserData)shell.getUserData()).setDead(true);
                 shell.setGravityScale(1);
                 stage.getRunner().hit();
+                break;
+            case BUDDHA:
+                shell.setGravityScale(1);
+                shell.setAngularVelocity(-1f * shell.getAngularVelocity());
+                shell.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_STRIKE_FLIP);
                 break;
         }
     }

@@ -1,6 +1,7 @@
 package net.uglukfearless.monk.stages;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector3;
@@ -51,9 +52,13 @@ public class MainMenuStage extends Stage {
 
         touchPoint = new Vector3();
 
-        setupTitle("Running Monk");
+
+        setupTitle(AssetLoader.sBundle.get("GAME_NAME"));
+
         setupButtons(yViewportHeight);
 
+        Gdx.input.setCatchBackKey(false);
+        Gdx.input.setCatchMenuKey(false);
     }
 
 
@@ -65,17 +70,20 @@ public class MainMenuStage extends Stage {
 
     private void setupButtons(float yViewportHeight) {
 
-        mTextButtonPlay = new MenuTextButtonLib("PLAY", AssetLoader.sGuiSkin, new MenuPlayAction(screen));
+        mTextButtonPlay = new MenuTextButtonLib(AssetLoader.sBundle.get("MENU_BUTTON_PLAY")
+                , AssetLoader.sGuiSkin, new MenuPlayAction(screen));
         mTextButtonPlay.setSize(Constants.BUTTON_MENU_WIDTH, Constants.BUTTON_MENU_HEIGHT);
         mTextButtonPlay.setPosition(75, VIEWPORT_HEIGHT / 2f);
         addActor(mTextButtonPlay);
 
-        mTextButtonOptions = new MenuTextButtonLib("OPTIONS", AssetLoader.sGuiSkin, new MenuOptionAction(screen));
+        mTextButtonOptions = new MenuTextButtonLib(AssetLoader.sBundle.get("MENU_BUTTON_OPTIONS")
+                , AssetLoader.sGuiSkin, new MenuOptionAction(screen));
         mTextButtonOptions.setSize(Constants.BUTTON_MENU_WIDTH, Constants.BUTTON_MENU_HEIGHT);
         mTextButtonOptions.setPosition(75, VIEWPORT_HEIGHT / 2f - mTextButtonOptions.getHeight());
         addActor(mTextButtonOptions);
 
-        mTextButtonStatistics = new MenuTextButtonLib("STATS", AssetLoader.sGuiSkin, new MenuStatisticsAction(screen));
+        mTextButtonStatistics = new MenuTextButtonLib(AssetLoader.sBundle.get("MENU_BUTTON_STATS")
+                , AssetLoader.sGuiSkin, new MenuStatisticsAction(screen));
         mTextButtonStatistics.setSize(Constants.BUTTON_MENU_WIDTH, Constants.BUTTON_MENU_HEIGHT);
         mTextButtonStatistics.setPosition(75, VIEWPORT_HEIGHT / 2f- mTextButtonOptions.getHeight()*2);
         addActor(mTextButtonStatistics);
@@ -87,18 +95,4 @@ public class MainMenuStage extends Stage {
         getCamera().unproject(touchPoint.set(screenX, screenY, 0));
     }
 
-    @Override
-    public void draw() {
-        super.draw();
-
-        mBatch = super.getBatch();
-        if (mBatch != null) {
-            mBatch.setProjectionMatrix(super.getCamera().combined);
-            mBatch.begin();
-//            mPlayButton.draw((SpriteBatch) mBatch);
-//            mOptionButton.draw((SpriteBatch)mBatch);
-//            mStatisticsButton.draw((SpriteBatch)mBatch);
-            mBatch.end();
-        }
-    }
 }

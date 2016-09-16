@@ -13,15 +13,15 @@ import java.util.Random;
  */
 public enum ObstacleType implements Danger {
     BOX(4f, 4f, 0, 0.5f,new String[] { "box.png"},
-            Constants.WORLD_STATIC_VELOCITY, 1, false, false, false,
+            0, 1, false, false, false,
             Constants.DANGERS_PRIORITY_OFTEN, 1, 1, 0, 0),
 //            Constants.DANGERS_PRIORITY_NEVER, 1, 1, 0, 0),
     STONE(4f, 4f, 0, 6f, new String[] { "stone.png"},
-            Constants.WORLD_STATIC_VELOCITY, 2, true, false, false,
-            Constants.DANGERS_PRIORITY_OFTEN, 1, 1, 0, 0),
+            0, 2, true, false, false,
+            Constants.DANGERS_PRIORITY_VERY_OFTEN, 1, 1, 0, 0),
 //            Constants.DANGERS_PRIORITY_NEVER, 1, 1, 0, 0),
     BLADES(4f, 4f, -2, 1f, null,
-            Constants.WORLD_STATIC_VELOCITY, 0, true, true, true,
+            0, 0, true, true, true,
             Constants.DANGERS_PRIORITY_NORMAL, 1, 1, 0, 0);
 //            Constants.DANGERS_PRIORITY_NEVER, 1, 1, 0, 0);
 
@@ -50,7 +50,7 @@ public enum ObstacleType implements Danger {
     private int mCurrentPriority = 0;
 
     ObstacleType(float width, float height, float y, float density, String[] regions,
-                 Vector2 linearVelocity, int gravityScale, boolean armour, boolean isTrap,
+                 float linearVelocity, int gravityScale, boolean armour, boolean isTrap,
                  boolean isSphere, int prior, float scaleX, float scaleY
             , float offsetX, float offsetY) {
 
@@ -61,7 +61,8 @@ public enum ObstacleType implements Danger {
 
         this.density = density;
         this.regions = regions;
-        this.linearVelocity = linearVelocity;
+        this.linearVelocity = new Vector2(Constants.WORLD_STATIC_VELOCITY.x + linearVelocity,
+                Constants.WORLD_STATIC_VELOCITY.y);
         this.gravityScale = gravityScale;
 
         if (gravityScale==0) {
@@ -157,7 +158,7 @@ public enum ObstacleType implements Danger {
     }
 
     public Vector2 getLinearVelocity() {
-        return linearVelocity;
+        return new Vector2(linearVelocity);
     }
 
     public int getGravityScale() {

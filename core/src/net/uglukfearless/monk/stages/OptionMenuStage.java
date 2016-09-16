@@ -1,6 +1,7 @@
 package net.uglukfearless.monk.stages;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector3;
@@ -8,7 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
@@ -53,6 +56,15 @@ public class OptionMenuStage extends Stage {
     private Table mContainer, mMainTable;
     private ScrollPane mScrollPane;
     private Cell<? extends Actor> mCell;
+    private boolean mHack;
+
+    //Локализация
+    private ButtonGroup<Button> mLanguageGroup;
+    private Button mCheckEnglish;
+    private Button mCheckRussian;
+    private Label mEnglish;
+    private Label mRussian;
+    private HorizontalGroup mHorizontal;
 
     public OptionMenuStage(MainMenuScreen screen, float yViewportHeight) {
         super(new FitViewport(VIEWPORT_WIDTH, yViewportHeight,
@@ -66,7 +78,7 @@ public class OptionMenuStage extends Stage {
 
         mTouchPoint = new Vector3();
 
-        setupTitle("Options");
+        setupTitle(AssetLoader.sBundle.get("MENU_OPTIONS"));
 
         setupButtons(screen);
         setupSliders();
@@ -76,9 +88,14 @@ public class OptionMenuStage extends Stage {
         mBackButton.setSize(100, 62);
         mBackButton.setPosition(0, VIEWPORT_HEIGHT - mBackButton.getHeight() - 50);
         addActor(mBackButton);
+
+        Gdx.input.setCatchBackKey(true);
+        Gdx.input.setCatchMenuKey(true);
     }
 
     private void setupSliders() {
+
+        mHack = false;
 
         mMusicSlider = new Slider(0f, 1f, 0.05f, false, AssetLoader.sGuiSkin);
         mMusicSlider.setValue(PreferencesManager.getMusicValue());
@@ -89,6 +106,8 @@ public class OptionMenuStage extends Stage {
                 SoundSystem.setMusicValue(mMusicSlider.getValue());
                 SoundSystem.setCurrentMusicValue(mMusicSlider.getValue());
                 PreferencesManager.setMusicValue(mMusicSlider.getValue());
+                mCheckMusic.setChecked(true);
+                checkMusic();
             }
         });
 
@@ -100,6 +119,12 @@ public class OptionMenuStage extends Stage {
                 mScrollPane.cancel();
                 SoundSystem.setSoundValue(mSoundSlider.getValue());
                 PreferencesManager.setSoundValue(mSoundSlider.getValue());
+                mCheckSound.setChecked(true);
+                checkSound();
+                if (!mHack) {
+                    AssetLoader.monkStrike.play(SoundSystem.getSoundValue());
+                }
+                mHack = !mHack;
             }
         });
     }
@@ -113,8 +138,7 @@ public class OptionMenuStage extends Stage {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                SoundSystem.setMusicEnable(mCheckMusic.isChecked());
-                PreferencesManager.setMusicEnable(mCheckMusic.isChecked());
+                checkMusic();
             }
         });
 
@@ -125,18 +149,61 @@ public class OptionMenuStage extends Stage {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                SoundSystem.setSoundEnable(mCheckSound.isChecked());
-                PreferencesManager.setSoundEnable(mCheckSound.isChecked());
+                checkSound();
             }
         });
+
+        mCheckEnglish = new Button(AssetLoader.sGuiSkin, "check");
+        mCheckEnglish.setSize(60, 60);
+        mCheckEnglish.setChecked(PreferencesManager.isRussianLanguage());
+        mCheckEnglish.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                PreferencesManager.setLanguage("en");
+                AssetLoader.changeLanguage();
+                mScreen.optionMenu();
+            }
+        });
+
+        mCheckRussian = new Button(AssetLoader.sGuiSkin, "check");
+        mCheckRussian.setSize(60, 60);
+        mCheckRussian.setChecked(PreferencesManager.isRussianLanguage());
+        mCheckRussian.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                PreferencesManager.setLanguage("ru");
+                AssetLoader.changeLanguage();
+                mScreen.optionMenu();
+            }
+        });
+
+        mLanguageGroup = new ButtonGroup<Button>();
+        mLanguageGroup.add(mCheckEnglish);
+        mLanguageGroup.add(mCheckRussian);
+        mLanguageGroup.setMaxCheckCount(1);
+    }
+
+    private void checkMusic() {
+        SoundSystem.setMusicEnable(mCheckMusic.isChecked());
+        PreferencesManager.setMusicEnable(mCheckMusic.isChecked());
+    }
+
+    private void checkSound() {
+        SoundSystem.setSoundEnable(mCheckSound.isChecked());
+        PreferencesManager.setSoundEnable(mCheckSound.isChecked());
     }
 
     private void setupLabels() {
 
-        mMusicLbl = new Label("Music", AssetLoader.sGuiSkin);
-        mMusicValLbl = new Label("Music Value", AssetLoader.sGuiSkin);
-        mSoundLbl = new Label("Sounds", AssetLoader.sGuiSkin);
-        mSoundValLbl = new Label("Sounds Value", AssetLoader.sGuiSkin);
+        mMusicLbl = new Label(AssetLoader.sBundle.get("MENU_OPTIONS_MUSIC"), AssetLoader.sGuiSkin);
+        mMusicValLbl = new Label(AssetLoader.sBundle.get("MENU_OPTIONS_MUSIC_VAL"), AssetLoader.sGuiSkin);
+        mSoundLbl = new Label(AssetLoader.sBundle.get("MENU_OPTIONS_SOUND"), AssetLoader.sGuiSkin);
+        mSoundValLbl = new Label(AssetLoader.sBundle.get("MENU_OPTIONS_SOUND_VAL"), AssetLoader.sGuiSkin);
+
+        mEnglish = new Label("English", AssetLoader.sGuiSkin);
+        mRussian = new Label("Русский", AssetLoader.sGuiSkin);
 
         mContainer = new Table();
 
@@ -162,6 +229,17 @@ public class OptionMenuStage extends Stage {
         mCell.align(Align.left);
         mCell = mContainer.add(mSoundSlider).width(250);
         mCell.align(Align.right);
+        mContainer.row();
+
+        mHorizontal = new HorizontalGroup();
+        mHorizontal.addActor(mCheckEnglish);
+        mHorizontal.addActor(mEnglish);
+        mContainer.add(mHorizontal).padTop(15);
+
+        mHorizontal = new HorizontalGroup();
+        mHorizontal.addActor(mCheckRussian);
+        mHorizontal.addActor(mRussian);
+        mContainer.add(mHorizontal).padTop(15);
 
         mScrollPane = new ScrollPane(mContainer);
 
@@ -173,6 +251,7 @@ public class OptionMenuStage extends Stage {
         mMainTable.add(mScrollPane).fill().expand();
 
         addActor(mMainTable);
+
     }
 
 
@@ -185,5 +264,15 @@ public class OptionMenuStage extends Stage {
 
     private void translateScreenToWorldCoordinates(int screenX, int screenY) {
         getCamera().unproject(mTouchPoint.set(screenX, screenY, 0));
+    }
+
+    @Override
+    public boolean keyDown(int keyCode) {
+
+
+        if (keyCode== Input.Keys.BACK||keyCode== Input.Keys.MENU) {
+            mScreen.mainMenu();
+        }
+        return super.keyDown(keyCode);
     }
 }

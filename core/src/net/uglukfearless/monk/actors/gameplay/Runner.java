@@ -1,6 +1,7 @@
-package net.uglukfearless.monk.actors;
+package net.uglukfearless.monk.actors.gameplay;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -14,6 +15,7 @@ import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.file.SoundSystem;
+import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 /**
  * Created by Ugluk on 18.05.2016.
@@ -39,6 +41,17 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     private Ground mGround1, mGround2;
 
+    private Color mColor;
+    private float mAlpha;
+    private boolean mWings;
+    private boolean mRetribution;
+    private boolean mThunderFist;
+    private boolean mBuddha;
+
+    private float mBuddhaTimer;
+    private float mBuddhaThreshold;
+
+
 
     public Runner(Body body) {
         super(body);
@@ -54,6 +67,12 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
         mCurrentAnimation = mAnimStay;
 
+        mAlpha = 1f;
+        mWings = false;
+        mRetribution = false;
+        mBuddhaTimer = 0;
+        mBuddhaThreshold = 0;
+
     }
 
     @Override
@@ -64,61 +83,27 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
         float y = body.getPosition().y - data.getHeight()/2;
         float width = data.getWidth()*1.2f;
 
-//        if (data.isDead()) {
-//            batch.draw(AssetLoader.playerHit,x, y, width*0.5f, data.getHeight()*0.5f, width,
-//                    data.getHeight(), 1f, 1f,(float) Math.toDegrees(body.getAngle()));
-//        }  else if (data.isStriking()) {
-//            batch.draw(AssetLoader.playerStrike, x + width/3.3f, y, width*1.5f, data.getHeight()*1.05f);
-//        } else if (data.isJumping1()) {
-//            batch.draw(AssetLoader.playerJump, x, y, width, data.getHeight());
-//        }else if (stay) {
-//            batch.draw(AssetLoader.playerRun.getKeyFrames()[0],x, y,
-//                    width, data.getHeight());
-//        } else {
-//            stateTime += Gdx.graphics.getDeltaTime();
-//            batch.draw(AssetLoader.playerRun.getKeyFrame(stateTime, true),x, y,
-//                    width, data.getHeight());
-//        }
-//        stateTime += Gdx.graphics.getDeltaTime();
-//        if (!data.isStriking()) {
-//            batch.draw(mCurrentAnimation.getKeyFrame(stateTime, true),x, y, width*0.5f, data.getHeight()*0.5f, width,
-//                    data.getHeight(), 1f, 1f,(float) Math.toDegrees(body.getAngle()));
-//        }  else if (!data.isDead()) {
-//            batch.draw(mCurrentAnimation.getKeyFrame(stateTime, true), x + width/3.3f, y, width*1.5f, data.getHeight()*1.05f);
-//        }
-
+        mColor = batch.getColor();
+        batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
         stateTime += Gdx.graphics.getDeltaTime();
         if (data.getState()==RunnerState.RUN_STRIKE||
             data.getState()==RunnerState.JUMP_STRIKE||
             data.getState()==RunnerState.JUMP_DOUBLE_STRIKE) {
             batch.draw(mCurrentAnimation.getKeyFrame(stateTime, true), x + width/3.3f, y, width*1.5f, data.getHeight()*1.05f);
         } else {
-            batch.draw(mCurrentAnimation.getKeyFrame(stateTime, true),x, y, width*0.5f, data.getHeight()*0.5f, width,
-                    data.getHeight(), 1f, 1f,(float) Math.toDegrees(body.getAngle()));
+
+            batch.draw(mCurrentAnimation.getKeyFrame(stateTime, true), x, y, width * 0.5f, data.getHeight() * 0.5f, width,
+                    data.getHeight(), 1f, 1f, (float) Math.toDegrees(body.getAngle()));
         }
+        batch.setColor(mColor);
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
 
-//        if (data.isStriking()==true) {
-//            strikeTime +=delta;
-//            if (strikeTime > 0.2f) {
-//                data.setStriking(false);
-//                if (!data.isDead()) {
-//                    if (data.isJumping1()||data.isJumping2()) {
-//                        mCurrentAnimation = mAnimJump;
-//                    } else {
-//                        mCurrentAnimation = mAnimRun;
-//                        System.out.println("!strike RUN");
-//                    }
-//                }
-//            }
-//        }
-//
         if (!data.isDead()) {
-            body.setLinearVelocity(0,body.getLinearVelocity().y);
+            body.setLinearVelocity(0, body.getLinearVelocity().y);
             if (!body.getWorld().isLocked()) {
                 float x = body.getPosition().x - data.getWidth()/2;
                 if (x>mGround1.getBody().getPosition().x
@@ -127,15 +112,19 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                     body.setTransform(Constants.RUNNER_X, body.getPosition().y, 0);
                 }
             }
+
+            if (body.getPosition().y>15) {
+                body.setLinearVelocity(body.getLinearVelocity().x, 0);
+            }
+
+            if (mBuddha) {
+                mBuddhaTimer +=delta;
+                if (mBuddhaTimer>mBuddhaThreshold) {
+                    ((GameStage)getStage()).changingSpeed(Constants.WORLD_STATIC_VELOCITY.x);
+                }
+
+            }
         }
-//
-//        if (!body.getWorld().isLocked()) {
-//            if (body.getUserData()!=null&&!getUserData().isDead()&&
-//                    body.getPosition().y - Constants.RUNNER_HEIGHT/2>=
-//                            Constants.GROUND_Y + Constants.GROUND_HEIGHT/2 + 2) {
-//                body.setTransform(Constants.RUNNER_X, body.getPosition().y, 0);
-//            }
-//        }
 
         switch (data.getState()) {
             case JUMP:
@@ -179,21 +168,21 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 break;
             case DIE:
                 dead(delta);
+                if (mBuddha) {
+                    ((GameStage)getStage()).changingSpeed(Constants.WORLD_STATIC_VELOCITY.x);
+                    mBuddha = false;
+                }
                 break;
-
         }
     }
 
     private void dead(float delta) {
         deadTime +=delta;
         if (deadTime>0.3f&&getStage()!=null) {
+            ((GameStage)getStage()).deactivationBonuses();
             GameStage stage = (GameStage) getStage();
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump1"));
             ((UserData)body.getUserData()).setDestroy(true);
-            ScoreCounter.death();
-            ScoreCounter.checkScore();
-            ScoreCounter.saveCalcStats();
-            ScoreCounter.checkAchieve();
             ((GameStage) getStage()).gameOver();
             this.remove();
         }
@@ -206,23 +195,14 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     public void jump() {
 
-//        if (!((data.isJumping1() && data.isJumping2())||data.isDead())) {
-//            body.applyLinearImpulse(data.getJumpingLinearImpulse()
-//                    , body.getWorldCenter(), true);
-//            if (!data.isJumping1()) {
-//                data.setJumping1(true);
-//                if (!data.isStriking()) {
-//                    mCurrentAnimation = mAnimJump;
-//                }
-//            } else {
-//                data.setJumping2(true);
-//            }
-//        }
-
         switch (data.getState()) {
             case DIE:
             case JUMP_DOUBLE:
             case JUMP_DOUBLE_STRIKE:
+                if (mWings&&body.getPosition().y<15) {
+                    body.applyLinearImpulse(data.getJumpingLinearImpulseOne()
+                            , body.getWorldCenter(), true);
+                }
                 break;
             case RUN:
                 data.setState(RunnerState.JUMP);
@@ -249,13 +229,6 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
     }
 
     public void landed() {
-//        data.setJumping1(false);
-//        data.setJumping2(false);
-
-//        if (!data.isDead()&&!data.isStriking()&&!stay) {
-//            mCurrentAnimation = mAnimRun;
-//            System.out.println("landed RUN");
-//        }
 
         switch (data.getState()) {
             case DIE:
@@ -275,12 +248,7 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
 
     public void strike() {
-//        if (!data.isStriking()&&!data.isDead()) {
-//            data.setStriking(true);
-//            AssetLoader.monkStrike.play(SoundSystem.getSoundValue());
-//            strikeTime = 0f;
-//            mCurrentAnimation = mAnimStrike;
-//        }
+
         switch (data.getState()) {
             case DIE:
                 break;
@@ -290,6 +258,11 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 AssetLoader.monkStrike.play(SoundSystem.getSoundValue());
                 mCurrentAnimation = mAnimStrike;
                 strikeTime = 0f;
+                if (mRetribution) {
+                    ((GameStage)getStage()).retribution();
+                } else if (mThunderFist) {
+                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition());
+                }
                 break;
             case JUMP_STRIKE:
             case JUMP:
@@ -297,6 +270,11 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 AssetLoader.monkStrike.play(SoundSystem.getSoundValue());
                 mCurrentAnimation = mAnimStrike;
                 strikeTime = 0f;
+                if (mRetribution) {
+                    ((GameStage)getStage()).retribution();
+                } else if (mThunderFist) {
+                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition());
+                }
                 break;
             case JUMP_DOUBLE_STRIKE:
             case JUMP_DOUBLE:
@@ -304,16 +282,19 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 AssetLoader.monkStrike.play(SoundSystem.getSoundValue());
                 mCurrentAnimation = mAnimStrike;
                 strikeTime = 0f;
+                if (mRetribution) {
+                    ((GameStage)getStage()).retribution();
+                } else if (mThunderFist) {
+                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition());
+                }
                 break;
         }
     }
 
     public void hit() {
         mCurrentAnimation = mAnimDie;
-        ((GameStage)getStage()).saveTimePoint();
-        body.applyAngularImpulse(data.getHitAngularImpulse(), true);
         body.setFixedRotation(false);
-//        data.setDead(true);
+        body.applyAngularImpulse(data.getHitAngularImpulse(), true);
         System.out.println("hit");
         getUserData().setState(RunnerState.DIE);
     }
@@ -328,5 +309,41 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
     public void setGrounds(Ground ground1, Ground ground2) {
         mGround1 = ground1;
         mGround2 = ground2;
+    }
+
+    public void setAlpha(float alpha) {
+        mAlpha = alpha;
+    }
+
+    public void setWings(boolean wings) {
+        mWings = wings;
+    }
+
+    public void setRetribution(boolean retribution) {
+        mRetribution = retribution;
+    }
+
+    public void setThunderFist(boolean thunderFist) {
+        mThunderFist = thunderFist;
+    }
+
+    public void setBuddha(boolean buddha) {
+        mBuddha = buddha;
+        if (!buddha) {
+            mBuddhaTimer=0;
+        }
+    }
+
+    public boolean isBuddha() {
+        return mBuddha;
+    }
+
+    public void setBuddha(boolean buddha, float workingTime, float speed) {
+        mBuddha = buddha;
+        mBuddhaThreshold = workingTime*0.8f;
+        ((GameStage) getStage()).changingSpeed(speed);
+        if (!buddha) {
+            mBuddhaTimer=0;
+        }
     }
 }

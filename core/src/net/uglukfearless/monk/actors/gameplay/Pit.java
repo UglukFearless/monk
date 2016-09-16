@@ -1,17 +1,19 @@
 package net.uglukfearless.monk.actors.gameplay;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 import net.uglukfearless.monk.box2d.PitUserData;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.Movable;
 import net.uglukfearless.monk.utils.gameplay.SpaceTable;
 
 /**
  * Created by Ugluk on 04.09.2016.
  */
-public class Pit extends GameActor {
+public class Pit extends GameActor implements Movable {
 
 
     public Pit(Body body) {
@@ -44,5 +46,11 @@ public class Pit extends GameActor {
     public void setPosition(float x) {
         body.setTransform(x + userData.getWidth()/2,userData.getHeight()/2,0);
         body.setActive(true);
+    }
+
+    @Override
+    public void changingStaticSpeed(float speedScale) {
+
+        body.setLinearVelocity(new Vector2(speedScale, 0));
     }
 }

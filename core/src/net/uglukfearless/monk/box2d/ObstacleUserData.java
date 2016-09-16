@@ -29,6 +29,7 @@ public class ObstacleUserData extends UserData {
         height = type.getHeight();
 
         linearVelocity = type.getLinearVelocity();
+
         gravityScale = type.getGravityScale();
 
 
@@ -90,7 +91,11 @@ public class ObstacleUserData extends UserData {
     }
 
     public void setLinearVelocity(Vector2 linearVelocity) {
-        this.linearVelocity = linearVelocity;
+        this.linearVelocity.set(linearVelocity);
+    }
+
+    public void setLinearVelocity(float x, float y) {
+        this.linearVelocity.set(x, y);
     }
 
     public int getGravityScale() {

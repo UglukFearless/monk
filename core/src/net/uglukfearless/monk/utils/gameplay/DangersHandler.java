@@ -9,6 +9,7 @@ import net.uglukfearless.monk.actors.gameplay.Enemy;
 import net.uglukfearless.monk.actors.gameplay.Ground;
 import net.uglukfearless.monk.actors.gameplay.Obstacle;
 import net.uglukfearless.monk.actors.gameplay.Pit;
+import net.uglukfearless.monk.actors.gameplay.bonuses.GameBonus;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PlacingCategory;
 import net.uglukfearless.monk.enums.EnemyType;
@@ -55,8 +56,9 @@ public class DangersHandler {
     private Array<Columns> mColumns1;
     private Array<Columns> mColumns2;
     private Pit mPit;
+    private Array<GameBonus> mBonuses;
 
-    public DangersHandler(GameStage stage) {
+    public DangersHandler(GameStage stage, Array<GameBonus> bonuses) {
         this.stage = stage;
         this.world = stage.getWorld();
         enemyTypes = EnemyType.values();
@@ -72,6 +74,8 @@ public class DangersHandler {
 
         mColumns1 = new Array<Columns>();
         mColumns2 = new Array<Columns>();
+
+        mBonuses = bonuses;
     }
 
     public void init() {
@@ -117,7 +121,8 @@ public class DangersHandler {
         for (int i = 0;i<prohibitionsMap.length-1;i++) {
             for (int j = 0; j < prohibitionsMap[0].length-1; j++) {
 
-                if (fillingCell()) {
+                if (fillingCell()&&!setBonus(i,j)) {
+                    System.out.println("danger is in " + i + " : " + j);
                     resolvedDangers.clear();
 
                     for (Danger danger : allDangers) {
@@ -162,6 +167,11 @@ public class DangersHandler {
                         }
 
                     }
+                } else {
+                    if (j==0) {
+                        prohibitionsMap[i][1] = (short) (prohibitionsMap[i][1]
+                                |PlacingCategory.CATEGORY_PLACING_OBSTACLE_OVERLAND);
+                    }
                 }
 
             }
@@ -176,6 +186,26 @@ public class DangersHandler {
                 prohibitionsMap[ii][jj] = 0;
             }
         }
+    }
+
+    private boolean setBonus(float i,float j) {
+//        System.out.println("setBonus!");
+        for (GameBonus bonus : mBonuses) {
+            if (bonus.isActive()) {
+//                System.out.println("is Active " + bonus.isActive());
+                return false;
+            }
+        }
+
+        if (rand.nextInt(100)>80) {
+            System.out.println("bonus in " + i + " : " + j);
+            mBonuses.get(rand.nextInt(mBonuses.size)).init(startX + Constants.STEP_OF_DANGERS * i,
+                    Constants.LAYOUT_Y_ONE + Constants.LAYOUT_Y_STEP * j);
+//            System.out.println("initGame bonus!");
+            return true;
+        }
+
+        return false;
     }
 
     private void fillPit() {

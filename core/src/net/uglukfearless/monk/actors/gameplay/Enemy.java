@@ -17,6 +17,7 @@ import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.Movable;
 import net.uglukfearless.monk.utils.gameplay.Situation;
 import net.uglukfearless.monk.utils.gameplay.SpaceTable;
 import net.uglukfearless.monk.utils.gameplay.WorldUtils;
@@ -26,7 +27,7 @@ import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 /**
  * Created by Ugluk on 20.05.2016.
  */
-public class Enemy extends GameActor implements Pool.Poolable {
+public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
 
     private Animation mAnimation;
@@ -55,6 +56,7 @@ public class Enemy extends GameActor implements Pool.Poolable {
     private boolean starting;
 
     private Situation mSituation;
+    private float mPreviousVelocity;
 
 
     public Enemy(World world, EnemyType enemyType) {
@@ -156,10 +158,12 @@ public class Enemy extends GameActor implements Pool.Poolable {
         }
 
         body.setTransform(x, getUserData().getBasicY() + y + getUserData().getHeight() / 2f, 0);
-        body.setLinearVelocity(Constants.WORLD_STATIC_VELOCITY);
+        body.setLinearVelocity(((GameStage) stage).getCurrentVelocity());
         body.setActive(true);
         starting = false;
         stage.addActor(this);
+        mPreviousVelocity = ((GameStage)stage).getCurrentVelocity().x;
+        ((GameStage)stage).addMovable(this);
     }
 
     @Override
@@ -200,20 +204,10 @@ public class Enemy extends GameActor implements Pool.Poolable {
 
             if (body.getPosition().x < Constants.GAME_WIDTH) {
 
-//              System.out.println(getUserData().enemyType.name() + ":");
-//              System.out.println("basicY " + getUserData().enemyType.getY());
-//              System.out.println("height " + getUserData().getHeight());
-//              System.out.println("y " + body.getPosition().y);
-//              System.out.println("set y " + (body.getPosition().y - getUserData().enemyType.getY() - getUserData().getHeight() / 2f));
-                mSituation = SpaceTable.getSituation(body.getPosition().x, body.getPosition().y - getUserData().enemyType.getY() - getUserData().getHeight() / 2f
+                mSituation = SpaceTable.getSituation(body.getPosition().x, body.getPosition().y
+                        - getUserData().enemyType.getY() - getUserData().getHeight() / 2f
                         , getUserData().getWidth(), getUserData().enemyType.getCategoryBit(), mSituation);
 
-//                SpaceTable.setCell(body.getPosition(), getUserData().enemyType.getCategoryBit());
-
-//                System.out.println(getUserData().enemyType.name() + " situation :");
-//                System.out.println("sit jump " + mSituation.jump);
-//                System.out.println("sit stop " + mSituation.stop);
-//                System.out.println("sit stop fly " + mSituation.stopFly);
                 if (mSituation.jump
                         &&body.getLinearVelocity().y==0
                         &&getUserData().isJumper()) {
@@ -276,7 +270,8 @@ public class Enemy extends GameActor implements Pool.Poolable {
             System.out.println(getUserData().enemyType.name() + " runAnim");
         }
         System.out.println(getUserData().enemyType.name() + " START");
-        body.setLinearVelocity(getUserData().getLinearVelocity());
+        body.setLinearVelocity(body.getLinearVelocity().x + getUserData().enemyType.getBasicXVelocity(),
+                body.getLinearVelocity().y);
         starting = true;
     }
 
@@ -349,6 +344,7 @@ public class Enemy extends GameActor implements Pool.Poolable {
 
         if (deadTime>0.2f&&getStage()!=null) {
             GameStage stage = (GameStage) getStage();
+            stage.removeMovable(this);
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump1"));
             this.remove();
             PoolsHandler.sEnemiesPools.get(getUserData().enemyType.name()).free(this);
@@ -359,7 +355,9 @@ public class Enemy extends GameActor implements Pool.Poolable {
 
     @Override
     public void reset() {
-
+        if (getStage()!=null) {
+            ((GameStage)getStage()).removeMovable(this);
+        }
         stateTime = 0f;
         deadTime = 0f;
         strikeTime = 0f;
@@ -376,4 +374,11 @@ public class Enemy extends GameActor implements Pool.Poolable {
         body.setTransform(-10, -10, 0);
     }
 
+    @Override
+    public void changingStaticSpeed(float speedScale) {
+
+        body.setLinearVelocity(body.getLinearVelocity().x
+                + (speedScale-(mPreviousVelocity)), body.getLinearVelocity().y);
+        mPreviousVelocity  = speedScale;
+    }
 }

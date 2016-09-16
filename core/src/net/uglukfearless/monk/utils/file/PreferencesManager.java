@@ -16,12 +16,12 @@ public class PreferencesManager {
     //НАСТРОЙКИ*******************************************
 
     public static void setMusicEnable(boolean enable) {
-        sSetting.putBoolean(PreferencesConstants.MUSIC_ENABLE_KEY, enable);
+        sSetting.putBoolean(PreferencesConstants.SET_MUSIC_ENABLE_KEY, enable);
         sSetting.flush();
     }
 
     public static void setSoundEnable(boolean enable) {
-        sSetting.putBoolean(PreferencesConstants.SOUND_ENABLE_KEY, enable);
+        sSetting.putBoolean(PreferencesConstants.SET_SOUND_ENABLE_KEY, enable);
         sSetting.flush();
     }
 
@@ -29,7 +29,7 @@ public class PreferencesManager {
         if (value>1) {
             value = 1;
         }
-        sSetting.putFloat(PreferencesConstants.MUSIC_VALUE_KEY, value);
+        sSetting.putFloat(PreferencesConstants.SET_MUSIC_VALUE_KEY, value);
         sSetting.flush();
     }
 
@@ -37,24 +37,41 @@ public class PreferencesManager {
         if (value>1) {
             value = 1;
         }
-        sSetting.putFloat(PreferencesConstants.SOUND_VALUE_KEY, value);
+        sSetting.putFloat(PreferencesConstants.SET_SOUND_VALUE_KEY, value);
         sSetting.flush();
     }
 
     public static boolean getMusicEnable() {
-        return sSetting.getBoolean(PreferencesConstants.MUSIC_ENABLE_KEY, true);
+        return sSetting.getBoolean(PreferencesConstants.SET_MUSIC_ENABLE_KEY, true);
     }
 
     public static boolean getSoundEnable() {
-        return sSetting.getBoolean(PreferencesConstants.SOUND_ENABLE_KEY, true);
+        return sSetting.getBoolean(PreferencesConstants.SET_SOUND_ENABLE_KEY, true);
     }
 
     public static float getMusicValue() {
-        return sSetting.getFloat(PreferencesConstants.MUSIC_VALUE_KEY, 0.5f);
+        return sSetting.getFloat(PreferencesConstants.SET_MUSIC_VALUE_KEY, 0.5f);
     }
 
     public static float getSoundValue() {
-        return sSetting.getFloat(PreferencesConstants.SOUND_VALUE_KEY, 0.5f);
+        return sSetting.getFloat(PreferencesConstants.SET_SOUND_VALUE_KEY, 0.5f);
+    }
+
+    public static boolean isRussianLanguage() {
+        return sSetting.getString(PreferencesConstants.SET_LANGUAGE).equals("ru");
+    }
+
+    public static boolean isEnglishLanguage() {
+        return sSetting.getString(PreferencesConstants.SET_LANGUAGE).equals("en");
+    }
+
+    public static String getLanguage() {
+        return sSetting.getString(PreferencesConstants.SET_LANGUAGE);
+    }
+
+    public static void setLanguage(String language) {
+        sSetting.putString(PreferencesConstants.SET_LANGUAGE, language);
+        sSetting.flush();
     }
 
     //СТАТИСТИКА*******************************************

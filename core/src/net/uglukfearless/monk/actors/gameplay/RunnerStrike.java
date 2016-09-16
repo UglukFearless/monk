@@ -1,8 +1,7 @@
-package net.uglukfearless.monk.actors;
+package net.uglukfearless.monk.actors.gameplay;
 
 import com.badlogic.gdx.physics.box2d.Body;
 
-import net.uglukfearless.monk.actors.gameplay.GameActor;
 import net.uglukfearless.monk.box2d.RunnerStrikeUserData;
 import net.uglukfearless.monk.constants.Constants;
 
@@ -33,5 +32,9 @@ public class RunnerStrike extends GameActor {
     @Override
     public RunnerStrikeUserData getUserData() {
         return (RunnerStrikeUserData) body.getUserData();
+    }
+
+    public void setRunner(Runner runner) {
+        this.runner = runner;
     }
 }

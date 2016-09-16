@@ -73,10 +73,11 @@ public enum EnemyType implements Danger {
     //временное
     private boolean newAtlas = false;
     public int number = 0;
+    private float basicXVelocity;
 
 
     EnemyType(float width, float height, float y,  float density, String [] regions
-            , Vector2 linearVelocity, int gravityScale, boolean armour, boolean jumper,
+            , float linearVelocity, int gravityScale, boolean armour, boolean jumper,
               boolean shouter, boolean striker, float jumpingImpulse, int prior, boolean newAtlas,
                 float scaleX, float scaleY, float offsetX, float offsetY, int number) {
         setupProhibitionMap();
@@ -85,7 +86,8 @@ public enum EnemyType implements Danger {
         this.height = height;
         this.width = width;
         this.regions = regions;
-        this.linearVelocity = linearVelocity;
+        this.linearVelocity = new Vector2(Constants.WORLD_STATIC_VELOCITY.x +linearVelocity, 0);
+        basicXVelocity = linearVelocity;
         this.gravityScale = gravityScale;
         if (gravityScale==0) {
             categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_FLYING);
@@ -176,7 +178,11 @@ public enum EnemyType implements Danger {
     }
 
     public Vector2 getLinearVelocity() {
-        return linearVelocity;
+        return new Vector2(linearVelocity);
+    }
+
+    public float  getBasicXVelocity() {
+        return basicXVelocity;
     }
 
 

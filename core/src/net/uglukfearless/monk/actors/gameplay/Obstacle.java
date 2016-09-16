@@ -15,6 +15,7 @@ import net.uglukfearless.monk.enums.ObstacleType;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.Movable;
 import net.uglukfearless.monk.utils.gameplay.SpaceTable;
 import net.uglukfearless.monk.utils.gameplay.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
@@ -22,7 +23,7 @@ import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 /**
  * Created by Ugluk on 07.06.2016.
  */
-public class Obstacle extends GameActor implements Pool.Poolable{
+public class Obstacle extends GameActor implements Pool.Poolable, Movable{
 
     private float deadTime;
     private float stateTime;
@@ -51,9 +52,12 @@ public class Obstacle extends GameActor implements Pool.Poolable{
     public void init(Stage stage, float x, float y) {
         body.setTransform(x, getUserData().obstacleType.getY() +
                 y + getUserData().obstacleType.getHeight() / 2f, 0);
-        body.setLinearVelocity(Constants.WORLD_STATIC_VELOCITY);
+        body.setLinearVelocity(getUserData().getLinearVelocity());
+        getUserData().setLinearVelocity(((GameStage)stage).getCurrentVelocity());
+        body.setLinearVelocity(getUserData().getLinearVelocity());
         body.setActive(true);
         stage.addActor(this);
+        ((GameStage)stage).addMovable(this);
     }
 
     @Override
@@ -108,11 +112,7 @@ public class Obstacle extends GameActor implements Pool.Poolable{
             PoolsHandler.sObstaclePools.get(getUserData().obstacleType.name()).free(this);
         } else {
             if (body.getPosition().x < Constants.GAME_WIDTH) {
-//                System.out.println(getUserData().obstacleType.name() + ":");
-//                System.out.println("basicY " + getUserData().obstacleType.getY());
-//                System.out.println("height " + getUserData().getHeight());
-//                System.out.println("y " + body.getPosition().y);
-//                System.out.println("set y " + (body.getPosition().y - getUserData().obstacleType.getY() - getUserData().getHeight() / 2f));
+
                 SpaceTable.setCell(body.getPosition().x, body.getPosition().y - getUserData().obstacleType.getY() - getUserData().getHeight()/2f
                         , getUserData().getWidth(),getUserData().obstacleType.getCategoryBit());
             }
@@ -122,9 +122,10 @@ public class Obstacle extends GameActor implements Pool.Poolable{
     private void dead(float delta) {
         deadTime +=delta;
         body.applyForceToCenter(500, 50, false);
-        if (deadTime>0.2f&&getStage()!=null) {
+        if ((deadTime>0.2f||getUserData().isTrap()) && getStage() != null) {
             GameStage stage = (GameStage) getStage();
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump2"));
+            stage.removeMovable(this);
             this.remove();
             PoolsHandler.sObstaclePools.get(getUserData().obstacleType.name()).free(this);
         }
@@ -132,6 +133,9 @@ public class Obstacle extends GameActor implements Pool.Poolable{
 
     @Override
     public void reset() {
+        if (getStage()!=null) {
+            ((GameStage)getStage()).removeMovable(this);
+        }
         getUserData().setDead(false);
         stateTime = 0f;
         deadTime = 0f;
@@ -141,5 +145,11 @@ public class Obstacle extends GameActor implements Pool.Poolable{
             body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_SIMPLE);
         }
         body.setTransform(-10, -10, 0);
+    }
+
+    @Override
+    public void changingStaticSpeed(float speedScale) {
+        getUserData().setLinearVelocity(speedScale, 0);
+        body.setLinearVelocity(getUserData().getLinearVelocity().x, body.getLinearVelocity().y);
     }
 }

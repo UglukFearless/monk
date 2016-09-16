@@ -7,9 +7,11 @@ import com.badlogic.gdx.utils.Pool;
 import net.uglukfearless.monk.actors.gameplay.Enemy;
 import net.uglukfearless.monk.actors.gameplay.Lump;
 import net.uglukfearless.monk.actors.gameplay.Obstacle;
+import net.uglukfearless.monk.actors.gameplay.RunnerShell;
 import net.uglukfearless.monk.actors.gameplay.Shell;
 import net.uglukfearless.monk.enums.EnemyType;
 import net.uglukfearless.monk.enums.ObstacleType;
+import net.uglukfearless.monk.stages.GameStage;
 
 import java.util.HashMap;
 
@@ -22,6 +24,7 @@ public class PoolsHandler {
 
     public static Pool<Lump> sLumpsPool;
     public static Pool<Shell> sShellPool;
+    public static Pool<RunnerShell> sRunnerShellPool;
     public static HashMap<String, Pool<Enemy>> sEnemiesPools;
     public static HashMap<String, Pool<Obstacle>> sObstaclePools;
 
@@ -43,6 +46,13 @@ public class PoolsHandler {
             @Override
             protected Shell newObject() {
                 return new Shell(sWorld);
+            }
+        };
+
+        sRunnerShellPool = new Pool<RunnerShell>(8,10) {
+            @Override
+            protected RunnerShell newObject() {
+                return new RunnerShell(sWorld);
             }
         };
 

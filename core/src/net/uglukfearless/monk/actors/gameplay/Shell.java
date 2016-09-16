@@ -9,23 +9,28 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Pool;
 
 import net.uglukfearless.monk.box2d.ShellUserData;
+import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.FilterConstants;
+import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.Movable;
 import net.uglukfearless.monk.utils.gameplay.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 /**
  * Created by Ugluk on 05.09.2016.
  */
-public class Shell extends GameActor implements Pool.Poolable {
+public class Shell extends GameActor implements Pool.Poolable, Movable {
 
     private TextureRegion mRegion;
+    private float mPreviousVelocity;
 
     public Shell(World world) {
         super(WorldUtils.createEnemyShell(world));
 
         mRegion = AssetLoader.enemiesAtlas.findRegion("enemy2_shell");
+
     }
 
     @Override
@@ -35,6 +40,7 @@ public class Shell extends GameActor implements Pool.Poolable {
 
     @Override
     public void reset() {
+        ((GameStage)getStage()).removeMovable(this);
         body.setActive(false);
         this.remove();
         getUserData().setDead(false);
@@ -49,6 +55,8 @@ public class Shell extends GameActor implements Pool.Poolable {
         body.setAngularVelocity(15);
         body.setActive(true);
         stage.addActor(this);
+        ((GameStage)stage).addMovable(this);
+        mPreviousVelocity = ((GameStage)stage).getCurrentVelocity().x;
     }
 
     public void init(Stage stage, Vector2 position, float speed, TextureRegion region) {
@@ -58,6 +66,8 @@ public class Shell extends GameActor implements Pool.Poolable {
         body.setAngularVelocity(15);
         body.setActive(true);
         stage.addActor(this);
+        ((GameStage)stage).addMovable(this);
+        mPreviousVelocity = ((GameStage)stage).getCurrentVelocity().x;
     }
 
     @Override
@@ -77,5 +87,13 @@ public class Shell extends GameActor implements Pool.Poolable {
                 getUserData().getWidth() * 0.5f, getUserData().getHeight() * 0.5f,
                 getUserData().getWidth(), getUserData().getHeight()
                 , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+    }
+
+    @Override
+    public void changingStaticSpeed(float speedScale) {
+
+        body.setLinearVelocity(body.getLinearVelocity().x
+                + (speedScale-(mPreviousVelocity)), body.getLinearVelocity().y);
+        mPreviousVelocity = speedScale;
     }
 }

@@ -1,6 +1,5 @@
 package net.uglukfearless.monk.utils.gameplay;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -9,8 +8,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 
-import net.uglukfearless.monk.actors.gameplay.Shell;
 import net.uglukfearless.monk.box2d.BackgroundUserData;
+import net.uglukfearless.monk.box2d.BudhaUserData;
 import net.uglukfearless.monk.box2d.ColumnsUserData;
 import net.uglukfearless.monk.box2d.EnemyUserData;
 import net.uglukfearless.monk.box2d.GroundUserData;
@@ -20,7 +19,6 @@ import net.uglukfearless.monk.box2d.PitUserData;
 import net.uglukfearless.monk.box2d.RunnerStrikeUserData;
 import net.uglukfearless.monk.box2d.RunnerUserData;
 import net.uglukfearless.monk.box2d.ShellUserData;
-import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.enums.EnemyType;
@@ -82,7 +80,7 @@ public class WorldUtils {
     public static Body createPit(World world, float width, float height) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(-10,-10);
+        bodyDef.position.set(-10, -10);
         Body body =  world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width/2f, height/2f);
@@ -109,7 +107,7 @@ public class WorldUtils {
         body.getFixtureList().get(0).setFriction(0);
         body.setFixedRotation(true);
         body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
-//        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_IMMORTAL);
+//        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_GHOST);
         body.resetMassData();
         body.setUserData(new RunnerUserData(Constants.RUNNER_WIDTH, Constants.RUNNER_HEIGHT));
         shape.dispose();
@@ -179,8 +177,10 @@ public class WorldUtils {
 
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, userData.getDensity());
-        if (userData.isTrap()||userData.isArmour()) {
+        if (userData.isTrap()) {
             body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_TRAP);
+        } else if (userData.isArmour()) {
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_ARMOUR);
         } else {
             body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_SIMPLE);
         }
@@ -205,6 +205,40 @@ public class WorldUtils {
         body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_STRIKE);
         body.resetMassData();
         body.setUserData(new RunnerStrikeUserData());
+        shape.dispose();
+        return body;
+    }
+
+    public static Body createBuddhasBody(World world) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(new Vector2(Constants.RUNNER_X, -10));
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox((Constants.RUNNER_WIDTH * 1.03f)/2f, (Constants.RUNNER_HEIGHT * 1.03f)/2f);
+        Body body = world.createBody(bodyDef);
+        body.createFixture(shape, Constants.RUNNER_DENSITY*10f);
+        body.setGravityScale(0);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_STRIKE_FLIP);
+        body.setFixedRotation(true);
+        body.resetMassData();
+        body.setUserData(new BudhaUserData((Constants.RUNNER_WIDTH * 1.03f)/2f
+                , (Constants.RUNNER_HEIGHT * 1.03f)/2f));
+        shape.dispose();
+        return body;
+    }
+
+    public static Body createRunnerShell(World world) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(new Vector2(-10, -10));
+        CircleShape shape = new CircleShape();
+        shape.setRadius(0.6f);
+        Body body = world.createBody(bodyDef);
+        body.createFixture(shape, Constants.RUNNER_DENSITY);
+        body.setGravityScale(0);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_STRIKE_FLIP);
+        body.resetMassData();
+        body.setUserData(new RunnerStrikeUserData(1.2f, 1.2f, true));
         shape.dispose();
         return body;
     }

@@ -28,12 +28,15 @@ public class GameScreen implements Screen {
     InputMultiplexer mMultiplexer;
 
     public GameScreen(Game game) {
-        AssetLoader.init();
+        AssetLoader.initGame();
         mYViewportHeight = Constants.GAME_WIDTH / ((float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight());
         ScoreCounter.resetStats();
+
         mGameStage = new GameStage(this, mYViewportHeight);
         mGame = game;
-        mGuiStage = new GameGuiStage(this, mGameStage, mYViewportHeight*(Constants.APP_WIDTH/Constants.GAME_WIDTH));
+        mGuiStage = new GameGuiStage(this, mGameStage, mYViewportHeight);
+
+        mGameStage.setGuiStage(mGuiStage);
 
         mMultiplexer = new InputMultiplexer();
         mMultiplexer.addProcessor(new InputAdapter(){
@@ -79,6 +82,7 @@ public class GameScreen implements Screen {
         mMultiplexer.removeProcessor(mGameStage);
         mGameStage.dispose();
         mGameStage = new GameStage(this, mYViewportHeight);
+        mGameStage.setGuiStage(mGuiStage);
         mMultiplexer.addProcessor(mGuiStage);
         mMultiplexer.addProcessor(mGameStage);
         Gdx.input.setInputProcessor(mMultiplexer);
@@ -92,7 +96,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-
+        if (mGameStage.getState()==GameState.RUN) mGameStage.pause();
     }
 
     @Override
@@ -109,8 +113,9 @@ public class GameScreen implements Screen {
     public void dispose() {
         AssetLoader.levelOneMusic.stop();
         SoundSystem.removeMusic(AssetLoader.levelOneMusic);
-        AssetLoader.dispose();
+        AssetLoader.disposeGame();
         if (((GameStage) mGameStage).getState()== GameState.RUN) {
+            mGameStage.saveTimePoint();
             ScoreCounter.saveCalcStats();
             ScoreCounter.checkAchieve();
             ScoreCounter.resetStats();

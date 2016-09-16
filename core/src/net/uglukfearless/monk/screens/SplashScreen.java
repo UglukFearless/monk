@@ -30,6 +30,7 @@ public class SplashScreen implements Screen {
 
     public SplashScreen(RunningMonk game) {
         this.mGame = game;
+        AssetLoader.initBundle();
         AssetLoader.initLogo();
         mSplashScreen = this;
     }

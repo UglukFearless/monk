@@ -13,27 +13,20 @@ import net.uglukfearless.monk.box2d.BackgroundUserData;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.utils.gameplay.Movable;
 import net.uglukfearless.monk.utils.gameplay.WorldUtils;
 
 /**
  * Created by Ugluk on 21.05.2016.
  */
-public class Background extends Actor {
+public class Background extends Actor implements Movable {
 
-
-    private Rectangle textureRegionBounds1;
-    private Rectangle textureRegionBounds2;
     private float speed = 0;
     private Body mBody1, mBody2;
 
 //    private Sprite mSprite1, mSprite2;
 
-    public Background(World world, int viewport_width, int viewport_height) {
-
-        textureRegionBounds1 = new Rectangle(0 - Constants.GAME_WIDTH/2,
-                Constants.BACKGROUND_OFFSET_Y, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
-        textureRegionBounds2 = new Rectangle(1.06f*Constants.GAME_WIDTH/2,
-                Constants.BACKGROUND_OFFSET_Y, Constants.GAME_WIDTH, Constants.GAME_HEIGHT);
+    public Background(World world, int viewport_width, float viewport_height) {
 
         mBody1 = WorldUtils.createBackground(world,0 - viewport_width*0.05f/2, viewport_width*1.05f, viewport_height);
         mBody2 = WorldUtils.createBackground(world,viewport_width + viewport_width*0.05f/2, viewport_width*1.05f, viewport_height);
@@ -53,12 +46,6 @@ public class Background extends Actor {
 
     @Override
     public void act(float delta) {
-
-        if (leftBoundsReached(delta)) {
-            resetBounds();
-        } else {
-            updateXBounds(delta);
-        }
 
         if (leftBoundsReached(mBody1)) {
             repositionBodies(mBody1, mBody2);
@@ -102,24 +89,17 @@ public class Background extends Actor {
         batch.enableBlending();
     }
 
-    private boolean leftBoundsReached(float delta) {
-        return (textureRegionBounds2.x ) <= 0; // - (delta*speed)
-    }
-
-    private void updateXBounds(float delta) {
-        textureRegionBounds1.x +=delta*speed;
-        textureRegionBounds2.x +=delta*speed;
-    }
-
-    private void resetBounds() {
-        textureRegionBounds1 = textureRegionBounds2;
-        textureRegionBounds2 = new Rectangle(Constants.GAME_WIDTH,
-                Constants.BACKGROUND_OFFSET_Y, Constants.GAME_WIDTH*1.01f, Constants.GAME_HEIGHT);
-    }
-
     public void setSpeed(float speed) {
         this.speed = speed;
         mBody1.setLinearVelocity(new Vector2(speed, 0));
         mBody2.setLinearVelocity(new Vector2(speed, 0));
+    }
+
+
+    @Override
+    public void changingStaticSpeed(float speedScale) {
+
+        mBody1.setLinearVelocity(new Vector2(speedScale*Constants.BACKGROUND_VELOCITY_COFF, 0));
+        mBody2.setLinearVelocity(new Vector2(speedScale*Constants.BACKGROUND_VELOCITY_COFF, 0));
     }
 }
