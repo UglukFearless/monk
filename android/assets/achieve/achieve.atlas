@@ -3,86 +3,114 @@ achieve.png
 format: RGBA4444
 filter: Linear,Linear
 repeat: none
-adept_kung_fu
+genius_kun_fu
   rotate: false
   xy: 1, 105
-  size: 102, 102
-  orig: 102, 102
+  size: 128, 128
+  orig: 128, 128
   offset: 0, 0
   index: -1
-adept_tamesivari
+genius_tamesivari
+  rotate: false
+  xy: 131, 105
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+reborn
+  rotate: false
+  xy: 261, 105
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ruthless
+  rotate: false
+  xy: 391, 105
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+adept_kun_fu
   rotate: false
   xy: 1, 1
   size: 102, 102
   orig: 102, 102
   offset: 0, 0
   index: -1
-bound_in_flesh
+adept_tamesivari
   rotate: false
-  xy: 105, 105
+  xy: 521, 131
   size: 102, 102
   orig: 102, 102
   offset: 0, 0
   index: -1
-hands_in_blood
+bound_in_flesh
   rotate: false
   xy: 105, 1
   size: 102, 102
   orig: 102, 102
   offset: 0, 0
   index: -1
-lock
+hands_in_blood
   rotate: false
-  xy: 209, 105
+  xy: 625, 131
   size: 102, 102
   orig: 102, 102
   offset: 0, 0
   index: -1
-master_kung_fu
+lock
   rotate: false
   xy: 209, 1
   size: 102, 102
   orig: 102, 102
   offset: 0, 0
   index: -1
-master_tamesivari
+master_kun_fu
   rotate: false
-  xy: 313, 105
+  xy: 729, 131
   size: 102, 102
   orig: 102, 102
   offset: 0, 0
   index: -1
-mortal
+master_tamesivari
   rotate: false
   xy: 313, 1
   size: 102, 102
   orig: 102, 102
   offset: 0, 0
   index: -1
-mushroom
+mortal
   rotate: false
-  xy: 417, 105
+  xy: 833, 131
   size: 102, 102
   orig: 102, 102
   offset: 0, 0
   index: -1
-neophyte_kung_fu
+mushroom
   rotate: false
   xy: 417, 1
   size: 102, 102
   orig: 102, 102
   offset: 0, 0
   index: -1
+neophyte_kun_fu
+  rotate: false
+  xy: 521, 27
+  size: 102, 102
+  orig: 102, 102
+  offset: 0, 0
+  index: -1
 neophyte_tamesivari
   rotate: false
-  xy: 521, 105
+  xy: 625, 27
   size: 102, 102
   orig: 102, 102
   offset: 0, 0
   index: -1
 wheel_of_samsara
   rotate: false
-  xy: 521, 1
+  xy: 729, 27
   size: 102, 102
   orig: 102, 102
   offset: 0, 0

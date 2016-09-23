@@ -40,7 +40,7 @@ public abstract class GameBonus extends Actor {
     private GameGuiStage mGuiStage;
     private float mGameHeight;
 
-    private String mActiveTitle;
+    protected String mActiveTitle;
 
 
     public GameBonus(GameStage gameStage, float gameHeight) {
@@ -54,7 +54,7 @@ public abstract class GameBonus extends Actor {
         mActiveTime = 0;
         mTimingBalance = 3;
 
-        mActiveTitle = AssetLoader.sBundle.get("PLAY_BONUS_ACTIVE_TITLE");
+        mActiveTitle = AssetLoader.sBundle.format("PLAY_BONUS_ACTIVE_TITLE", mName);
 
         mRunnerBounds = new Rectangle(Constants.RUNNER_X, Constants.RUNNER_Y
                 , Constants.RUNNER_WIDTH, Constants.RUNNER_HEIGHT);
@@ -85,7 +85,8 @@ public abstract class GameBonus extends Actor {
 
             } else if (!mAddsActions){
                 activation();
-                mGuiStage.setLabel(mName + mActiveTitle, 2f);
+//                mGuiStage.setLabel(mName + mActiveTitle, 2f);
+                mGuiStage.setLabel(mActiveTitle, 2f);
                 AssetLoader.getBonus.play(SoundSystem.getSoundValue());
                 this.addAction(Actions.sequence(Actions.sizeBy(1.15f, 1.15f, 0.08f)
                         , Actions.sizeBy(-1.15f, -1.15f, 0.08f)));
@@ -157,4 +158,5 @@ public abstract class GameBonus extends Actor {
     public void setGui(GameGuiStage gui) {
         mGuiStage = gui;
     }
+
 }

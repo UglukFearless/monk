@@ -1,9 +1,10 @@
-package net.uglukfearless.monk.utils.gameplay;
+package net.uglukfearless.monk.utils.gameplay.ai;
 
 import com.badlogic.gdx.math.Vector2;
 
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PlacingCategory;
+import net.uglukfearless.monk.utils.gameplay.ai.Situation;
 
 /**
  * Created by Ugluk on 03.09.2016.

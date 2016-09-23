@@ -57,14 +57,15 @@ public class MainMenuStage extends Stage {
 
         setupButtons(yViewportHeight);
 
-        Gdx.input.setCatchBackKey(false);
-        Gdx.input.setCatchMenuKey(false);
+        Gdx.input.setCatchBackKey(true);
+        Gdx.input.setCatchMenuKey(true);
+
     }
 
 
     private void setupTitle(String title) {
         mTitle = new Label(title , AssetLoader.sGuiSkin, "title");
-        mTitle.setPosition(VIEWPORT_WIDTH/2f - mTitle.getWidth()/2f, VIEWPORT_HEIGHT - 30 - mTitle.getHeight());
+        mTitle.setPosition(VIEWPORT_WIDTH / 2f - mTitle.getWidth() / 2f, VIEWPORT_HEIGHT - 30 - mTitle.getHeight());
         addActor(mTitle);
     }
 
@@ -93,6 +94,12 @@ public class MainMenuStage extends Stage {
 
     private void translateScreenToWorldCoordinates(int screenX, int screenY) {
         getCamera().unproject(touchPoint.set(screenX, screenY, 0));
+    }
+
+    @Override
+    public boolean keyDown(int keyCode) {
+        Gdx.app.exit();
+        return super.keyDown(keyCode);
     }
 
 }

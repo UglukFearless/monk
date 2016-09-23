@@ -47,7 +47,7 @@ public class GameContactListener implements ContactListener {
                 b.setFixedRotation(false);
                 ((EnemyUserData) b.getUserData()).setDoll(true);
             } else {
-                stage.getRunner().hit();
+                stage.getRunner().hit(((EnemyUserData) b.getUserData()).getKEY());
             }
 
         } else if (((BodyUtils.bodyIsEnemy(a)&&!((EnemyUserData)a.getUserData()).isDead())&&BodyUtils.bodyIsRunner(b))) {
@@ -55,7 +55,7 @@ public class GameContactListener implements ContactListener {
                 a.setFixedRotation(false);
                 ((EnemyUserData) a.getUserData()).setDoll(true);
             } else {
-                stage.getRunner().hit();
+                stage.getRunner().hit(((EnemyUserData) a.getUserData()).getKEY());
             }
 
         } else if ((BodyUtils.bodyIsRunner(a)&&BodyUtils.bodyIsGround(b))
@@ -127,7 +127,7 @@ public class GameContactListener implements ContactListener {
                         &&!((ObstacleUserData)a.getUserData()).isTrap()) {
                     stage.getRunner().landed();
             } else if (!((ObstacleUserData)a.getUserData()).isDead()) {
-                    stage.getRunner().hit();
+                    stage.getRunner().hit(((ObstacleUserData)a.getUserData()).getKEY());
                     if (((ObstacleUserData)a.getUserData()).isBlades()) {
                         b.setLinearVelocity(a.getLinearVelocity().add(40,10));
                     }
@@ -138,7 +138,7 @@ public class GameContactListener implements ContactListener {
                     &&!((ObstacleUserData)b.getUserData()).isTrap()){
                 stage.getRunner().landed();
             } else if (!((ObstacleUserData)b.getUserData()).isDead()){
-                stage.getRunner().hit();
+                stage.getRunner().hit(((ObstacleUserData)b.getUserData()).getKEY());
                 if (((ObstacleUserData)b.getUserData()).isBlades()) {
                     a.setLinearVelocity(a.getLinearVelocity().add(40, 10));
                 }
@@ -147,8 +147,10 @@ public class GameContactListener implements ContactListener {
             //Обработка столкновений препятствий с ударом монаха
 
                 if (!((ObstacleUserData)b.getUserData()).isDead()
-                        &&!(((ObstacleUserData)b.getUserData()).isArmour()
-                        &&((RunnerStrikeUserData)a.getUserData()).isShell())) {
+                        &&((!((ObstacleUserData)b.getUserData()).isTrap()
+                        &&((RunnerStrikeUserData)a.getUserData()).isPiercing1())
+                        ||((RunnerStrikeUserData)a.getUserData()).isPiercing2()
+                        ||!((ObstacleUserData)b.getUserData()).isArmour())) {
                     ScoreCounter.increaseScore(1);
                     ScoreCounter.increaseDestroyed();
                     ((ObstacleUserData)b.getUserData()).setDead(true);
@@ -164,13 +166,15 @@ public class GameContactListener implements ContactListener {
 
         } else if (BodyUtils.bodyIsRunnerStrike(b)&&BodyUtils.bodyIsObstacle(a)) {
 
-                if (!((ObstacleUserData)a.getUserData()).isDead()
-                        &&!(((ObstacleUserData)a.getUserData()).isArmour()
-                            &&((RunnerStrikeUserData)b.getUserData()).isShell())) {
-                    ScoreCounter.increaseScore(1);
-                    ScoreCounter.increaseDestroyed();
-                    ((ObstacleUserData)a.getUserData()).setDead(true);
-                }
+            if (!((ObstacleUserData)a.getUserData()).isDead()
+                    &&((!((ObstacleUserData)a.getUserData()).isTrap()
+                    &&((RunnerStrikeUserData)b.getUserData()).isPiercing1())
+                    ||((RunnerStrikeUserData)b.getUserData()).isPiercing2())
+                    ||!((ObstacleUserData)a.getUserData()).isArmour()) {
+                ScoreCounter.increaseScore(1);
+                ScoreCounter.increaseDestroyed();
+                ((ObstacleUserData)a.getUserData()).setDead(true);
+            }
 
 
             if (((RunnerStrikeUserData)b.getUserData()).isShell()) {
@@ -294,7 +298,7 @@ public class GameContactListener implements ContactListener {
             case RUNNER:
                 ((ShellUserData)shell.getUserData()).setDead(true);
                 shell.setGravityScale(1);
-                stage.getRunner().hit();
+                stage.getRunner().hit(((ShellUserData)shell.getUserData()).getKEY());
                 break;
             case BUDDHA:
                 shell.setGravityScale(1);

@@ -1,6 +1,24 @@
 package net.uglukfearless.monk.utils.file;
 
+import com.badlogic.gdx.utils.Array;
+
 import net.uglukfearless.monk.constants.PreferencesConstants;
+import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
+import net.uglukfearless.monk.utils.gameplay.achievements.AdeptKunFu;
+import net.uglukfearless.monk.utils.gameplay.achievements.AdeptTamesivari;
+import net.uglukfearless.monk.utils.gameplay.achievements.BoundInFlush;
+import net.uglukfearless.monk.utils.gameplay.achievements.GeniusKunFu;
+import net.uglukfearless.monk.utils.gameplay.achievements.GeniusTamesivari;
+import net.uglukfearless.monk.utils.gameplay.achievements.HandsInBlood;
+import net.uglukfearless.monk.utils.gameplay.achievements.MasterKunFu;
+import net.uglukfearless.monk.utils.gameplay.achievements.MasterTamesivari;
+import net.uglukfearless.monk.utils.gameplay.achievements.Mortal;
+import net.uglukfearless.monk.utils.gameplay.achievements.Mushroom;
+import net.uglukfearless.monk.utils.gameplay.achievements.NeophyteKunFu;
+import net.uglukfearless.monk.utils.gameplay.achievements.NeophyteTamesivari;
+import net.uglukfearless.monk.utils.gameplay.achievements.Reborn;
+import net.uglukfearless.monk.utils.gameplay.achievements.Ruthless;
+import net.uglukfearless.monk.utils.gameplay.achievements.WheelOfSamsara;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,13 +34,42 @@ public class ScoreCounter {
 
     private static int time = 0;
     private static int killed = 0;
+    private static int enemiesAll = 0;
     private static int destroyed = 0;
     private static int deaths = 0;
     private static float efficiency = 0;
 
-    private static Set<String> currentAchieve = new HashSet<String>();
-    private static Set<String> lockAchieve = new HashSet<String>();
-    private static Set<String> newAchieve = new HashSet<String>();
+    private static int useBuddha = 0;
+    private static int useGhost = 0;
+    private static int useRetribution = 0;
+    private static int useRevival = 0;
+    private static int useStrongBeat = 0;
+    private static int useThunderFist = 0;
+    private static int useWings = 0;
+
+    private static Array<Achievement> sAchievementList;
+
+    public static void createAchieveList() {
+
+        sAchievementList = new Array<Achievement>();
+
+        sAchievementList.add(new Mushroom());
+        sAchievementList.add(new Mortal());
+        sAchievementList.add(new HandsInBlood());
+        sAchievementList.add(new NeophyteKunFu());
+        sAchievementList.add(new AdeptKunFu());
+        sAchievementList.add(new MasterKunFu());
+        sAchievementList.add(new GeniusKunFu());
+        sAchievementList.add(new NeophyteTamesivari());
+        sAchievementList.add(new AdeptTamesivari());
+        sAchievementList.add(new MasterTamesivari());
+        sAchievementList.add(new GeniusTamesivari());
+        sAchievementList.add(new BoundInFlush());
+        sAchievementList.add(new Reborn());
+        sAchievementList.add(new WheelOfSamsara());
+        sAchievementList.add(new Ruthless());
+    }
+
 
     //возможно в будущем избавлюсь от вызова этого метода и буду его реализовывать иначе
     public static void increaseScore(int score) {
@@ -67,8 +114,16 @@ public class ScoreCounter {
         return efficiency;
     }
 
+    public static int getEnemiesAll() {
+        return enemiesAll;
+    }
+
     public static void setTime(int time) {
         ScoreCounter.time = time;
+    }
+
+    public static void increaseEnemies() {
+        enemiesAll++;
     }
 
     public static void increaseKilled() {
@@ -81,12 +136,40 @@ public class ScoreCounter {
         deaths++;
     }
 
+    //подсчет бонусов
+    public static void increaseBuddha() {
+        useBuddha++;
+    }
+    public static void increaseGhost() {
+        useGhost++;
+    }
+    public static void increaseRetribution() {
+        useRetribution++;
+    }
+    public static void increaseRevival() {
+        useRevival++;
+    }
+    public static void increaseStrongBeat() {
+        useStrongBeat++;
+    }
+    public static void increaseThunderFist() {
+        useThunderFist++;
+    }
+    public static void increaseWings() {
+        useWings++;
+    }
+
+    public static void saveCalcStats(String currentKillerKey) {
+        saveCalcStats();
+        PreferencesManager.setDeathCause(currentKillerKey);
+    }
     public static void saveCalcStats() {
+
         PreferencesManager.setScore(score);
         PreferencesManager.addTime(time);
         PreferencesManager.addKilled(killed);
         PreferencesManager.addDestroyed(destroyed);
-        PreferencesManager.addDeath();
+        PreferencesManager.addEnemies(enemiesAll);
         if (deaths == 0) {
             efficiency = (killed + destroyed)/1f;
         } else {
@@ -94,6 +177,14 @@ public class ScoreCounter {
         }
         PreferencesManager.calcAddEfficiency();
 
+        //по бонусам
+        PreferencesManager.addBuddha(useBuddha);
+        PreferencesManager.addGhost(useGhost);
+        PreferencesManager.addRetribution(useRetribution);
+        PreferencesManager.addRevival(useRevival);
+        PreferencesManager.addThunder(useThunderFist);
+        PreferencesManager.addStrong(useStrongBeat);
+        PreferencesManager.addWings(useWings);
     }
 
     public static void resetStats() {
@@ -104,96 +195,18 @@ public class ScoreCounter {
         destroyed = 0;
         deaths = 0;
         efficiency = 0;
+        enemiesAll = 0;
+
+        useBuddha = 0;
+        useGhost = 0;
+        useRetribution = 0;
+        useRevival = 0;
+        useStrongBeat = 0;
+        useThunderFist = 0;
+        useWings = 0;
     }
 
-    public static void loadAchieve() {
-        for (int i=0;i < PreferencesConstants.ALL_ACHIEVE_KEYS.length; i++) {
-            if (PreferencesManager.checkAchieve(PreferencesConstants.ALL_ACHIEVE_KEYS[i])) {
-                currentAchieve.add(PreferencesConstants.ALL_ACHIEVE_KEYS[i]);
-            } else {
-                lockAchieve.add(PreferencesConstants.ALL_ACHIEVE_KEYS[i]);
-            }
-        }
-    }
-
-    public static void checkAchieve() {
-        if (PreferencesManager.getTime()>=18000&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_MUSHROOM_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_MUSHROOM_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_MUSHROOM_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_MUSHROOM_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_MUSHROOM_KEY);
-        }
-        if (PreferencesManager.getKilled()>=1&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_HIB_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_HIB_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_HIB_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_HIB_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_HIB_KEY);
-        }
-        if (PreferencesManager.getKilled()>=100&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_NKF_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_NKF_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_NKF_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_NKF_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_NKF_KEY);
-        }
-        if (PreferencesManager.getKilled()>=1000&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_AKF_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_AKF_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_AKF_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_AKF_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_AKF_KEY);
-        }
-        if (PreferencesManager.getKilled()>=10000&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_MKF_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_MKF_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_MKF_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_MKF_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_MKF_KEY);
-        }
-        if (PreferencesManager.getDestroyed()>=50&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_NT_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_NT_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_NT_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_NT_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_NT_KEY);
-        }
-        if (PreferencesManager.getDestroyed()>=500&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_AT_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_AT_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_AT_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_AT_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_AT_KEY);
-        }
-        if (PreferencesManager.getDestroyed()>=5000&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_MT_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_MT_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_MT_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_MT_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_MT_KEY);
-        }
-        if (PreferencesManager.getDeaths()>=1&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_MORTAL_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_MORTAL_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_MORTAL_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_MORTAL_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_MORTAL_KEY);
-        }
-        if (PreferencesManager.getDeaths()>=100&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_BIF_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_BIF_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_BIF_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_BIF_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_BIF_KEY);
-        }
-        if (PreferencesManager.getDeaths()>=1000&&!currentAchieve.contains(PreferencesConstants.ACHIEVE_WOS_KEY)) {
-            PreferencesManager.unlockAchieve(PreferencesConstants.ACHIEVE_WOS_KEY);
-            currentAchieve.add(PreferencesConstants.ACHIEVE_WOS_KEY);
-            newAchieve.add(PreferencesConstants.ACHIEVE_WOS_KEY);
-            lockAchieve.remove(PreferencesConstants.ACHIEVE_WOS_KEY);
-        }
-    }
-
-    public static Set<String> getCurrentAchieve() {
-        return currentAchieve;
-    }
-
-    public static Set<String> getLockAchieve() {
-        return lockAchieve;
-    }
-
-    public static Set<String> getNewAchieve() {
-        return newAchieve;
+    public static Array<Achievement> getAchieveList() {
+        return sAchievementList;
     }
 }

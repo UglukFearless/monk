@@ -3,7 +3,9 @@ package net.uglukfearless.monk.enums;
 import com.badlogic.gdx.math.Vector2;
 
 import net.uglukfearless.monk.constants.Constants;
-import net.uglukfearless.monk.utils.gameplay.Danger;
+import net.uglukfearless.monk.constants.PreferencesConstants;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
+import net.uglukfearless.monk.utils.gameplay.dangers.Danger;
 import net.uglukfearless.monk.constants.PlacingCategory;
 
 import java.util.Random;
@@ -14,37 +16,48 @@ import java.util.Random;
  */
 public enum EnemyType implements Danger {
 
-    ENEMY_1(1.3f,3f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
+    ENEMY_1("SPEARMEN", "Spearmen", "Копейщик"
+            ,1.3f,3f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.ENEMY1_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
             false, true, false, true, Constants.ENEMY_JUMPING_COFF,
             Constants.DANGERS_PRIORITY_OFTEN, true,1.8f, 1.1f,-0.2f,0, 1),
 
-    ENEMY_2(1.5f,3.2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
+    ENEMY_2("AXEMEN", "Axemen", "Воин с топором"
+            ,1.5f,3.2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.RUNNING_WIDE_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
             false, true, true, true, Constants.ENEMY_JUMPING_COFF,
             Constants.DANGERS_PRIORITY_OFTEN, true,1.43f, 1.05f,0,0, 2),
 
-    ENEMY_3(1f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
+    ENEMY_3("PENIS", "Leech", "Пиявка"
+            ,1f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.RUNNING_LONG_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
             false, false, false, true, Constants.ENEMY_JUMPING_COFF,
             Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0, 3),
 
-    ENEMY_4(2f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
+    ENEMY_4("SPIDER", "Spider", "Паукан"
+            ,2f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.RUNNING_BIG_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
             false, false, false, true, Constants.ENEMY_JUMPING_COFF,
             Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0, 4),
 
-    ENEMY_5(1f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
+    ENEMY_5("BEE", "Bee", "Пчола"
+            ,1f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.FLYING_SMALL_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 0,
             false, false, false, true, Constants.ENEMY_JUMPING_COFF,
             Constants.DANGERS_PRIORITY_VERY_SELDOM, false,1.2f, 1.1f,0,0, 5),
 
-    ENEMY_6(2f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
+    ENEMY_6("MYXA", "Myxa", "Муха"
+            ,2f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
             Constants.FLYING_WIDE_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 0,
             false, false, false, true, Constants.ENEMY_JUMPING_COFF,
             Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0, 6);
 
     private Random rand = new Random();
+
+    private String name;
+    private String enName;
+    private String ruName;
+    private String KEY;
 
     private float width;
     private float height;
@@ -76,10 +89,19 @@ public enum EnemyType implements Danger {
     private float basicXVelocity;
 
 
-    EnemyType(float width, float height, float y,  float density, String [] regions
-            , float linearVelocity, int gravityScale, boolean armour, boolean jumper,
-              boolean shouter, boolean striker, float jumpingImpulse, int prior, boolean newAtlas,
-                float scaleX, float scaleY, float offsetX, float offsetY, int number) {
+    EnemyType(String name, String enName, String ruName
+            , float width, float height, float y,  float density, String [] regions
+            , float linearVelocity, int gravityScale, boolean armour, boolean jumper
+            , boolean shouter, boolean striker, float jumpingImpulse, int prior, boolean newAtlas
+            , float scaleX, float scaleY, float offsetX, float offsetY, int number) {
+
+        this.name = name;
+        this.ruName = ruName;
+        this.enName = enName;
+        this.KEY = PreferencesConstants.GENERAL_DANGER_KEY.concat(this.name);
+
+        PreferencesManager.putDangerKey(KEY, this.enName, this.ruName);
+
         setupProhibitionMap();
         this.density = density;
         this.y = y;
@@ -229,6 +251,10 @@ public enum EnemyType implements Danger {
 
     public float getTextureOffsetY() {
         return textureOffsetY;
+    }
+
+    public String getKEY() {
+        return KEY;
     }
 
     //временное

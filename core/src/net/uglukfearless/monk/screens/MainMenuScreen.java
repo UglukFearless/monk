@@ -11,8 +11,11 @@ import net.uglukfearless.monk.stages.MainMenuStage;
 import net.uglukfearless.monk.stages.OptionMenuStage;
 import net.uglukfearless.monk.stages.StatisticsMenuStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.file.SoundSystem;
+
+import java.util.Map;
 
 /**
  * Created by Ugluk on 30.06.2016.
@@ -27,7 +30,7 @@ public class MainMenuScreen implements Screen {
     public MainMenuScreen(Game game) {
         this.game = game;
         AssetLoader.initMenu();
-        ScoreCounter.loadAchieve();
+        ScoreCounter.createAchieveList();
     }
 
     @Override

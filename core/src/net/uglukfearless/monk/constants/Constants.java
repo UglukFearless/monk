@@ -32,7 +32,7 @@ public class Constants {
 
     public static final float GROUND_X = 0;
     public static final float GROUND_Y = 0;
-    public static final float GROUND_WIDTH = 38f;
+    public static final float GROUND_WIDTH = 40f;
     public static final float GROUND_HEIGHT = 6f;
     public static final float GROUND_DENSITY = 10f;
     public static final Vector2 GROUND_LINEAR_VELOCITY = WORLD_STATIC_VELOCITY;
@@ -127,11 +127,31 @@ public class Constants {
     public static final String [] ENEMY_ANIMATION_GROUP_NAMES = new String[]
             {"_stay", "_run", "_jump", "_strike", "_hit"};
 
-    public static final String [] ACHIEVE_NAMES = new String []
-            {"mushroom", "hands_in_blood",
-            "neophyte_kung_fu", "adept_kung_fu", "master_kung_fu",
-            "neophyte_tamesivari", "adept_tamesivari", "master_tamesivari",
-            "mortal", "bound_in_flesh", "wheel_of_samsara", "lock"};
+
+    public static final String ACHIEVE_MUSHROOM_REGION = "mushroom";
+    public static final String ACHIEVE_HIB_REGION = "hands_in_blood";
+    public static final String ACHIEVE_NKF_REGION = "neophyte_kun_fu";
+    public static final String ACHIEVE_AKF_REGION = "adept_kun_fu";
+    public static final String ACHIEVE_MKF_REGION = "master_kun_fu";
+    public static final String ACHIEVE_GKF_REGION = "genius_kun_fu";
+    public static final String ACHIEVE_NT_REGION = "neophyte_tamesivari";
+    public static final String ACHIEVE_AT_REGION = "adept_tamesivari";
+    public static final String ACHIEVE_MT_REGION = "master_tamesivari";
+    public static final String ACHIEVE_GT_REGION = "genius_tamesivari";
+    public static final String ACHIEVE_MORTAL_REGION = "mortal";
+    public static final String ACHIEVE_BIF_REGION = "bound_in_flesh";
+    public static final String ACHIEVE_REBORN_REGION = "reborn";
+    public static final String ACHIEVE_WOS_REGION = "wheel_of_samsara";
+    public static final String ACHIEVE_LOCK_REGION = "lock";
+    public static final String ACHIEVE_RUTHLESS_REGION = "ruthless";
+
+    public static final String BONUS_BUDDHA_REGION = "buddha";
+    public static final String BONUS_WINGS_REGION = "faith_wings";
+    public static final String BONUS_GHOST_REGION = "ghost";
+    public static final String BONUS_RETRIBUTION_REGION = "retribution";
+    public static final String BONUS_REVIVAL_REGION = "revival";
+    public static final String BONUS_STRONG_BEAT_REGION = "strong_beat";
+    public static final String BONUS_THUNDER_FIST_REGION = "thunder_fist";
 
     public static final String BUTTON_MENU_ON = "button_on";
     public static final String BUTTON_MENU_OFF = "button_off";

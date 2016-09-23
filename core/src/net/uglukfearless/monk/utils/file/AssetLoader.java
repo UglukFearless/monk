@@ -55,8 +55,6 @@ public class AssetLoader {
     public static TextureAtlas bladesAtlas;
     public static Animation blades;
 
-    public static HashMap<String,TextureRegion> sAchieveRegions;
-
     public static TextureRegion buttonMenuOn;
     public static TextureRegion buttonMenuOff;
     public static TextureRegion buttonBackOn;
@@ -153,12 +151,6 @@ public class AssetLoader {
         broadbordTexture = new Texture(Gdx.files.internal("broadbord.png"));
         broadbord = new TextureRegion(broadbordTexture);
 
-        sAchieveRegions = new HashMap<String, TextureRegion>(Constants.ACHIEVE_NAMES.length);
-        for (int i=0; i<Constants.ACHIEVE_NAMES.length -1;i++) {
-            sAchieveRegions.put(PreferencesConstants.ALL_ACHIEVE_KEYS[i]
-                    , achieveAtlas.findRegion(Constants.ACHIEVE_NAMES[i]));
-        }
-
     }
 
     //Инициализация ресурсов уровня
@@ -171,15 +163,6 @@ public class AssetLoader {
 
         charactersAtlas = new TextureAtlas(Gdx.files.internal(Constants.CHARACTERS_ATLAS_PATH));
         monkAtlas = new TextureAtlas(Gdx.files.internal("new/monk.atlas"));
-
-//        playerFrames = new TextureRegion[Constants.RUNNER_RUNNING_REGION_NAMES.length];
-//        for (int i=0;i< Constants.RUNNER_RUNNING_REGION_NAMES.length;i++) {
-//            playerFrames[i] = monkAtlas.findRegion(Constants.RUNNER_RUNNING_REGION_NAMES[i]);
-//        }
-//        playerRun = new Animation(0.12f, playerFrames);
-//        playerJump = monkAtlas.findRegion(Constants.RUNNER_JUMPING_REGION_NAME);
-//        playerHit = monkAtlas.findRegion(Constants.RUNNER_HIT_REGION_NAME);
-//        playerStrike = monkAtlas.findRegion(Constants.RUNNER_STRIKING_REGION_NAME);
 
         stoneTexture = new Texture(Gdx.files.internal("stone.png"));
         stone = new TextureRegion(stoneTexture);
@@ -213,6 +196,7 @@ public class AssetLoader {
         menuBackgroundTexture = new Texture(Gdx.files.internal("menuBackground.png"));
         guiAtlas = new TextureAtlas(Gdx.files.internal("gui/gui.atlas"));
         achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
+        bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
 
         buttonMenuOff = new TextureRegion(guiAtlas.findRegion("button_off"));
         buttonMenuOn = new TextureRegion(guiAtlas.findRegion("button_on"));
@@ -228,13 +212,6 @@ public class AssetLoader {
 
         sGuiSkin = new Skin(Gdx.files.internal("gui/forskin/exp/gui_exp.json"));
 
-        //**********************************************************
-        //!!!!!!!!!!!! ВОТ ТУТ СОМНИТЕЛЬНЫЙ ХОД!!!!!!!!!!!
-        sAchieveRegions = new HashMap<String, TextureRegion>(Constants.ACHIEVE_NAMES.length);
-        for (int i=0; i<Constants.ACHIEVE_NAMES.length - 1;i++) {
-            sAchieveRegions.put(PreferencesConstants.ALL_ACHIEVE_KEYS[i]
-                    , achieveAtlas.findRegion(Constants.ACHIEVE_NAMES[i]));
-        }
     }
 
     public static void initLogo() {
@@ -252,8 +229,8 @@ public class AssetLoader {
         monkStrike.dispose();
         menuBackgroundTexture.dispose();
         guiAtlas.dispose();
-        sAchieveRegions.clear();
         achieveAtlas.dispose();
+        bonusesAtlas.dispose();
         font.dispose();
         fontBig.dispose();
         sGuiSkin.dispose();
@@ -265,7 +242,6 @@ public class AssetLoader {
         charactersAtlas.dispose();
         monkAtlas.dispose();
         enemiesAtlas.dispose();
-        sAchieveRegions.clear();
         achieveAtlas.dispose();
         bonusesAtlas.dispose();
         lumpsAtlas.dispose();

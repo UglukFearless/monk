@@ -1,4 +1,4 @@
-package net.uglukfearless.monk.utils.gameplay;
+package net.uglukfearless.monk.utils.gameplay.dangers;
 
 import net.uglukfearless.monk.stages.GameStage;
 

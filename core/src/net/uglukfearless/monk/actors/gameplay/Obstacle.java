@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Pool;
 
 import net.uglukfearless.monk.box2d.ObstacleUserData;
-import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.enums.ObstacleType;
@@ -16,7 +15,7 @@ import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.gameplay.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.Movable;
-import net.uglukfearless.monk.utils.gameplay.SpaceTable;
+import net.uglukfearless.monk.utils.gameplay.ai.SpaceTable;
 import net.uglukfearless.monk.utils.gameplay.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 

@@ -6,15 +6,17 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.physics.box2d.Body;
 
-import net.uglukfearless.monk.actors.gameplay.Ground;
 import net.uglukfearless.monk.box2d.RunnerUserData;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.constants.FilterConstants;
+import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.enums.RunnerState;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
-import net.uglukfearless.monk.utils.file.ScoreCounter;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.SoundSystem;
+import net.uglukfearless.monk.utils.gameplay.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 /**
@@ -44,13 +46,18 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
     private Color mColor;
     private float mAlpha;
     private boolean mWings;
+
     private boolean mRetribution;
+    private int mRetributionLevel;
+
     private boolean mThunderFist;
+    private int mThunderFistLevel;
     private boolean mBuddha;
 
     private float mBuddhaTimer;
     private float mBuddhaThreshold;
 
+    private String mCurrentKillerKey;
 
 
     public Runner(Body body) {
@@ -124,6 +131,23 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 }
 
             }
+
+            if (BodyUtils.runnerIsFallDown(body)) {
+                if (mWings) {
+                    body.setTransform(Constants.RUNNER_X,Constants.RUNNER_Y, 0);
+                    ((GameStage)getStage()).StartRebutRunner();
+                } else {
+                    hit(PreferencesConstants.STATS_CRASHED_DEATH_KEY);
+                }
+
+            } else if (BodyUtils.runnerIsBehind(body)) {
+                if (mWings) {
+                    body.setTransform(Constants.RUNNER_X,Constants.RUNNER_Y, 0);
+                    ((GameStage)getStage()).StartRebutRunner();
+                } else {
+                    hit(PreferencesConstants.STATS_CRASHED_DEATH_KEY);
+                }
+            }
         }
 
         switch (data.getState()) {
@@ -183,7 +207,10 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             GameStage stage = (GameStage) getStage();
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump1"));
             ((UserData)body.getUserData()).setDestroy(true);
-            ((GameStage) getStage()).gameOver();
+            if (((GameStage) getStage()).getRevival()==0) {
+                PreferencesManager.addDeath();
+            }
+            ((GameStage) getStage()).gameOver(mCurrentKillerKey);
             this.remove();
         }
     }
@@ -259,9 +286,9 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 mCurrentAnimation = mAnimStrike;
                 strikeTime = 0f;
                 if (mRetribution) {
-                    ((GameStage)getStage()).retribution();
+                    ((GameStage)getStage()).retribution(mRetributionLevel);
                 } else if (mThunderFist) {
-                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition());
+                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition(), mThunderFistLevel);
                 }
                 break;
             case JUMP_STRIKE:
@@ -271,9 +298,9 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 mCurrentAnimation = mAnimStrike;
                 strikeTime = 0f;
                 if (mRetribution) {
-                    ((GameStage)getStage()).retribution();
+                    ((GameStage)getStage()).retribution(mRetributionLevel);
                 } else if (mThunderFist) {
-                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition());
+                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition(), mThunderFistLevel);
                 }
                 break;
             case JUMP_DOUBLE_STRIKE:
@@ -283,15 +310,16 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 mCurrentAnimation = mAnimStrike;
                 strikeTime = 0f;
                 if (mRetribution) {
-                    ((GameStage)getStage()).retribution();
+                    ((GameStage)getStage()).retribution(mRetributionLevel);
                 } else if (mThunderFist) {
-                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition());
+                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition(), mThunderFistLevel);
                 }
                 break;
         }
     }
 
-    public void hit() {
+    public void hit(String key) {
+        mCurrentKillerKey = key;
         mCurrentAnimation = mAnimDie;
         body.setFixedRotation(false);
         body.applyAngularImpulse(data.getHitAngularImpulse(), true);
@@ -319,12 +347,14 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
         mWings = wings;
     }
 
-    public void setRetribution(boolean retribution) {
+    public void setRetribution(boolean retribution, int level) {
         mRetribution = retribution;
+        mRetributionLevel = level;
     }
 
-    public void setThunderFist(boolean thunderFist) {
+    public void setThunderFist(boolean thunderFist, int level) {
         mThunderFist = thunderFist;
+        mThunderFistLevel = level;
     }
 
     public void setBuddha(boolean buddha) {
@@ -345,5 +375,9 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
         if (!buddha) {
             mBuddhaTimer=0;
         }
+    }
+
+    public String getCurrentKillerKey() {
+        return mCurrentKillerKey;
     }
 }

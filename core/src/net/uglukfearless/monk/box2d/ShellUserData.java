@@ -8,6 +8,7 @@ import net.uglukfearless.monk.enums.UserDataType;
 public class ShellUserData extends UserData {
 
     private boolean mDead;
+    private String KEY;
 
     public ShellUserData(float width, float height) {
         super(width, height);
@@ -21,5 +22,13 @@ public class ShellUserData extends UserData {
 
     public boolean isDead() {
         return mDead;
+    }
+
+    public String getKEY() {
+        return KEY;
+    }
+
+    public void setKEY(String key) {
+        this.KEY = new String(key);
     }
 }

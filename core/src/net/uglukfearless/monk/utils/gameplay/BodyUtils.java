@@ -38,6 +38,16 @@ public class BodyUtils {
         return true;
     }
 
+    public static boolean runnerIsFallDown(Body body) {
+        UserData userData = (UserData) body.getUserData();
+        return (body.getPosition().y + userData.getHeight()/2f < 0);
+    }
+
+    public static boolean runnerIsBehind(Body body) {
+        UserData userData = (UserData) body.getUserData();
+        return (body.getPosition().x + userData.getWidth()/2f < 0);
+    }
+
     public static boolean bodyIsEnemy(Body body) {
         UserData userData = (UserData) body.getUserData();
 

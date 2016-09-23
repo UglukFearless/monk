@@ -5,6 +5,8 @@ import com.badlogic.gdx.Preferences;
 
 import net.uglukfearless.monk.constants.PreferencesConstants;
 
+import java.util.Map;
+
 /**
  * Created by Ugluk on 17.08.2016.
  */
@@ -12,6 +14,9 @@ public class PreferencesManager {
 
     private static Preferences sStatistics = Gdx.app.getPreferences(PreferencesConstants.PREFERENCES_STATISTICS);
     private static Preferences sSetting = Gdx.app.getPreferences(PreferencesConstants.PREFERENCES_SETTING);
+
+    private static Preferences sDangersKeys = Gdx.app.getPreferences(PreferencesConstants.PREFERENCES_DANGERS_KEYS);
+    private static Preferences sDangersNames = Gdx.app.getPreferences(PreferencesConstants.PREFERENCES_DANGERS_NAMES);
 
     //НАСТРОЙКИ*******************************************
 
@@ -91,12 +96,41 @@ public class PreferencesManager {
         return sStatistics.getInteger(PreferencesConstants.STATS_TOTALTIME_KEY, 0);
     }
 
+    public static int getBestTime() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_BEST_TIME_KEY, 0);
+    }
+
+    public static float getAverageTime() {
+        if (getDeaths()==0) {
+            return 0;
+        }
+        return ((float)getTime()/(float)getDeaths());
+    }
+
+    public static int getKillingRate() {
+        if (getTime()==0) {
+            return 0;
+        }
+        return getKilled()*60/getTime();
+    }
+
+    public static long getKillPercent() {
+        if (getEnemies()==0) {
+            return 0;
+        }
+        return getKilled()*100/getEnemies()>100 ? 100 : getKilled()*100/getEnemies();
+    }
+
     public static int getKilled() {
         return sStatistics.getInteger(PreferencesConstants.STATS_KILLED_KEY, 0);
     }
 
     public static int getDestroyed() {
         return sStatistics.getInteger(PreferencesConstants.STATS_DESTROYED_KEY, 0);
+    }
+
+    private static long getEnemies() {
+        return sStatistics.getLong(PreferencesConstants.STATS_ENEMIES_ALL_KEY, 0);
     }
 
     public static int getDeaths() {
@@ -107,8 +141,35 @@ public class PreferencesManager {
         return sStatistics.getFloat(PreferencesConstants.STATS_EFFICIENCY_KEY, 0.0f);
     }
 
+
+    //геттеры бонусов
+    public static int getBuddha() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_USE_BUDDHA_KEY, 0);
+    }
+    public static int getGhost() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_USE_GHOST_KEY, 0);
+    }
+    public static int getRetribution() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_USE_RETRIBUTION_KEY, 0);
+    }
+    public static int getRevival() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_USE_REVIVAL_KEY, 0);
+    }
+    public static int getThunder() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_USE_THUNDER_KEY, 0);
+    }
+    public static int getStrong() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_USE_STRONG_KEY, 0);
+    }
+    public static int getWings() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_USE_WINGS_KEY, 0);
+    }
+
     public static void addTime(int time) {
         sStatistics.putInteger(PreferencesConstants.STATS_TOTALTIME_KEY, getTime() + time);
+        if (time>getBestTime()) {
+            sStatistics.putInteger(PreferencesConstants.STATS_BEST_TIME_KEY, time);
+        }
         sStatistics.flush();
     }
 
@@ -122,8 +183,43 @@ public class PreferencesManager {
         sStatistics.flush();
     }
 
+    public static void addEnemies(int enemiesAll) {
+        sStatistics.putLong(PreferencesConstants.STATS_ENEMIES_ALL_KEY, getEnemies() + enemiesAll);
+        sStatistics.flush();
+    }
+
     public static void addDeath() {
         sStatistics.putInteger(PreferencesConstants.STATS_DEATHS_KEY, getDeaths() + 1);
+        sStatistics.flush();
+    }
+
+    //эддеры бонусов
+    public static void addBuddha(int buddha) {
+        sStatistics.putInteger(PreferencesConstants.STATS_USE_BUDDHA_KEY, getBuddha() + buddha);
+        sStatistics.flush();
+    }
+    public static void addGhost(int ghost) {
+        sStatistics.putInteger(PreferencesConstants.STATS_USE_GHOST_KEY, getGhost() + ghost);
+        sStatistics.flush();
+    }
+    public static void addRetribution(int retribution) {
+        sStatistics.putInteger(PreferencesConstants.STATS_USE_RETRIBUTION_KEY, getRetribution() + retribution);
+        sStatistics.flush();
+    }
+    public static void addRevival(int revival) {
+        sStatistics.putInteger(PreferencesConstants.STATS_USE_REVIVAL_KEY, getRevival() + revival);
+        sStatistics.flush();
+    }
+    public static void addThunder(int thunder) {
+        sStatistics.putInteger(PreferencesConstants.STATS_USE_THUNDER_KEY, getThunder() + thunder);
+        sStatistics.flush();
+    }
+    public static void addStrong(int strong) {
+        sStatistics.putInteger(PreferencesConstants.STATS_USE_STRONG_KEY, getStrong() + strong);
+        sStatistics.flush();
+    }
+    public static void addWings(int wings) {
+        sStatistics.putInteger(PreferencesConstants.STATS_USE_WINGS_KEY, getWings() + wings);
         sStatistics.flush();
     }
 
@@ -138,6 +234,17 @@ public class PreferencesManager {
         sStatistics.flush();
     }
 
+
+
+    public static int getReceivedTimeBonuses() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_USED_TIME_BONUSES, 0);
+    }
+
+    public static void increaseReceivedTimeBonuses() {
+        sStatistics.putInteger(PreferencesConstants.STATS_USED_TIME_BONUSES, getReceivedTimeBonuses() + 1);
+    }
+
+
     //АЧИВОЧКИ*******************************************
     public static void unlockAchieve(String achieve_key) {
         sStatistics.putBoolean(achieve_key, true);
@@ -148,4 +255,45 @@ public class PreferencesManager {
     public static boolean checkAchieve(String achieve_key) {
         return sStatistics.getBoolean(achieve_key, false);
     }
+
+    //СПИСОК ВГРАГОВ*******************************************
+    public static Map<String,String> getDangersKeys() {
+        return (Map<String, String>) sDangersKeys.get();
+    }
+
+    public static void putDangerKey(String key, String enName, String ruName) {
+        sDangersKeys.putString(key, key);
+        sDangersKeys.flush();
+
+        sDangersNames.putString(key.concat("_EN"), enName);
+        sDangersNames.putString(key.concat("_RU"), ruName);
+        sDangersNames.flush();
+    }
+
+    public static String getEnName(String key) {
+        return sDangersNames.getString(key.concat("_EN"),"");
+    }
+
+    public static String getRuName(String key) {
+        return sDangersNames.getString(key.concat("_RU"),"");
+    }
+
+    //геттер для типа смерти
+    public static int getDeathCause(String dangersKey) {
+        return sStatistics.getInteger(dangersKey, 0);
+    }
+
+    public static int getDeathCausePercent(String dangersKey) {
+        if (getDeaths()==0) {
+            return 0;
+        }
+        return getDeathCause(dangersKey)*100/getDeaths();
+    }
+
+    //сеттер для типа смерти
+    public static void setDeathCause(String dangersKey) {
+        sStatistics.putInteger(dangersKey, getDeathCause(dangersKey) + 1);
+        sStatistics.flush();
+    }
+
 }

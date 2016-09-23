@@ -6,9 +6,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 import net.uglukfearless.monk.box2d.GroundUserData;
 import net.uglukfearless.monk.utils.file.AssetLoader;
-import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.utils.gameplay.Movable;
-import net.uglukfearless.monk.utils.gameplay.SpaceTable;
 
 /**
  * Created by Ugluk on 18.05.2016.

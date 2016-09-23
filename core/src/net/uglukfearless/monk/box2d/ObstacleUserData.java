@@ -163,4 +163,8 @@ public class ObstacleUserData extends UserData {
     public void setOffsetY(float offsetY) {
         this.offsetY = offsetY;
     }
+
+    public String getKEY() {
+        return obstacleType.getKEY();
+    }
 }

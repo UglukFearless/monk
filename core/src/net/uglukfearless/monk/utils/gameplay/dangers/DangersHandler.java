@@ -1,7 +1,6 @@
-package net.uglukfearless.monk.utils.gameplay;
+package net.uglukfearless.monk.utils.gameplay.dangers;
 
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 
 import net.uglukfearless.monk.actors.gameplay.Columns;
@@ -10,11 +9,13 @@ import net.uglukfearless.monk.actors.gameplay.Ground;
 import net.uglukfearless.monk.actors.gameplay.Obstacle;
 import net.uglukfearless.monk.actors.gameplay.Pit;
 import net.uglukfearless.monk.actors.gameplay.bonuses.GameBonus;
+import net.uglukfearless.monk.actors.gameplay.bonuses.RevivalBonus;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PlacingCategory;
 import net.uglukfearless.monk.enums.EnemyType;
 import net.uglukfearless.monk.enums.ObstacleType;
 import net.uglukfearless.monk.stages.GameStage;
+import net.uglukfearless.monk.utils.gameplay.dangers.Danger;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 import java.util.ArrayList;
@@ -67,8 +68,8 @@ public class DangersHandler {
 
         allObstacles = new ArrayList<ObstacleType>();
 
-        allDangers = new ArrayList<net.uglukfearless.monk.utils.gameplay.Danger>();
-        resolvedDangers = new ArrayList<net.uglukfearless.monk.utils.gameplay.Danger>();
+        allDangers = new ArrayList<Danger>();
+        resolvedDangers = new ArrayList<Danger>();
 
         rand = new Random();
 
@@ -189,19 +190,25 @@ public class DangersHandler {
     }
 
     private boolean setBonus(float i,float j) {
-//        System.out.println("setBonus!");
+
         for (GameBonus bonus : mBonuses) {
             if (bonus.isActive()) {
-//                System.out.println("is Active " + bonus.isActive());
+
                 return false;
             }
         }
 
         if (rand.nextInt(100)>80) {
-            System.out.println("bonus in " + i + " : " + j);
-            mBonuses.get(rand.nextInt(mBonuses.size)).init(startX + Constants.STEP_OF_DANGERS * i,
+
+            GameBonus gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
+
+            while ((gameBonus instanceof RevivalBonus)&&(mBonuses.size>1)&&stage.getRevival()==stage.getLimitRevival()) {
+                gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
+            }
+
+            gameBonus.init(startX + Constants.STEP_OF_DANGERS * i,
                     Constants.LAYOUT_Y_ONE + Constants.LAYOUT_Y_STEP * j);
-//            System.out.println("initGame bonus!");
+
             return true;
         }
 

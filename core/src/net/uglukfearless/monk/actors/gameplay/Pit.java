@@ -4,11 +4,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 import net.uglukfearless.monk.box2d.PitUserData;
-import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.utils.gameplay.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.Movable;
-import net.uglukfearless.monk.utils.gameplay.SpaceTable;
+import net.uglukfearless.monk.utils.gameplay.ai.SpaceTable;
 
 /**
  * Created by Ugluk on 04.09.2016.

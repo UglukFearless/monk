@@ -35,21 +35,22 @@ import net.uglukfearless.monk.actors.gameplay.bonuses.RevivalBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.StrongBeatBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.ThunderFistBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.WingsBonus;
-import net.uglukfearless.monk.box2d.EnemyUserData;
-import net.uglukfearless.monk.box2d.RunnerUserData;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.FilterConstants;
+import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.enums.GameState;
 import net.uglukfearless.monk.listeners.GameContactListener;
 import net.uglukfearless.monk.screens.GameScreen;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.SoundSystem;
 import net.uglukfearless.monk.utils.gameplay.BodyUtils;
 import net.uglukfearless.monk.constants.Constants;
-import net.uglukfearless.monk.utils.gameplay.DangersHandler;
+import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
+import net.uglukfearless.monk.utils.gameplay.dangers.DangersHandler;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.gameplay.Movable;
-import net.uglukfearless.monk.utils.gameplay.SpaceTable;
+import net.uglukfearless.monk.utils.gameplay.ai.SpaceTable;
 import net.uglukfearless.monk.utils.gameplay.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
@@ -118,6 +119,8 @@ public class GameStage extends Stage {
     private boolean mReturnFilter;
     private RevivalAvatar mRevivalAvatar;
     private BuddhasBody mBuddhaBonus;
+    private int mStartRevival;
+    private int mLimitRevival;
 
 
     public GameStage(GameScreen screen, float yViewportHeight) {
@@ -203,16 +206,26 @@ public class GameStage extends Stage {
     private void setUpRevival() {
         mRevivalAvatar = new RevivalAvatar(this, VIEWPORT_HEIGHT);
 
+        mLimitRevival = 1;
+
+        if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_REBORN_KEY)) {
+            mLimitRevival+=2;
+        }
+        if (PreferencesManager.getTime()/3600>PreferencesManager.getReceivedTimeBonuses()) {
+            addStartRevival();
+            PreferencesManager.increaseReceivedTimeBonuses();
+        }
+
+        addActor(mRevivalAvatar);
+
+        mRevival = mStartRevival;
+        mRevivalRunner = false;
+
         if (mRevival>0) {
             mRevivalAvatar.setVisible(true);
             mGameGuiStage.enableRevivalLabel();
             mGameGuiStage.setRevivalLabel(mRevivalAvatar.getX(), mRevivalAvatar.getY(), mRevival);
         }
-
-        addActor(mRevivalAvatar);
-
-        mRevival = 0;
-        mRevivalRunner = false;
     }
 
     private void setUpPits() {
@@ -329,8 +342,8 @@ public class GameStage extends Stage {
             }
 
             if (mRevivalRunner
-                    &&((Math.abs(ground1.getPosition().x)<1)
-                    ||(Math.abs(ground2.getPosition().x)<1))) {
+                    &&((Math.abs(ground1.getPosition().x)<0.5f)
+                    ||(Math.abs(ground2.getPosition().x)<0.5f))) {
                 runner = new Runner(WorldUtils.createRunner(world));
                 runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_GHOST);
                 runner.setAlpha(0.3f);
@@ -367,13 +380,9 @@ public class GameStage extends Stage {
 
     private void update(Body body) {
         if (!BodyUtils.bodyInBounds(body)) {
-            if (BodyUtils.bodyIsRunner(body)) {
-                runner.hit();
-                this.saveTimePoint();
-            } else if (body!=null&&BodyUtils.bodyIsGround(body)) {
+            if (body!=null&&BodyUtils.bodyIsGround(body)) {
                 repositionGround();
             }
-
         }
 
         UserData data = (UserData) body.getUserData();
@@ -485,14 +494,21 @@ public class GameStage extends Stage {
     @Override
     public boolean keyDown(int keyCode) {
 
-        if (keyCode==Input.Keys.ESCAPE||keyCode==Input.Keys.MENU) {
+        if (keyCode==Input.Keys.ESCAPE||keyCode==Input.Keys.BACK||keyCode==Input.Keys.MENU) {
+            if (mRevival==0&&runner.getUserData().isDead()) {
+                PreferencesManager.addDeath();
+                gameOver(runner.getCurrentKillerKey());
+            }
+
             screen.setMenu();
-        } else if (mState == GAME_OVER&&keyCode!=Input.Keys.BACK) {
-            System.out.println("***********************************");
-            System.out.println(timeMid);
-            System.out.println("***********************************");
-            screen.newGame();
-        } else if (mState == START&&keyCode!=Input.Keys.BACK) {
+        }
+//        else if (mState == GAME_OVER&&keyCode!=Input.Keys.BACK) {
+//            System.out.println("***********************************");
+//            System.out.println(timeMid);
+//            System.out.println("***********************************");
+//            screen.newGame();
+//        }
+        else if (mState == START&&keyCode!=Input.Keys.BACK&&keyCode!=Input.Keys.MENU) {
 
             this.start();
 
@@ -527,13 +543,17 @@ public class GameStage extends Stage {
         ScoreCounter.setTime((int)runTime);
     }
 
-    public void gameOver() {
+    public void gameOver(String currentKillerKey) {
         if (mRevival<1) {
             saveTimePoint();
             ScoreCounter.death();
             ScoreCounter.checkScore();
-            ScoreCounter.saveCalcStats();
-            ScoreCounter.checkAchieve();
+            ScoreCounter.saveCalcStats(currentKillerKey);
+
+            for (Achievement achievement: ScoreCounter.getAchieveList()) {
+                achievement.checkAchieve();
+            }
+
             mState = GAME_OVER;
             mRevivalAvatar.setVisible(false);
             mGameGuiStage.disableRevivalLabel();
@@ -575,29 +595,73 @@ public class GameStage extends Stage {
         return timeMid;
     }
 
-    public void retribution() {
+    public void retribution(int retributionLevel) {
 
         AssetLoader.retributionBonus.play(SoundSystem.getSoundValue());
 
-       for(Actor actor : getActors()) {
-           if (actor instanceof Enemy) {
-               if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-                       &&!(((Enemy)actor).getUserData()).isDead()) {
-                   (((Enemy)actor).getUserData()).setDead(true);
-                   ScoreCounter.increaseScore(1);
-                   ScoreCounter.increaseKilled();
-               }
-           } else if ((actor instanceof Obstacle)
-                   &&!(((Obstacle)actor).getUserData()).isTrap()
-                   &&!(((Obstacle)actor).getUserData()).isArmour()
-                   &&!(((Obstacle)actor).getUserData()).isDead()) {
-               (((Obstacle)actor).getUserData()).setDead(true);
-               ScoreCounter.increaseScore(1);
-               ScoreCounter.increaseDestroyed();
-           } else if (actor instanceof Shell) {
-               ((Shell) actor).getUserData().setDead(true);
-           }
-       }
+        switch (retributionLevel) {
+            case 0:
+                for(Actor actor : getActors()) {
+                    if (actor instanceof Enemy) {
+                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
+                                &&!(((Enemy)actor).getUserData()).isDead()) {
+                            (((Enemy)actor).getUserData()).setDead(true);
+                            ScoreCounter.increaseScore(1);
+                            ScoreCounter.increaseKilled();
+                        }
+                    } else if ((actor instanceof Obstacle)
+                            &&!(((Obstacle)actor).getUserData()).isTrap()
+                            &&!(((Obstacle)actor).getUserData()).isArmour()
+                            &&!(((Obstacle)actor).getUserData()).isDead()) {
+                        (((Obstacle)actor).getUserData()).setDead(true);
+                        ScoreCounter.increaseScore(1);
+                        ScoreCounter.increaseDestroyed();
+                    } else if (actor instanceof Shell) {
+                        ((Shell) actor).getUserData().setDead(true);
+                    }
+                }
+                break;
+            case 1:
+                for(Actor actor : getActors()) {
+                    if (actor instanceof Enemy) {
+                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
+                                &&!(((Enemy)actor).getUserData()).isDead()) {
+                            (((Enemy)actor).getUserData()).setDead(true);
+                            ScoreCounter.increaseScore(1);
+                            ScoreCounter.increaseKilled();
+                        }
+                    } else if ((actor instanceof Obstacle)
+                            &&!(((Obstacle)actor).getUserData()).isTrap()
+                            &&!(((Obstacle)actor).getUserData()).isDead()) {
+                        (((Obstacle)actor).getUserData()).setDead(true);
+                        ScoreCounter.increaseScore(1);
+                        ScoreCounter.increaseDestroyed();
+                    } else if (actor instanceof Shell) {
+                        ((Shell) actor).getUserData().setDead(true);
+                    }
+                }
+                break;
+            case 2:
+                for(Actor actor : getActors()) {
+                    if (actor instanceof Enemy) {
+                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
+                                &&!(((Enemy)actor).getUserData()).isDead()) {
+                            (((Enemy)actor).getUserData()).setDead(true);
+                            ScoreCounter.increaseScore(1);
+                            ScoreCounter.increaseKilled();
+                        }
+                    } else if ((actor instanceof Obstacle)
+                            &&!(((Obstacle)actor).getUserData()).isDead()) {
+                        (((Obstacle)actor).getUserData()).setDead(true);
+                        ScoreCounter.increaseScore(1);
+                        ScoreCounter.increaseDestroyed();
+                    } else if (actor instanceof Shell) {
+                        ((Shell) actor).getUserData().setDead(true);
+                    }
+                }
+                break;
+        }
+
     }
 
     public void changingSpeed(float speedScale) {
@@ -620,7 +684,7 @@ public class GameStage extends Stage {
     }
 
     public void addRevival() {
-        if (mRevival<3) {
+        if (mRevival<mLimitRevival) {
             mRevival++;
         }
 
@@ -631,13 +695,30 @@ public class GameStage extends Stage {
         }
     }
 
+    public void addStartRevival() {
+        if (mStartRevival<mLimitRevival) {
+            mStartRevival++;
+        }
+    }
+
     public int getRevival() {
         return mRevival;
+    }
+
+    public int getLimitRevival() {
+        return mLimitRevival;
     }
 
     public void pause() {
         if (mState==RUN) {
             mState = PAUSE;
         }
+    }
+
+    public void StartRebutRunner() {
+        runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_GHOST);
+        runner.setAlpha(0.3f);
+        mReturnTimer = 0;
+        mReturnFilter = true;
     }
 }

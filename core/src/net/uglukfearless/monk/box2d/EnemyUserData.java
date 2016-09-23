@@ -178,4 +178,8 @@ public class EnemyUserData extends UserData {
     public void setShoot(boolean shoot) {
         mShoot = shoot;
     }
+
+    public String getKEY() {
+        return enemyType.getKEY();
+    }
 }

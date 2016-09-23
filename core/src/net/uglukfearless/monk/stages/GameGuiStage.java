@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
@@ -23,6 +24,7 @@ import net.uglukfearless.monk.enums.GameState;
 import net.uglukfearless.monk.screens.GameScreen;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
+import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
 
 /**
  * Created by Ugluk on 22.08.2016.
@@ -217,6 +219,8 @@ public class GameGuiStage extends Stage {
                 , VIEWPORT_HEIGHT/2f - mPauseLabel.getHeight()/2f);
         mPauseLabel.setVisible(false);
         addActor(mPauseLabel);
+
+
     }
 
     @Override
@@ -272,17 +276,23 @@ public class GameGuiStage extends Stage {
                     mKilledValue.setText(String.valueOf(ScoreCounter.getKilled()));
                     mDestroyedValue.setText(String.valueOf(ScoreCounter.getDestroyed()));
 
-                    for (String achieve : ScoreCounter.getNewAchieve()) {
-                        mLabel = new Label(AssetLoader.sBundle.get(achieve), AssetLoader.sGuiSkin);
-                        mContainerDeath.add(mLabel).align(Align.left).fill().expand().padBottom(5).padTop(5);
-                        mNewAchieveListObj.add(mLabel);
+                    for (Achievement achieve : ScoreCounter.getAchieveList()) {
 
-                        mImage = new Image(AssetLoader.sAchieveRegions.get(achieve));
-                        mContainerDeath.add(mImage).align(Align.right).prefWidth(60).prefHeight(60).padBottom(5).padTop(5);
-                        mNewAchieveListObj.add(mImage);
+                        if (achieve.isNew()) {
+                            mLabel = new Label(achieve.getName(), AssetLoader.sGuiSkin);
+                            mContainerDeath.add(mLabel).align(Align.left).fill().expand().padBottom(5).padTop(5);
+                            mNewAchieveListObj.add(mLabel);
 
-                        mContainerDeath.row();
+                            mImage = new Image(achieve.getRegion());
+                            mContainerDeath.add(mImage).align(Align.right).prefWidth(60).prefHeight(60).padBottom(5).padTop(5);
+                            mNewAchieveListObj.add(mImage);
+
+                            achieve.setNew(false);
+
+                            mContainerDeath.row();
+                        }
                     }
+
                     mScrollPaneDeath.layout();
                     mScrollPaneDeath.setScrollPercentY(0);
 

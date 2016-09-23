@@ -1,4 +1,4 @@
-package net.uglukfearless.monk.utils.gameplay;
+package net.uglukfearless.monk.utils.gameplay.ai;
 
 /**
  * Created by Ugluk on 06.09.2016.

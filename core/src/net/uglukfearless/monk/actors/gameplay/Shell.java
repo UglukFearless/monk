@@ -49,7 +49,8 @@ public class Shell extends GameActor implements Pool.Poolable, Movable {
         body.setTransform(-10, -10, 0);
     }
 
-    public void init(Stage stage, Vector2 position, float speed) {
+    public void init(Stage stage, Vector2 position, float speed, String key) {
+        getUserData().setKEY(key);
         body.setTransform(position.x, position.y + 0.5f, 0);
         body.setLinearVelocity(speed - 10f, 0);
         body.setAngularVelocity(15);
@@ -59,8 +60,9 @@ public class Shell extends GameActor implements Pool.Poolable, Movable {
         mPreviousVelocity = ((GameStage)stage).getCurrentVelocity().x;
     }
 
-    public void init(Stage stage, Vector2 position, float speed, TextureRegion region) {
+    public void init(Stage stage, Vector2 position, float speed, TextureRegion region, String key) {
         mRegion = region;
+        getUserData().setKEY(key);
         body.setTransform(position.x, position.y + 0.5f, 0);
         body.setLinearVelocity(speed - 10f, 0);
         body.setAngularVelocity(15);

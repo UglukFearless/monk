@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import net.uglukfearless.monk.RunningMonk;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.file.SoundSystem;
 import net.uglukfearless.monk.utils.fortween.SpriteAccessor;
 

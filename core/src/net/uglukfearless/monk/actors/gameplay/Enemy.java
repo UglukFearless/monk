@@ -16,10 +16,11 @@ import net.uglukfearless.monk.enums.EnemyType;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.gameplay.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.Movable;
-import net.uglukfearless.monk.utils.gameplay.Situation;
-import net.uglukfearless.monk.utils.gameplay.SpaceTable;
+import net.uglukfearless.monk.utils.gameplay.ai.Situation;
+import net.uglukfearless.monk.utils.gameplay.ai.SpaceTable;
 import net.uglukfearless.monk.utils.gameplay.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
@@ -273,6 +274,11 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         body.setLinearVelocity(body.getLinearVelocity().x + getUserData().enemyType.getBasicXVelocity(),
                 body.getLinearVelocity().y);
         starting = true;
+
+        if (((GameStage)getStage()).getRunner()!=null||!((GameStage)getStage()).getRunner().getUserData().isDead()) {
+            ScoreCounter.increaseEnemies();
+        }
+
     }
 
     private void shoot() {
@@ -289,10 +295,10 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
             getUserData().setShoot(true);
             if (mShellRegion!=null) {
                 PoolsHandler.sShellPool.obtain().init(getStage(), body.getPosition()
-                        , body.getLinearVelocity().x, mShellRegion);
+                        , body.getLinearVelocity().x, mShellRegion, getUserData().getKEY());
             } else {
                 PoolsHandler.sShellPool.obtain().init(getStage(), body.getPosition()
-                        , body.getLinearVelocity().x);
+                        , body.getLinearVelocity().x, getUserData().getKEY());
             }
         }
     }

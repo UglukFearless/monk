@@ -12,9 +12,13 @@ import net.uglukfearless.monk.utils.file.AssetLoader;
 public class MenuBackground extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
+
+        //страшный костыль, боюсь, что так делать низя нихья. Это связано с использованием ScrollPane... хз как она меняет цвет
+        batch.setColor(1f, 1f, 1f, 1f);
 
         batch.draw(AssetLoader.menuBackgroundTexture, 0, 0,
                 Constants.APP_WIDTH, Constants.APP_HEIGHT);
+
+        super.draw(batch, parentAlpha);
     }
 }

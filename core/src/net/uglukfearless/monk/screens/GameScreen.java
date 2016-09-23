@@ -14,6 +14,7 @@ import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.file.SoundSystem;
+import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
 
 /**
  * Created by Ugluk on 17.05.2016.
@@ -39,7 +40,7 @@ public class GameScreen implements Screen {
         mGameStage.setGuiStage(mGuiStage);
 
         mMultiplexer = new InputMultiplexer();
-        mMultiplexer.addProcessor(new InputAdapter(){
+        mMultiplexer.addProcessor(new InputAdapter() {
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                 System.out.println("click regist");
@@ -76,9 +77,7 @@ public class GameScreen implements Screen {
     }
 
     public void newGame() {
-        ScoreCounter.saveCalcStats();
         ScoreCounter.resetStats();
-        ScoreCounter.getNewAchieve().clear();
         mMultiplexer.removeProcessor(mGameStage);
         mGameStage.dispose();
         mGameStage = new GameStage(this, mYViewportHeight);
@@ -117,7 +116,11 @@ public class GameScreen implements Screen {
         if (((GameStage) mGameStage).getState()== GameState.RUN) {
             mGameStage.saveTimePoint();
             ScoreCounter.saveCalcStats();
-            ScoreCounter.checkAchieve();
+
+            for (Achievement achievement: ScoreCounter.getAchieveList()) {
+                achievement.checkAchieve();
+            }
+
             ScoreCounter.resetStats();
         }
         System.out.print("GameScreenDispose");
