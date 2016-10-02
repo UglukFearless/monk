@@ -59,20 +59,20 @@ public class WorldUtils {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         if (isSecond==true) {
-            bodyDef.position.set(new Vector2(Constants.GROUND_X + Constants.GROUND_WIDTH,
+            bodyDef.position.set(new Vector2(Constants.GROUND_X + Constants.GROUND_WIDTH_INIT,
                     Constants.GROUND_Y));
         } else {
             bodyDef.position.set(new Vector2(Constants.GROUND_X, Constants.GROUND_Y));
         }
         Body body =  world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(Constants.GROUND_WIDTH / 2, Constants.GROUND_HEIGHT / 2);
+        shape.setAsBox(Constants.GROUND_WIDTH_INIT / 2, Constants.GROUND_HEIGHT / 2);
         body.createFixture(shape, Constants.GROUND_DENSITY);
         body.setGravityScale(0);
         body.getFixtureList().get(0).setFriction(0);
         body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_STATIC);
         body.resetMassData();
-        body.setUserData(new GroundUserData(Constants.GROUND_WIDTH, Constants.GROUND_HEIGHT));
+        body.setUserData(new GroundUserData(Constants.GROUND_WIDTH_INIT, Constants.GROUND_HEIGHT));
         shape.dispose();
         return body;
     }
@@ -269,13 +269,13 @@ public class WorldUtils {
         bodyDef.position.set(-10, -10);
         Body body =  world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(Constants.COLUMNS_WIDTH / 2, Constants.COLUMNS_HEIGHT / 2);
+        shape.setAsBox(Constants.COLUMNS_WIDTH_INIT / 2, Constants.COLUMNS_HEIGHT_INIT / 2);
         body.createFixture(shape, Constants.COLUMNS_DENSITY);
         body.setGravityScale(0);
         body.getFixtureList().get(0).setFriction(0);
         body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_STATIC);
         body.resetMassData();
-        body.setUserData(new ColumnsUserData(Constants.COLUMNS_WIDTH, Constants.COLUMNS_HEIGHT));
+        body.setUserData(new ColumnsUserData(Constants.COLUMNS_WIDTH_INIT, Constants.COLUMNS_HEIGHT_INIT));
         body.setActive(false);
         shape.dispose();
         return body;

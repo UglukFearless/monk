@@ -30,6 +30,7 @@ import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
  */
 public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
+    private GameStage mStage;
 
     private Animation mAnimation;
     private Animation mStayAnimation;
@@ -38,15 +39,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
     private Animation mStrikeAnimation;
     private Animation mDieAnimation;
 
-    private Array<Animation> mAnimations;
-    private Array<TextureRegion> mRegions;
-
-    private boolean mStopSeek;
     private TextureRegion mShellRegion;
-    private TextureRegion mCurrentRegion;
-
-    private StringBuilder mStringBuilder;
-    private int mRegionNum;
 
     private float stateTime;
     private float deadTime;
@@ -63,78 +56,17 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
     public Enemy(World world, EnemyType enemyType) {
         super(WorldUtils.createEnemy(world, enemyType));
 
-        TextureRegion [] runningFrames = new TextureRegion[getUserData().getTextureRegions().length];
-        if (getUserData().atlas) {
-            for (int i=0;i<getUserData().getTextureRegions().length;i++) {
-                runningFrames[i] = AssetLoader.enemiesAtlas
-                        .findRegion(getUserData().getTextureRegions()[i]);
-            }
 
-            mAnimations = new Array<Animation>();
-            mRegions = new Array<TextureRegion>();
-            mStringBuilder = new StringBuilder();
+        mShellRegion = getUserData().getShellRegion();
 
-//            for (int i=1; i<3; i++) {
+        mStayAnimation = getUserData().getStayAnimation();
+        mRunAnimation = getUserData().getRunAnimation();
+        mJumpAnimation = getUserData().getJumpAnimation();
+        mStrikeAnimation = getUserData().getStrikeAnimation();
+        mDieAnimation = getUserData().getDieAnimation();
 
+        mAnimation = getUserData().getAnimation();
 
-
-                for (int ii=0; ii<Constants.ENEMY_ANIMATION_GROUP_NAMES.length; ii++) {
-                    mStopSeek = false;
-                    mRegions.clear();
-                    mStringBuilder.append("enemy").append(getUserData().enemyType.number);
-                    mStringBuilder.append(Constants.ENEMY_ANIMATION_GROUP_NAMES[ii]);
-                    mRegionNum = 0;
-
-                    while (!mStopSeek) {
-                        mRegionNum++;
-
-                        mCurrentRegion = (AssetLoader.enemiesAtlas.findRegion(mStringBuilder.toString()
-                                + String.valueOf(mRegionNum)));
-
-                        System.out.println(mStringBuilder.toString() + String.valueOf(mRegionNum));
-                        if (mCurrentRegion!=null) {
-                            mRegions.add(mCurrentRegion);
-                        } else {
-                            mStopSeek = true;
-                            mRegionNum = 0;
-                        }
-                    }
-
-                    mStopSeek = false;
-
-                    if (mRegions.size>0) {
-                        mAnimations.add(new Animation(0.12f, mRegions));
-                    } else {
-                        mAnimations.add(null);
-                    }
-
-                    mStringBuilder.delete(0, mStringBuilder.length());
-                }
-
-                mShellRegion = AssetLoader.enemiesAtlas.findRegion("enemy" + getUserData().enemyType.number + "_shell");
-
-//            }
-
-            mStayAnimation = mAnimations.get(0);
-            mRunAnimation = mAnimations.get(1);
-            mJumpAnimation = mAnimations.get(2);
-            mStrikeAnimation = mAnimations.get(3);
-            mDieAnimation = mAnimations.get(4);
-
-            if (mStayAnimation!=null) {
-                mAnimation = mStayAnimation;
-            } else {
-                mAnimation = mRunAnimation;
-            }
-
-        } else {
-            for (int i=0;i<getUserData().getTextureRegions().length;i++) {
-                runningFrames[i] = AssetLoader.charactersAtlas
-                        .findRegion(getUserData().getTextureRegions()[i]);
-            }
-
-            mAnimation = new Animation(0.1f, runningFrames);
-        }
 
 
 
@@ -152,6 +84,8 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
     public void init(Stage stage, float x, float y) {
 
+        mStage = (GameStage)stage;
+
         if (mStayAnimation!=null) {
             mAnimation = mStayAnimation;
         } else if (mRunAnimation!=null){
@@ -159,12 +93,12 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         }
 
         body.setTransform(x, getUserData().getBasicY() + y + getUserData().getHeight() / 2f, 0);
-        body.setLinearVelocity(((GameStage) stage).getCurrentVelocity());
+        body.setLinearVelocity(mStage.getCurrentVelocity());
         body.setActive(true);
         starting = false;
-        stage.addActor(this);
-        mPreviousVelocity = ((GameStage)stage).getCurrentVelocity().x;
-        ((GameStage)stage).addMovable(this);
+        mStage.addActor(this);
+        mPreviousVelocity = mStage.getCurrentVelocity().x;
+        mStage.addMovable(this);
     }
 
     @Override
@@ -200,14 +134,14 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
             dead(delta);
         } else if (!BodyUtils.bodyInBounds(body)) {
             this.remove();
-            PoolsHandler.sEnemiesPools.get(getUserData().enemyType.name()).free(this);
+            PoolsHandler.sEnemiesPools.get(getUserData().getEnemyType().name()).free(this);
         } else {
 
             if (body.getPosition().x < Constants.GAME_WIDTH) {
 
                 mSituation = SpaceTable.getSituation(body.getPosition().x, body.getPosition().y
-                        - getUserData().enemyType.getY() - getUserData().getHeight() / 2f
-                        , getUserData().getWidth(), getUserData().enemyType.getCategoryBit(), mSituation);
+                        - getUserData().getEnemyType().getY() - getUserData().getHeight() / 2f
+                        , getUserData().getWidth(), getUserData().getEnemyType().getCategoryBit(), mSituation);
 
                 if (mSituation.jump
                         &&body.getLinearVelocity().y==0
@@ -231,8 +165,8 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
                     shoot();
                 }
 
-                if (body.getLinearVelocity().x>Constants.WORLD_STATIC_VELOCITY.x)  {
-                    body.applyForceToCenter(Constants.WORLD_STATIC_VELOCITY.x, 0, true);
+                if (body.getLinearVelocity().x>mStage.getCurrentVelocity().x)  {
+                    body.applyForceToCenter(mStage.getCurrentVelocity().x, 0, true);
                 }
 
                 if (getUserData().isStrike()||mAnimation==mStrikeAnimation) {
@@ -255,7 +189,6 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
                         &&mAnimation!=mJumpAnimation)&&body.getLinearVelocity().y!=0) {
                     mAnimation = mJumpAnimation;
                     stateTime = 0;
-                    System.out.println(getUserData().enemyType.name() + " jumpAnim");
                 }
             }
 
@@ -265,17 +198,15 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
     }
 
     private void start() {
-        if (mRunAnimation!=null&&getUserData().getLinearVelocity().x<Constants.WORLD_STATIC_VELOCITY.x) {
+        if (mRunAnimation!=null&&getUserData().getEnemyType().getBasicXVelocity()<0) {
             mAnimation = mRunAnimation;
             stateTime = 0;
-            System.out.println(getUserData().enemyType.name() + " runAnim");
         }
-        System.out.println(getUserData().enemyType.name() + " START");
-        body.setLinearVelocity(body.getLinearVelocity().x + getUserData().enemyType.getBasicXVelocity(),
+        body.setLinearVelocity(body.getLinearVelocity().x + getUserData().getEnemyType().getBasicXVelocity(),
                 body.getLinearVelocity().y);
         starting = true;
 
-        if (((GameStage)getStage()).getRunner()!=null||!((GameStage)getStage()).getRunner().getUserData().isDead()) {
+        if (mStage.getRunner()!=null||!mStage.getRunner().getUserData().isDead()) {
             ScoreCounter.increaseEnemies();
         }
 
@@ -288,16 +219,14 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
                 mAnimation = mStrikeAnimation;
                 strikeTime = 0;
                 stateTime = 0;
-                System.out.println(getUserData().enemyType.name() + " shootAnim");
             }
 
-            System.out.println(getUserData().enemyType.name() + " SHOOT");
             getUserData().setShoot(true);
             if (mShellRegion!=null) {
-                PoolsHandler.sShellPool.obtain().init(getStage(), body.getPosition()
+                PoolsHandler.sShellPool.obtain().init(mStage, body.getPosition()
                         , body.getLinearVelocity().x, mShellRegion, getUserData().getKEY());
             } else {
-                PoolsHandler.sShellPool.obtain().init(getStage(), body.getPosition()
+                PoolsHandler.sShellPool.obtain().init(mStage, body.getPosition()
                         , body.getLinearVelocity().x, getUserData().getKEY());
             }
         }
@@ -310,10 +239,8 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
                 mAnimation = mStrikeAnimation;
                 strikeTime = 0;
                 stateTime = 0;
-                System.out.println(getUserData().enemyType.name() + " strikeAnim");
             }
 
-            System.out.println(getUserData().enemyType.name() + " STRIKE");
             getUserData().setStrike(true);
 
         }
@@ -321,18 +248,15 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
     private void jump() {
         if (!getUserData().isJumping()) {
-            System.out.println(getUserData().enemyType.name() + " JUMP");
             body.applyLinearImpulse(jumpImpulse , body.getWorldCenter(), true);
             getUserData().setJumping(true);
         }
     }
 
     private void standing() {
-        System.out.println(getUserData().enemyType.name() + " STAND");
-        body.setLinearVelocity(new Vector2(Constants.WORLD_STATIC_VELOCITY.x, getUserData().getLinearVelocity().y));
+        body.setLinearVelocity(new Vector2(mStage.getCurrentVelocity().x, getUserData().getLinearVelocity().y));
         if (mStayAnimation!=null&&mAnimation!=mStrikeAnimation&&mAnimation!=mJumpAnimation&&mAnimation!=mStayAnimation) {
             mAnimation = mStayAnimation;
-            System.out.println(getUserData().enemyType.name() + " stayAnim");
             stateTime = 0;
         }
     }
@@ -343,7 +267,6 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
         if (mDieAnimation!=null) {
             mAnimation = mDieAnimation;
-            System.out.println(getUserData().enemyType.name() + " dieAnim");
             stateTime = 0;
         }
 
@@ -353,10 +276,9 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
             stage.removeMovable(this);
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump1"));
             this.remove();
-            PoolsHandler.sEnemiesPools.get(getUserData().enemyType.name()).free(this);
+            PoolsHandler.sEnemiesPools.get(getUserData().getEnemyType().name()).free(this);
         }
 
-        System.out.println(getUserData().enemyType.name() + " DIE");
     }
 
     @Override
@@ -374,7 +296,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         getUserData().setDoll(false);
         starting = false;
         body.setActive(false);
-        body.setGravityScale(getUserData().enemyType.getGravityScale());
+        body.setGravityScale(getUserData().getEnemyType().getGravityScale());
         body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY);
         body.setFixedRotation(true);
         body.setTransform(-10, -10, 0);

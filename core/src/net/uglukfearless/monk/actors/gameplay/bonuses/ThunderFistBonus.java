@@ -28,7 +28,7 @@ public class ThunderFistBonus extends GameBonus {
             mWorkingTime +=10;
         }
 
-        if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_AKF_KEY)) {
+        if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_MKF_KEY)) {
             mWorkingTime +=10;
         }
 

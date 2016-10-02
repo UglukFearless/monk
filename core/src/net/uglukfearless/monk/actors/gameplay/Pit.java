@@ -17,9 +17,9 @@ public class Pit extends GameActor implements Movable {
 
     public Pit(Body body) {
         super(body);
-        body.setLinearVelocity(Constants.WORLD_STATIC_VELOCITY);
+        body.setLinearVelocity(Constants.WORLD_STATIC_VELOCITY_INIT);
 
-        if (userData.getWidth()>Constants.GROUND_PIT) {
+        if (userData.getWidth()>Constants.GROUND_PIT_INIT) {
             getUserData().setColumns(true);
         }
     }

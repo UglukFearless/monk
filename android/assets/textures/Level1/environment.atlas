@@ -1,0 +1,26 @@
+
+environment.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+background
+  rotate: false
+  xy: 1, 1
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: -1
+column
+  rotate: false
+  xy: 803, 260
+  size: 54, 221
+  orig: 54, 221
+  offset: 0, 0
+  index: -1
+ground
+  rotate: false
+  xy: 859, 411
+  size: 70, 70
+  orig: 70, 70
+  offset: 0, 0
+  index: -1

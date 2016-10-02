@@ -9,11 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.stages.MainMenuStage;
 import net.uglukfearless.monk.stages.OptionMenuStage;
+import net.uglukfearless.monk.stages.SelectLevelStage;
 import net.uglukfearless.monk.stages.StatisticsMenuStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.file.SoundSystem;
+import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 
 import java.util.Map;
 
@@ -55,10 +57,10 @@ public class MainMenuScreen implements Screen {
         stage.act(delta);
     }
 
-    public void newGame() {
+    public void newGame(LevelModel levelModel) {
         this.dispose();
         stage.dispose();
-        game.setScreen(new GameScreen(game));
+        game.setScreen(new GameScreen(game, levelModel));
     }
 
     @Override
@@ -101,5 +103,10 @@ public class MainMenuScreen implements Screen {
     public void statisticsMenu() {
         stage.dispose();
         stage = new StatisticsMenuStage(this, mYViewportHeight);
+    }
+
+    public void selectLevelMenu() {
+        stage.dispose();
+        stage = new SelectLevelStage(this, mYViewportHeight);
     }
 }

@@ -1,6 +1,7 @@
 package net.uglukfearless.monk.actors.gameplay;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
@@ -27,12 +28,20 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
     private float deadTime;
     private float stateTime;
 
+    private Animation mStayAnimation;
+    private Animation mDieAnimation;
+    private Animation mAnimation;
+
     public Obstacle(Body body) {
         super(body);
 
         stateTime = 0f;
 
         deadTime = 0f;
+
+        mAnimation = getUserData().getStayAnimation();
+        mStayAnimation = getUserData().getStayAnimation();
+        mDieAnimation = getUserData().getDieAnimation();
 
         body.setLinearVelocity(getUserData().getLinearVelocity());
     }
@@ -45,12 +54,16 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
 
         deadTime = 0f;
 
+        mAnimation = getUserData().getStayAnimation();
+        mStayAnimation = getUserData().getStayAnimation();
+        mDieAnimation = getUserData().getDieAnimation();
+
         body.setLinearVelocity(getUserData().getLinearVelocity());
     }
 
     public void init(Stage stage, float x, float y) {
-        body.setTransform(x, getUserData().obstacleType.getY() +
-                y + getUserData().obstacleType.getHeight() / 2f, 0);
+        body.setTransform(x, getUserData().getObstacleType().getY() +
+                y + getUserData().getObstacleType().getHeight() / 2f, 0);
         body.setLinearVelocity(getUserData().getLinearVelocity());
         getUserData().setLinearVelocity(((GameStage)stage).getCurrentVelocity());
         body.setLinearVelocity(getUserData().getLinearVelocity());
@@ -63,32 +76,16 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
 
-        ObstacleUserData data = (ObstacleUserData) getUserData();
+        ObstacleUserData data = getUserData();
 
-        //ВНИМАНИЕ! ЭТО ПЕРЕПИСАТЬ(выбор региона для рисования)! ЛАЖА ПОЛНАЯ
-        if (!getUserData().isSphere()&&getUserData().isArmour()) {
-            batch.draw(AssetLoader.stone,
-                    body.getPosition().x - (data.getWidth()*data.getScaleX()/2) + data.getOffsetX() ,
-                    body.getPosition().y - (data.getHeight()/2) + data.getOffsetY(),
-                    getUserData().getWidth()*0.5f,getUserData().getHeight()*0.5f,
-                    data.getWidth()*data.getScaleX(), data.getHeight()*data.getScaleY()
-                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
-        } else if (!getUserData().isSphere()&&!getUserData().isArmour()) {
-            batch.draw(AssetLoader.box,
-                    body.getPosition().x - (data.getWidth()*data.getScaleX()/2) + data.getOffsetX() ,
-                    body.getPosition().y - (data.getHeight()/2) + data.getOffsetY(),
-                    getUserData().getWidth()*0.5f,getUserData().getHeight()*0.5f,
-                    data.getWidth()*data.getScaleX(), data.getHeight()*data.getScaleY()
-                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
-        } else {
-            stateTime += Gdx.graphics.getDeltaTime();
-            batch.draw(AssetLoader.blades.getKeyFrame(stateTime,true),
-                    body.getPosition().x - (data.getWidth()*data.getScaleX()/2) + data.getOffsetX() ,
-                    body.getPosition().y - (data.getHeight()/2) + data.getOffsetY(),
-                    getUserData().getWidth()*0.5f,getUserData().getHeight()*0.5f,
-                    data.getWidth()*data.getScaleX(), data.getHeight()*data.getScaleY()
-                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
-        }
+
+        stateTime += Gdx.graphics.getDeltaTime();
+        batch.draw(mAnimation.getKeyFrame(stateTime,true),
+                body.getPosition().x - (data.getWidth()*data.getScaleX()/2) + data.getOffsetX() ,
+                body.getPosition().y - (data.getHeight()/2) + data.getOffsetY(),
+                getUserData().getWidth()*0.5f,getUserData().getHeight()*0.5f,
+                data.getWidth()*data.getScaleX(), data.getHeight()*data.getScaleY()
+                , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
     }
 
     @Override
@@ -108,12 +105,12 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
             dead(delta);
         } else if (!BodyUtils.bodyInBounds(body)) {
             this.remove();
-            PoolsHandler.sObstaclePools.get(getUserData().obstacleType.name()).free(this);
+            PoolsHandler.sObstaclePools.get(getUserData().getObstacleType().name()).free(this);
         } else {
             if (body.getPosition().x < Constants.GAME_WIDTH) {
 
-                SpaceTable.setCell(body.getPosition().x, body.getPosition().y - getUserData().obstacleType.getY() - getUserData().getHeight()/2f
-                        , getUserData().getWidth(),getUserData().obstacleType.getCategoryBit());
+                SpaceTable.setCell(body.getPosition().x, body.getPosition().y - getUserData().getObstacleType().getY() - getUserData().getHeight()/2f
+                        , getUserData().getWidth(),getUserData().getObstacleType().getCategoryBit());
             }
         }
     }
@@ -121,12 +118,15 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
     private void dead(float delta) {
         deadTime +=delta;
         body.applyForceToCenter(500, 50, false);
+        if (mDieAnimation!=null) {
+            mAnimation = mDieAnimation;
+        }
         if ((deadTime>0.2f||getUserData().isTrap()) && getStage() != null) {
             GameStage stage = (GameStage) getStage();
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump2"));
             stage.removeMovable(this);
             this.remove();
-            PoolsHandler.sObstaclePools.get(getUserData().obstacleType.name()).free(this);
+            PoolsHandler.sObstaclePools.get(getUserData().getObstacleType().name()).free(this);
         }
     }
 

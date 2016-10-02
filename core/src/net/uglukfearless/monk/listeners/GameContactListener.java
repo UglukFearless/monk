@@ -128,9 +128,10 @@ public class GameContactListener implements ContactListener {
                     stage.getRunner().landed();
             } else if (!((ObstacleUserData)a.getUserData()).isDead()) {
                     stage.getRunner().hit(((ObstacleUserData)a.getUserData()).getKEY());
-                    if (((ObstacleUserData)a.getUserData()).isBlades()) {
-                        b.setLinearVelocity(a.getLinearVelocity().add(40,10));
-                    }
+//                    if (((ObstacleUserData)a.getUserData()).isBlades()) {
+//                        b.setLinearVelocity(a.getLinearVelocity().add(40,10));
+//                    }
+                    ((ObstacleUserData) a.getUserData()).hitExecution(b,false);
                 }
         } else if (BodyUtils.bodyIsRunner(a)&&BodyUtils.bodyIsObstacle(b)) {
             if ((a.getPosition().y -((UserData)a.getUserData()).getHeight()/2
@@ -139,9 +140,10 @@ public class GameContactListener implements ContactListener {
                 stage.getRunner().landed();
             } else if (!((ObstacleUserData)b.getUserData()).isDead()){
                 stage.getRunner().hit(((ObstacleUserData)b.getUserData()).getKEY());
-                if (((ObstacleUserData)b.getUserData()).isBlades()) {
-                    a.setLinearVelocity(a.getLinearVelocity().add(40, 10));
-                }
+//                if (((ObstacleUserData)b.getUserData()).isBlades()) {
+//                    a.setLinearVelocity(a.getLinearVelocity().add(40, 10));
+//                }
+                ((ObstacleUserData) b.getUserData()).hitExecution(a,false);
             }
         } else if (BodyUtils.bodyIsRunnerStrike(a)&&BodyUtils.bodyIsObstacle(b)) {
             //Обработка столкновений препятствий с ударом монаха
@@ -188,17 +190,19 @@ public class GameContactListener implements ContactListener {
             if (((ObstacleUserData)b.getUserData()).isTrap()) {
                 ((EnemyUserData)a.getUserData()).setDead(true);
                 a.setFixedRotation(false);
-                if (((ObstacleUserData)b.getUserData()).isBlades()) {
-                    a.setLinearVelocity(a.getLinearVelocity().add(-40, 10));
-                }
+//                if (((ObstacleUserData)b.getUserData()).isBlades()) {
+//                    a.setLinearVelocity(a.getLinearVelocity().add(-40, 10));
+//                }
+                ((ObstacleUserData) b.getUserData()).hitExecution(a,true);
             }
         } else if (BodyUtils.bodyIsObstacle(a)&&BodyUtils.bodyIsEnemy(b)) {
             if (((ObstacleUserData)a.getUserData()).isTrap()) {
                 ((EnemyUserData)b.getUserData()).setDead(true);
                 b.setFixedRotation(false);
-                if (((ObstacleUserData)a.getUserData()).isBlades()) {
-                    b.setLinearVelocity(b.getLinearVelocity().add(-40, 10));
-                }
+//                if (((ObstacleUserData)a.getUserData()).isBlades()) {
+//                    b.setLinearVelocity(b.getLinearVelocity().add(-40, 10));
+//                }
+                ((ObstacleUserData) a.getUserData()).hitExecution(b,true);
             }
 
 

@@ -52,6 +52,7 @@ import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.gameplay.Movable;
 import net.uglukfearless.monk.utils.gameplay.ai.SpaceTable;
 import net.uglukfearless.monk.utils.gameplay.WorldUtils;
+import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 import java.util.Random;
@@ -110,7 +111,6 @@ public class GameStage extends Stage {
 
     private float timeMid;
     private float runTime;
-    private int coint = 0;
     private Array<Movable> mMovableArray;
     private Vector2 mCurrentVelocity;
     private int mRevival;
@@ -122,8 +122,11 @@ public class GameStage extends Stage {
     private int mStartRevival;
     private int mLimitRevival;
 
+    private LevelModel mLevelModel;
+    private LevelModel mLevelModel2_EXP;
 
-    public GameStage(GameScreen screen, float yViewportHeight) {
+
+    public GameStage(GameScreen screen, float yViewportHeight, LevelModel levelModel) {
 
         super(new FitViewport(VIEWPORT_WIDTH, yViewportHeight,
                 new OrthographicCamera(VIEWPORT_WIDTH, yViewportHeight)));
@@ -137,8 +140,9 @@ public class GameStage extends Stage {
 
         bodies = new Array<Body>();
         mMovableArray = new Array<Movable>();
-        mCurrentVelocity = Constants.WORLD_STATIC_VELOCITY;
+        mCurrentVelocity = Constants.WORLD_STATIC_VELOCITY_INIT;
 
+        setUpLevel(levelModel);
         setUpWorld();
         setupCamera();
         setupTouchControlAreas();
@@ -175,6 +179,27 @@ public class GameStage extends Stage {
         setUpBuddhaBody();
         setUpBonuses();
         setUpDangersHandler();
+
+    }
+
+    private void setUpLevel(LevelModel levelModel) {
+
+
+
+//        FileHandle file = Gdx.files.external("level1.json");
+
+//        mLevelModel2_EXP = new LevelModel();
+//        Json jsonOut = new Json();
+//        file.writeString(jsonOut.prettyPrint(mLevelModel2_EXP), false);
+//
+//        Json jsonIn = new Json();
+//        mLevelModel = jsonIn.fromJson(LevelModel.class, file);
+        mLevelModel = levelModel;
+//        System.out.println(jsonIn.prettyPrint(mLevelModel));
+
+        mLevelModel.setStage(this);
+
+
     }
 
     private void setUpBuddhaBody() {
@@ -198,8 +223,13 @@ public class GameStage extends Stage {
         mBonuses.add(new StrongBeatBonus(this, VIEWPORT_HEIGHT));
         mBonuses.add(new RetributionBonus(this, VIEWPORT_HEIGHT));
         mBonuses.add(new ThunderFistBonus(this, VIEWPORT_HEIGHT));
-        mBonuses.add(new BuddhaBonus(this, VIEWPORT_HEIGHT));
         mBonuses.add(new RevivalBonus(this, VIEWPORT_HEIGHT));
+        mBonuses.add(new BuddhaBonus(this, VIEWPORT_HEIGHT));
+
+
+        for (GameBonus gameBonus : mBonuses) {
+            addMovable(gameBonus);
+        }
 
     }
 
@@ -230,33 +260,31 @@ public class GameStage extends Stage {
 
     private void setUpPits() {
 
-        if (Constants.PRIORITY_PIT>0) {
-            simplePit1 = new Pit(WorldUtils.createPit(world, Constants.GROUND_PIT, Constants.GROUND_HEIGHT/2f));
-            simplePit2 = new Pit(WorldUtils.createPit(world, Constants.GROUND_PIT, Constants.GROUND_HEIGHT/2f));
+            simplePit1 = new Pit(WorldUtils.createPit(world, Constants.GROUND_PIT_INIT, Constants.GROUND_HEIGHT/2f));
+            simplePit2 = new Pit(WorldUtils.createPit(world, Constants.GROUND_PIT_INIT, Constants.GROUND_HEIGHT/2f));
             addMovable(simplePit1);
             addMovable(simplePit2);
-        }
 
-        if (Constants.PRIORITY_COLUMNS>0) {
+
             columnsPit1 = new Pit(WorldUtils.createPit(world,
-                    Constants.COLUMNS_QUANTITY*Constants.COLUMNS_WIDTH
-                            + Constants.COLUMNS_PIT * (Constants.COLUMNS_QUANTITY + 1)
+                    Constants.COLUMNS_QUANTITY_INIT *Constants.COLUMNS_WIDTH_INIT
+                            + Constants.COLUMNS_PIT_INIT * (Constants.COLUMNS_QUANTITY_INIT + 1)
             , Constants.GROUND_HEIGHT/2f));
             columnsPit2 = new Pit(WorldUtils.createPit(world,
-                    Constants.COLUMNS_QUANTITY*Constants.COLUMNS_WIDTH
-                            + Constants.COLUMNS_PIT * (Constants.COLUMNS_QUANTITY + 1)
+                    Constants.COLUMNS_QUANTITY_INIT *Constants.COLUMNS_WIDTH_INIT
+                            + Constants.COLUMNS_PIT_INIT * (Constants.COLUMNS_QUANTITY_INIT + 1)
             , Constants.GROUND_HEIGHT/2f));
-        }
+            addMovable(columnsPit1);
+            addMovable(columnsPit2);
 
-        addMovable(columnsPit1);
-        addMovable(columnsPit2);
+
     }
 
     private void setUpColumns() {
-        if (Constants.PRIORITY_COLUMNS>0) {
+        if (mLevelModel.mPriorityColumns>0) {
             mColumns1 = new Array<Columns>();
             mColumns2 = new Array<Columns>();
-            for (int i=0; i<Constants.COLUMNS_QUANTITY; i++) {
+            for (int i=0; i<Constants.COLUMNS_QUANTITY_INIT; i++) {
                 Columns columns1 = new Columns(WorldUtils.createColumns(world));
                 Columns columns2 = new Columns(WorldUtils.createColumns(world));
                 mColumns1.add(columns1);
@@ -268,7 +296,7 @@ public class GameStage extends Stage {
     }
 
     private void setUpDangersHandler() {
-        dangersHandler = new DangersHandler(this, mBonuses);
+        dangersHandler = new DangersHandler(this, mBonuses, mLevelModel);
         dangersHandler.init();
         if (mColumns1!=null) {
             dangersHandler.setColumns(mColumns1, mColumns2);
@@ -281,7 +309,7 @@ public class GameStage extends Stage {
     }
 
     private void setUpBackground() {
-        background = new Background(world, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+        background = new Background(world, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, Constants.BACKGROUND_VELOCITY_COF);
         addActor(background);
         addMovable(background);
     }
@@ -357,7 +385,7 @@ public class GameStage extends Stage {
                 mReturnFilter = true;
             } else if (mReturnFilter) {
                 mReturnTimer +=delta;
-                if (mReturnTimer>3&&runner!=null) {
+                if (mReturnTimer>3&&runner.getBody()!=null) {
                     runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
                     runner.setAlpha(1f);
                     mReturnTimer=0;
@@ -374,6 +402,8 @@ public class GameStage extends Stage {
             bodies.clear();
 
             SpaceTable.leaf();
+
+            mLevelModel.act(delta);
 
         }
     }
@@ -404,7 +434,7 @@ public class GameStage extends Stage {
     public void createLump(Body parent, int quantity, TextureRegion textureRegion) {
         for (int i=0;i<quantity;i++) {
             Lump lump = null;
-            lump = (Lump) PoolsHandler.sLumpsPool.obtain();
+            lump = PoolsHandler.sLumpsPool.obtain();
             if (lump!=null) {
                 lump.init(this, parent, textureRegion);
             }
@@ -429,8 +459,6 @@ public class GameStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
-        coint++;
-        System.out.println("click" + coint);
         translateScreenToWorldCoordinates(screenX, screenY);
 
         if (mState == START) {
@@ -442,7 +470,6 @@ public class GameStage extends Stage {
             mState = RUN;
 
         } else if (rightSideTouched(touchPoint.x, touchPoint.y)) {
-            System.out.println("strike" + coint);
             runner.strike();
 
         } else if (leftSideTouched(touchPoint.x, touchPoint.y)) {
@@ -461,7 +488,7 @@ public class GameStage extends Stage {
         runner.start();
         ground1.setVelocity(Constants.GROUND_LINEAR_VELOCITY);
         ground2.setVelocity(Constants.GROUND_LINEAR_VELOCITY);
-        background.setSpeed(Constants.WORLD_STATIC_VELOCITY.x * Constants.BACKGROUND_VELOCITY_COFF);
+        background.setSpeed(Constants.WORLD_STATIC_VELOCITY_INIT.x * background.getSpeedCof());
     }
 
     private void translateScreenToWorldCoordinates(int screenX, int screenY) {
@@ -610,6 +637,7 @@ public class GameStage extends Stage {
                             ScoreCounter.increaseKilled();
                         }
                     } else if ((actor instanceof Obstacle)
+                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
                             &&!(((Obstacle)actor).getUserData()).isTrap()
                             &&!(((Obstacle)actor).getUserData()).isArmour()
                             &&!(((Obstacle)actor).getUserData()).isDead()) {
@@ -631,6 +659,7 @@ public class GameStage extends Stage {
                             ScoreCounter.increaseKilled();
                         }
                     } else if ((actor instanceof Obstacle)
+                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
                             &&!(((Obstacle)actor).getUserData()).isTrap()
                             &&!(((Obstacle)actor).getUserData()).isDead()) {
                         (((Obstacle)actor).getUserData()).setDead(true);
@@ -651,6 +680,7 @@ public class GameStage extends Stage {
                             ScoreCounter.increaseKilled();
                         }
                     } else if ((actor instanceof Obstacle)
+                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
                             &&!(((Obstacle)actor).getUserData()).isDead()) {
                         (((Obstacle)actor).getUserData()).setDead(true);
                         ScoreCounter.increaseScore(1);
@@ -669,6 +699,13 @@ public class GameStage extends Stage {
         for (Movable movable:mMovableArray) {
             movable.changingStaticSpeed(speedScale);
         }
+    }
+
+    public void changingSpeedHandler(float speedScale) {
+        if (runner.isBuddha()&&!runner.isUseBuddhaTreshhold()) {
+            speedScale*=2f;
+        }
+        changingSpeed(speedScale);
     }
 
     public void addMovable(Movable movable) {
@@ -720,5 +757,9 @@ public class GameStage extends Stage {
         runner.setAlpha(0.3f);
         mReturnTimer = 0;
         mReturnFilter = true;
+    }
+
+    public DangersHandler getDangersHandler() {
+        return dangersHandler;
     }
 }

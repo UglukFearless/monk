@@ -6,16 +6,13 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 
 import net.uglukfearless.monk.constants.Constants;
-import net.uglukfearless.monk.constants.PreferencesConstants;
 
-import java.util.HashMap;
 import java.util.Locale;
 
 /**
@@ -23,15 +20,12 @@ import java.util.Locale;
  */
 public class AssetLoader {
 
-    public static Texture backgroundTexture;
-    public static TextureRegion background;
-    public static Texture groundTexture;
-    public static TextureRegion ground;
     public static Texture broadbordTexture;
     public static TextureRegion broadbord;
 
-    public static TextureAtlas charactersAtlas;
+    public static TextureAtlas environmentAtlas;
     public static TextureAtlas enemiesAtlas;
+    public static TextureAtlas obstaclesAtlas;
     public static TextureAtlas monkAtlas;
     public static TextureAtlas guiAtlas;
     public static TextureAtlas achieveAtlas;
@@ -46,24 +40,12 @@ public class AssetLoader {
     public static Animation playerStrike;
     public static Texture playerShell;
 
-    public static Texture stoneTexture;
-    public static TextureRegion stone;
-    public static Texture boxTexture;
-    public static TextureRegion box;
-    public static Texture columnTexture;
-    public static TextureRegion column;
-    public static TextureAtlas bladesAtlas;
-    public static Animation blades;
-
     public static TextureRegion buttonMenuOn;
     public static TextureRegion buttonMenuOff;
     public static TextureRegion buttonBackOn;
     public static TextureRegion buttonBackOff;
 
-    public static Music levelOneMusic;
-
-    public static BitmapFont font;
-    public static BitmapFont fontBig;
+    public static Music levelMusic;
 
     public static Skin sGuiSkin;
 
@@ -97,13 +79,9 @@ public class AssetLoader {
 
     public static void initGame() {
 
-        backgroundTexture = new Texture(Gdx.files.internal(Constants.BACKGROUND_IMAGE_PATH));
-        background = new TextureRegion(backgroundTexture);
-        groundTexture = new Texture(Gdx.files.internal(Constants.GROUND_IMAGE_PATH));
-        ground = new TextureRegion(groundTexture);
-
-        charactersAtlas = new TextureAtlas(Gdx.files.internal(Constants.CHARACTERS_ATLAS_PATH));
-        enemiesAtlas = new TextureAtlas(Gdx.files.internal("new/enemies.atlas"));
+//        environmentAtlas = new TextureAtlas(Gdx.files.internal("new/environment.atlas"));
+//        enemiesAtlas = new TextureAtlas(Gdx.files.internal("new/enemies.atlas"));
+//        obstaclesAtlas = new TextureAtlas(Gdx.files.internal("new/obstacles.atlas"));
         monkAtlas = new TextureAtlas(Gdx.files.internal("new/monk.atlas"));
         achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
         bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
@@ -120,31 +98,11 @@ public class AssetLoader {
         playerStrike = new Animation(0.12f ,monkAtlas.findRegion(Constants.RUNNER_STRIKING_REGION_NAME));
         playerShell = new Texture(Gdx.files.internal("monkShell.png"));
 
-        stoneTexture = new Texture(Gdx.files.internal("stone.png"));
-        stone = new TextureRegion(stoneTexture);
-        boxTexture = new Texture(Gdx.files.internal("box.png"));
-        box = new TextureRegion(boxTexture);
-        columnTexture = new Texture(Gdx.files.internal("column.png"));
-        column = new TextureRegion(columnTexture);
-        bladesAtlas = new TextureAtlas(Gdx.files.internal("blades.atlas"));
-
-        String [] textureRegions = new String [] { "blade1", "blade2", "blade3", "blade4" };
-
-        TextureRegion[] frames = new TextureRegion[textureRegions.length];
-        for (int i=0;i<textureRegions.length;i++) {
-            frames[i] = bladesAtlas.findRegion(textureRegions[i]);
-        }
-        blades = new Animation(0.025f, frames);
-
-        levelOneMusic = Gdx.audio.newMusic(Gdx.files.internal("music/level1.mp3"));
 
         monkStrike = Gdx.audio.newSound(Gdx.files.internal("sound/kiya.wav"));
         getBonus = Gdx.audio.newSound(Gdx.files.internal("sound/coin.wav"));
         balanceBonus = Gdx.audio.newSound(Gdx.files.internal("sound/beep.wav"));
         retributionBonus = Gdx.audio.newSound(Gdx.files.internal("sound/beat.wav"));
-
-        font = new BitmapFont(Gdx.files.internal("text.fnt"));
-        font.getData().setScale(.25f, .25f);
 
         sGuiSkin = new Skin(Gdx.files.internal("gui/forskin/exp/gui_exp.json"));
 
@@ -154,36 +112,15 @@ public class AssetLoader {
     }
 
     //Инициализация ресурсов уровня
-    public static void initLevel() {
+    public static void initLevel(String levelName) {
 
-        backgroundTexture = new Texture(Gdx.files.internal(Constants.BACKGROUND_IMAGE_PATH));
-        background = new TextureRegion(backgroundTexture);
-        groundTexture = new Texture(Gdx.files.internal(Constants.GROUND_IMAGE_PATH));
-        ground = new TextureRegion(groundTexture);
+        environmentAtlas = new TextureAtlas(Gdx.files.internal("textures/" + levelName + "/environment.atlas"));
+        enemiesAtlas = new TextureAtlas(Gdx.files.internal("textures/" + levelName + "/enemies.atlas"));
+        obstaclesAtlas = new TextureAtlas(Gdx.files.internal("textures/" + levelName + "/obstacles.atlas"));
 
-        charactersAtlas = new TextureAtlas(Gdx.files.internal(Constants.CHARACTERS_ATLAS_PATH));
-        monkAtlas = new TextureAtlas(Gdx.files.internal("new/monk.atlas"));
-
-        stoneTexture = new Texture(Gdx.files.internal("stone.png"));
-        stone = new TextureRegion(stoneTexture);
-        boxTexture = new Texture(Gdx.files.internal("box.png"));
-        box = new TextureRegion(boxTexture);
-        bladesAtlas = new TextureAtlas(Gdx.files.internal("blades.atlas"));
-
-        String [] textureRegions = new String [] { "blade1", "blade2", "blade3", "blade4" };
-
-        TextureRegion[] frames = new TextureRegion[textureRegions.length];
-        for (int i=0;i<textureRegions.length;i++) {
-            frames[i] = bladesAtlas.findRegion(textureRegions[i]);
-        }
-        blades = new Animation(0.025f, frames);
-
-        levelOneMusic = Gdx.audio.newMusic(Gdx.files.internal("music/level1.mp3"));
-        levelOneMusic.setLooping(true);
-        levelOneMusic.setVolume(SoundSystem.getMusicValue());
-
-        font = new BitmapFont(Gdx.files.internal("text.fnt"));
-        font.getData().setScale(.025f, .025f);
+        levelMusic = Gdx.audio.newMusic(Gdx.files.internal("music/" + levelName + "/music.mp3"));
+        levelMusic.setLooping(true);
+        levelMusic.setVolume(SoundSystem.getMusicValue());
 
     }
 
@@ -204,11 +141,6 @@ public class AssetLoader {
         buttonBackOff = new TextureRegion(guiAtlas.findRegion("back_off"));
         broadbordTexture = new Texture(Gdx.files.internal("broadbord.png"));
         broadbord = new TextureRegion(broadbordTexture);
-
-        font = new BitmapFont(Gdx.files.internal("text.fnt"));
-        font.getData().setScale(.6f, .6f);
-        fontBig = new BitmapFont(Gdx.files.internal("text.fnt"));
-        fontBig.getData().setScale(1f, 1f);
 
         sGuiSkin = new Skin(Gdx.files.internal("gui/forskin/exp/gui_exp.json"));
 
@@ -231,32 +163,32 @@ public class AssetLoader {
         guiAtlas.dispose();
         achieveAtlas.dispose();
         bonusesAtlas.dispose();
-        font.dispose();
-        fontBig.dispose();
         sGuiSkin.dispose();
         broadbordTexture.dispose();
         sGuiSkin.dispose();
     }
 
     public static void disposeGame() {
-        charactersAtlas.dispose();
         monkAtlas.dispose();
-        enemiesAtlas.dispose();
+
         achieveAtlas.dispose();
         bonusesAtlas.dispose();
         lumpsAtlas.dispose();
-        stoneTexture.dispose();
-        boxTexture.dispose();
-        columnTexture.dispose();
-        bladesAtlas.dispose();
-        backgroundTexture.dispose();
         broadbordTexture.dispose();
-        groundTexture.dispose();
-        levelOneMusic.dispose();
+
         monkStrike.dispose();
         getBonus.dispose();
         balanceBonus.dispose();
         retributionBonus.dispose();
-        font.dispose();
+
+        disposeLevel();
+    }
+
+    public static void disposeLevel() {
+        enemiesAtlas.dispose();
+        obstaclesAtlas.dispose();
+        environmentAtlas.dispose();
+
+        levelMusic.dispose();
     }
 }

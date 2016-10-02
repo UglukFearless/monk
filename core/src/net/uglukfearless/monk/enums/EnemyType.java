@@ -1,12 +1,18 @@
 package net.uglukfearless.monk.enums;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
+import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.gameplay.dangers.Danger;
 import net.uglukfearless.monk.constants.PlacingCategory;
+import net.uglukfearless.monk.utils.gameplay.models.EnemyModel;
+import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 
 import java.util.Random;
 
@@ -16,41 +22,25 @@ import java.util.Random;
  */
 public enum EnemyType implements Danger {
 
-    ENEMY_1("SPEARMEN", "Spearmen", "Копейщик"
-            ,1.3f,3f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
-            Constants.ENEMY1_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
-            false, true, false, true, Constants.ENEMY_JUMPING_COFF,
-            Constants.DANGERS_PRIORITY_OFTEN, true,1.8f, 1.1f,-0.2f,0, 1),
+    ENEMY_1(),
 
-    ENEMY_2("AXEMEN", "Axemen", "Воин с топором"
-            ,1.5f,3.2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
-            Constants.RUNNING_WIDE_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
-            false, true, true, true, Constants.ENEMY_JUMPING_COFF,
-            Constants.DANGERS_PRIORITY_OFTEN, true,1.43f, 1.05f,0,0, 2),
+    ENEMY_2(),
 
-    ENEMY_3("PENIS", "Leech", "Пиявка"
-            ,1f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
-            Constants.RUNNING_LONG_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
-            false, false, false, true, Constants.ENEMY_JUMPING_COFF,
-            Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0, 3),
+    ENEMY_3(),
 
-    ENEMY_4("SPIDER", "Spider", "Паукан"
-            ,2f,2f, Constants.OVERLAND_ENEMY_Y, Constants.ENEMY_DENSITY,
-            Constants.RUNNING_BIG_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 2,
-            false, false, false, true, Constants.ENEMY_JUMPING_COFF,
-            Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0, 4),
+    ENEMY_4(),
 
-    ENEMY_5("BEE", "Bee", "Пчола"
-            ,1f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
-            Constants.FLYING_SMALL_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 0,
-            false, false, false, true, Constants.ENEMY_JUMPING_COFF,
-            Constants.DANGERS_PRIORITY_VERY_SELDOM, false,1.2f, 1.1f,0,0, 5),
+    ENEMY_5(),
 
-    ENEMY_6("MYXA", "Myxa", "Муха"
-            ,2f,1f, Constants.FLYING_ENEMY_Y, Constants.ENEMY_DENSITY,
-            Constants.FLYING_WIDE_ENEMY_REGION_NAMES, Constants.ENEMY_LINEAR_VELOCITY, 0,
-            false, false, false, true, Constants.ENEMY_JUMPING_COFF,
-            Constants.DANGERS_PRIORITY_SELDOM, false,1.2f, 1.1f,0,0, 6);
+    ENEMY_6(),
+
+    ENEMY_7(),
+
+    ENEMY_8(),
+
+    ENEMY_9(),
+
+    ENEMY_10();
 
     private Random rand = new Random();
 
@@ -63,7 +53,6 @@ public enum EnemyType implements Danger {
     private float height;
     private float y;
     private float density;
-    private String [] regions;
     private Vector2 linearVelocity;
     private float jumpingImpulse;
     private int gravityScale;
@@ -84,39 +73,98 @@ public enum EnemyType implements Danger {
     private int mCurrentPriority = 0;
 
     //временное
-    private boolean newAtlas = false;
-    public int number = 0;
+    private int number = 0;
     private float basicXVelocity;
 
+    //для анимации
+    private Array<Animation> mAnimations;
+    private Array<TextureRegion> mRegions;
+    private StringBuilder mStringBuilder;
+    private boolean mStopSeek;
+    private int mRegionNum;
+    private TextureRegion mCurrentRegion;
+    private TextureRegion mShellRegion;
+    private Animation mStayAnimation;
+    private Animation mRunAnimation;
+    private Animation mJumpAnimation;
+    private Animation mStrikeAnimation;
+    private Animation mDieAnimation;
+    private Animation mAnimation;
+    private boolean mBlock;
 
-    EnemyType(String name, String enName, String ruName
-            , float width, float height, float y,  float density, String [] regions
-            , float linearVelocity, int gravityScale, boolean armour, boolean jumper
-            , boolean shouter, boolean striker, float jumpingImpulse, int prior, boolean newAtlas
-            , float scaleX, float scaleY, float offsetX, float offsetY, int number) {
 
-        this.name = name;
-        this.ruName = ruName;
-        this.enName = enName;
+    EnemyType() {
+
+//        this.name = name;
+//        this.ruName = ruName;
+//        this.enName = enName;
+//        this.KEY = PreferencesConstants.GENERAL_DANGER_KEY.concat(this.name);
+
+//        PreferencesManager.putDangerKey(KEY, this.enName, this.ruName);
+
+        setupProhibitionMap();
+        this.density = Constants.ENEMY_DENSITY;
+//        this.y = y;
+//        this.height = height;
+//        this.width = width;
+//        this.linearVelocity = new Vector2(Constants.WORLD_STATIC_VELOCITY_INIT.x +linearVelocity, 0);
+//        basicXVelocity = linearVelocity;
+//        this.gravityScale = gravityScale;
+//        if (gravityScale==0) {
+//            categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_FLYING);
+//        }  else {
+//            categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_OVERLAND);
+//        }
+//        this.armour = armour;
+//        if (armour) {
+//            categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR);
+//
+//            prohibitionsMap[0][1] = (short) (prohibitionsMap[0][1] | PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR
+//                    | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP);
+//            prohibitionsMap[1][1] = PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR
+//                    | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP;
+//            prohibitionsMap[1][0] = PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP
+//                    | PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR;
+//        }
+//
+//        this.jumper = jumper;
+//        this.shouter = shouter;
+//        this.striker = striker;
+//        this.jumpingImpulse = jumpingImpulse;
+//
+//        priority = prior;
+//
+//        this.textureScaleX = scaleX;
+//        this.textureScaleY = scaleY;
+//        this.textureOffsetX = offsetX;
+//        this.textureOffsetY = offsetY;
+//
+//        this.number = number;
+    }
+
+    public void init(EnemyModel enemyModel) {
+
+
+        this.name = enemyModel.name;
+        this.ruName = enemyModel.ruName;
+        this.enName = enemyModel.enName;
         this.KEY = PreferencesConstants.GENERAL_DANGER_KEY.concat(this.name);
 
         PreferencesManager.putDangerKey(KEY, this.enName, this.ruName);
 
         setupProhibitionMap();
-        this.density = density;
-        this.y = y;
-        this.height = height;
-        this.width = width;
-        this.regions = regions;
-        this.linearVelocity = new Vector2(Constants.WORLD_STATIC_VELOCITY.x +linearVelocity, 0);
-        basicXVelocity = linearVelocity;
-        this.gravityScale = gravityScale;
+        this.y = enemyModel.y;
+        this.height = enemyModel.height;
+        this.width = enemyModel.width;
+        this.linearVelocity = new Vector2(Constants.WORLD_STATIC_VELOCITY_INIT.x +enemyModel.basicXVelocity, 0);
+        basicXVelocity = enemyModel.basicXVelocity;
+        this.gravityScale = enemyModel.gravityScale;
         if (gravityScale==0) {
             categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_FLYING);
         }  else {
             categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_OVERLAND);
         }
-        this.armour = armour;
+        armour = false;
         if (armour) {
             categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR);
 
@@ -128,21 +176,82 @@ public enum EnemyType implements Danger {
                     | PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR;
         }
 
-        this.jumper = jumper;
-        this.shouter = shouter;
-        this.striker = striker;
-        this.jumpingImpulse = jumpingImpulse;
+        prohibitionsMap[0][1] = (short) (prohibitionsMap[0][1] | enemyModel.prohibitionsMap [0][1]);
+        prohibitionsMap[1][1] = (short) (prohibitionsMap[1][1] | enemyModel.prohibitionsMap [1][1]);
+        prohibitionsMap[1][0] = (short) (prohibitionsMap[1][0] | enemyModel.prohibitionsMap [1][0]);
 
-        priority = prior;
+        this.jumper = enemyModel.jumper;
+        this.shouter = enemyModel.shouter;
+        this.striker = enemyModel.striker;
+        this.jumpingImpulse = enemyModel.jumpingImpulse;
 
-        this.textureScaleX = scaleX;
-        this.textureScaleY = scaleY;
-        this.textureOffsetX = offsetX;
-        this.textureOffsetY = offsetY;
+        priority = enemyModel.priority;
 
-        //временное
-        this.newAtlas = newAtlas;
-        this.number = number;
+        this.textureScaleX = enemyModel.textureScaleX;
+        this.textureScaleY = enemyModel.textureScaleY;
+        this.textureOffsetX = enemyModel.textureOffsetX;
+        this.textureOffsetY = enemyModel.textureOffsetY;
+
+        mBlock = enemyModel.block;
+
+        this.number = enemyModel.number;
+
+        init();
+    }
+
+    public void init() {
+
+            mAnimations = new Array<Animation>();
+            mRegions = new Array<TextureRegion>();
+            mStringBuilder = new StringBuilder();
+
+            for (int ii=0; ii<Constants.ENEMY_ANIMATION_GROUP_NAMES.length; ii++) {
+                mStopSeek = false;
+                mRegions.clear();
+                mStringBuilder.append("enemy").append(number);
+                mStringBuilder.append(Constants.ENEMY_ANIMATION_GROUP_NAMES[ii]);
+                mRegionNum = 0;
+
+                while (!mStopSeek) {
+                    mRegionNum++;
+
+                    mCurrentRegion = (AssetLoader.enemiesAtlas.findRegion(mStringBuilder.toString()
+                            + String.valueOf(mRegionNum)));
+
+
+                    if (mCurrentRegion!=null) {
+                        mRegions.add(mCurrentRegion);
+                    } else {
+                        mStopSeek = true;
+                        mRegionNum = 0;
+                    }
+                }
+
+                mStopSeek = false;
+
+                if (mRegions.size>0) {
+                    mAnimations.add(new Animation(0.12f, mRegions));
+                } else {
+                    mAnimations.add(null);
+                }
+
+                mStringBuilder.delete(0, mStringBuilder.length());
+            }
+
+            mShellRegion = AssetLoader.enemiesAtlas.findRegion("enemy" + number + "_shell");
+
+            mStayAnimation = mAnimations.get(0);
+            mRunAnimation = mAnimations.get(1);
+            mJumpAnimation = mAnimations.get(2);
+            mStrikeAnimation = mAnimations.get(3);
+            mDieAnimation = mAnimations.get(4);
+
+            if (mStayAnimation!=null) {
+                mAnimation = mStayAnimation;
+            } else {
+                mAnimation = mRunAnimation;
+            }
+
     }
 
     private void setupProhibitionMap() {
@@ -195,9 +304,6 @@ public enum EnemyType implements Danger {
         return density;
     }
 
-    public String[] getRegions() {
-        return regions;
-    }
 
     public Vector2 getLinearVelocity() {
         return new Vector2(linearVelocity);
@@ -257,10 +363,46 @@ public enum EnemyType implements Danger {
         return KEY;
     }
 
-    //временное
-
-    public boolean isNewAtlas() {
-        return newAtlas;
+    //геттеры по анимациям
+    public TextureRegion getShellRegion() {
+        return mShellRegion;
     }
 
+    public Animation getStayAnimation() {
+        return mStayAnimation;
+    }
+
+    public Animation getRunAnimation() {
+        return mRunAnimation;
+    }
+
+    public Animation getJumpAnimation() {
+        return mJumpAnimation;
+    }
+
+    public Animation getStrikeAnimation() {
+        return mStrikeAnimation;
+    }
+
+    public Animation getDieAnimation() {
+        return mDieAnimation;
+    }
+
+    public Animation getAnimation() {
+        return mAnimation;
+    }
+
+    //управление параметрами
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public boolean isBlock() {
+        return mBlock;
+    }
+
+    public void setBlock(boolean block) {
+        mBlock = block;
+    }
 }

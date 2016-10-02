@@ -16,9 +16,9 @@ public class ObstaclesMap {
     public static boolean one = true;
     public static boolean cycle = false;
 
-    public static Vector2 velocity = Constants.WORLD_STATIC_VELOCITY;
+    public static Vector2 velocity = Constants.WORLD_STATIC_VELOCITY_INIT;
 
-    public static float sectionLength = Constants.GROUND_WIDTH/3f;
+    public static float sectionLength = Constants.GROUND_WIDTH_INIT /3f;
 
     public static float x = 0;
 
@@ -57,9 +57,9 @@ public class ObstaclesMap {
                     }
                 }
                 if (pit1) {
-                    x +=Constants.GROUND_WIDTH + Constants.GROUND_PIT;
+                    x +=Constants.GROUND_WIDTH_INIT + Constants.GROUND_PIT_INIT;
                 } else {
-                    x +=Constants.GROUND_WIDTH;
+                    x +=Constants.GROUND_WIDTH_INIT;
                 }
                 pit1=pit2;
                 pit2=false;
@@ -79,31 +79,31 @@ public class ObstaclesMap {
     public static int [] checkPlacing(float inX, float inY) {
         int[] point = new int[2];
 
-        if (inX < x || inX > x + Constants.GROUND_WIDTH*2 + Constants.GROUND_PIT*2) {
+        if (inX < x || inX > x + Constants.GROUND_WIDTH_INIT *2 + Constants.GROUND_PIT_INIT *2) {
             point[0] = -1;
             point[1] = -1;
             return point;
         }
-        if (pit1&&(inX-x)<Constants.GROUND_PIT) {
+        if (pit1&&(inX-x)<Constants.GROUND_PIT_INIT) {
             point[0] = 0;
-        } else if (pit1&&(inX-x)<Constants.GROUND_WIDTH + Constants.GROUND_PIT) {
-            point[0] = ((int)((inX - x - Constants.GROUND_PIT)/sectionLength) + 1);
-        } else if (pit1&&pit2&&(inX-x)<Constants.GROUND_WIDTH + Constants.GROUND_PIT*2) {
+        } else if (pit1&&(inX-x)<Constants.GROUND_WIDTH_INIT + Constants.GROUND_PIT_INIT) {
+            point[0] = ((int)((inX - x - Constants.GROUND_PIT_INIT)/sectionLength) + 1);
+        } else if (pit1&&pit2&&(inX-x)<Constants.GROUND_WIDTH_INIT + Constants.GROUND_PIT_INIT *2) {
             point[0] = 4;
-        } else if (pit1&&pit2&&(inX-x)<Constants.GROUND_WIDTH*2 + Constants.GROUND_PIT*2) {
-            point[0] = ((int)((inX - x - 2*Constants.GROUND_PIT)/sectionLength) + 2);
-        } else if (pit1&&!pit2&&(inX-x)<Constants.GROUND_WIDTH*2 + Constants.GROUND_PIT) {
-            point[0] = ((int)((inX - x - Constants.GROUND_PIT)/sectionLength) + 2);
+        } else if (pit1&&pit2&&(inX-x)<Constants.GROUND_WIDTH_INIT *2 + Constants.GROUND_PIT_INIT *2) {
+            point[0] = ((int)((inX - x - 2*Constants.GROUND_PIT_INIT)/sectionLength) + 2);
+        } else if (pit1&&!pit2&&(inX-x)<Constants.GROUND_WIDTH_INIT *2 + Constants.GROUND_PIT_INIT) {
+            point[0] = ((int)((inX - x - Constants.GROUND_PIT_INIT)/sectionLength) + 2);
         }
 
-        else if (!pit1&&(inX-x)<Constants.GROUND_WIDTH) {
+        else if (!pit1&&(inX-x)<Constants.GROUND_WIDTH_INIT) {
             point[0] = ((int)((inX - x)/sectionLength) + 1);
-        } else if (!pit1&&pit2&&(inX-x)<Constants.GROUND_WIDTH + Constants.GROUND_PIT) {
+        } else if (!pit1&&pit2&&(inX-x)<Constants.GROUND_WIDTH_INIT + Constants.GROUND_PIT_INIT) {
             point[0] = 4;
-        } else if (!pit1&&pit2&&(inX-x)<Constants.GROUND_WIDTH*2 + Constants.GROUND_PIT) {
-            point[0] = ((int)((inX - x - Constants.GROUND_PIT)/sectionLength) + 2);
-        } else if (!pit1&&!pit2&&(inX-x)<Constants.GROUND_WIDTH*2) {
-            point[0] = ((int)((inX - x - Constants.GROUND_PIT)/sectionLength) + 2);
+        } else if (!pit1&&pit2&&(inX-x)<Constants.GROUND_WIDTH_INIT *2 + Constants.GROUND_PIT_INIT) {
+            point[0] = ((int)((inX - x - Constants.GROUND_PIT_INIT)/sectionLength) + 2);
+        } else if (!pit1&&!pit2&&(inX-x)<Constants.GROUND_WIDTH_INIT *2) {
+            point[0] = ((int)((inX - x - Constants.GROUND_PIT_INIT)/sectionLength) + 2);
         }
 
         if (inY<Constants.LAYOUT_Y_ONE + 4) {

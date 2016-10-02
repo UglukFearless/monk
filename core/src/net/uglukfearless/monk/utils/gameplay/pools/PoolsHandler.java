@@ -58,7 +58,7 @@ public class PoolsHandler {
 
         for (final EnemyType enemyType : EnemyType.values()) {
 
-            if (enemyType.getPriority()>0) {
+            if (!enemyType.isBlock()) {
                 Pool<Enemy> pool = new Pool<Enemy>() {
                     @Override
                     protected Enemy newObject() {
@@ -72,13 +72,12 @@ public class PoolsHandler {
                     enemies.add(pool.obtain());
                 }
                 pool.freeAll(enemies);
-
             }
         }
 
         for (final ObstacleType obstacleType: ObstacleType.values()) {
 
-            if (obstacleType.getPriority()>0) {
+            if (!obstacleType.isBlock()) {
                 Pool<Obstacle> pool = new Pool<Obstacle>() {
                     @Override
                     protected Obstacle newObject() {

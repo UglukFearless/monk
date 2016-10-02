@@ -14,16 +14,17 @@ import net.uglukfearless.monk.stages.GameGuiStage;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.SoundSystem;
+import net.uglukfearless.monk.utils.gameplay.Movable;
 
 
 /**
  * Created by Ugluk on 10.09.2016.
  */
-public abstract class GameBonus extends Actor {
+public abstract class GameBonus extends Actor implements Movable {
 
     protected String mName;
     protected GameStage mStage;
-    private float mSpeed = Constants.WORLD_STATIC_VELOCITY.x;
+    protected float mSpeed = Constants.WORLD_STATIC_VELOCITY_INIT.x;
 
     private boolean mTouched;
     private boolean mAddsActions;
@@ -135,6 +136,7 @@ public abstract class GameBonus extends Actor {
         this.setPosition(x + 1.5f, y + 1.5f);
         this.setVisible(true);
         mStage.addActor(this);
+        mSpeed = mStage.getCurrentVelocity().x;
     }
 
     public abstract void activation();
@@ -159,4 +161,8 @@ public abstract class GameBonus extends Actor {
         mGuiStage = gui;
     }
 
+    public void changingStaticSpeed(float speedScale) {
+
+        mSpeed = speedScale;
+    }
 }

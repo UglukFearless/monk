@@ -40,9 +40,9 @@ public class Ground extends GameActor  implements Movable {
         super.draw(batch, parentAlpha);
 
         batch.disableBlending();
-        batch.draw(AssetLoader.ground, body.getPosition().x - userData.getWidth() / 2,
+        batch.draw(AssetLoader.environmentAtlas.findRegion("ground"), body.getPosition().x - userData.getWidth()*1.01f / 2,
                 body.getPosition().y - userData.getHeight() / 2,
-                userData.getWidth(), userData.getHeight());
+                userData.getWidth()*1.01f, userData.getHeight());
         batch.enableBlending();
 
     }

@@ -1,5 +1,7 @@
 package net.uglukfearless.monk.box2d;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import net.uglukfearless.monk.enums.EnemyType;
@@ -28,8 +30,7 @@ public class EnemyUserData extends UserData {
     private float offsetY;
 
     //временное
-    public boolean atlas;
-    public EnemyType  enemyType;
+    private EnemyType  enemyType;
 
 
     public EnemyUserData(EnemyType type) {
@@ -53,7 +54,6 @@ public class EnemyUserData extends UserData {
         offsetX = type.getTextureOffsetX();
         offsetY = type.getTextureOffsetY();
 
-        atlas = type.isNewAtlas();
         this.enemyType = type;
     }
 
@@ -63,10 +63,6 @@ public class EnemyUserData extends UserData {
 
     public void setLinearVelocity(Vector2 linearVelocity) {
         this.linearVelocity = linearVelocity;
-    }
-
-    public String[] getTextureRegions() {
-        return enemyType.getRegions();
     }
 
     public boolean isDead() {
@@ -181,5 +177,39 @@ public class EnemyUserData extends UserData {
 
     public String getKEY() {
         return enemyType.getKEY();
+    }
+
+    public EnemyType getEnemyType() {
+        return enemyType;
+    }
+
+
+    //геттеры по анимациям
+    public TextureRegion getShellRegion() {
+        return enemyType.getShellRegion();
+    }
+
+    public Animation getStayAnimation() {
+        return enemyType.getStayAnimation();
+    }
+
+    public Animation getRunAnimation() {
+        return enemyType.getRunAnimation();
+    }
+
+    public Animation getJumpAnimation() {
+        return enemyType.getJumpAnimation();
+    }
+
+    public Animation getStrikeAnimation() {
+        return enemyType.getStrikeAnimation();
+    }
+
+    public Animation getDieAnimation() {
+        return enemyType.getDieAnimation();
+    }
+
+    public Animation getAnimation() {
+        return enemyType.getAnimation();
     }
 }

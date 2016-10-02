@@ -20,11 +20,13 @@ public class MenuPlayAction implements ButtonAction {
 
     @Override
     public void isTouchUp() {
-        mScreen.newGame();
+//        mScreen.newGame();
+        mScreen.selectLevelMenu();
     }
 
     @Override
     public void action() {
-        mScreen.newGame();
+//        mScreen.newGame();
+        mScreen.selectLevelMenu();
     }
 }

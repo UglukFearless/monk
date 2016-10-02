@@ -75,8 +75,8 @@ public class GameGuiStage extends Stage {
         super(new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
                 new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight())));
 
-        VIEWPORT_WIDTH = (int) Gdx.graphics.getWidth();
-        VIEWPORT_HEIGHT = (int) Gdx.graphics.getHeight();
+        VIEWPORT_WIDTH = Gdx.graphics.getWidth();
+        VIEWPORT_HEIGHT = Gdx.graphics.getHeight();
         mYGameHeight = yViewportHeight;
         mGameScreen = screen;
         mGameStage = gameStage;

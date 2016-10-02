@@ -15,7 +15,7 @@ import net.uglukfearless.monk.constants.PlacingCategory;
 import net.uglukfearless.monk.enums.EnemyType;
 import net.uglukfearless.monk.enums.ObstacleType;
 import net.uglukfearless.monk.stages.GameStage;
-import net.uglukfearless.monk.utils.gameplay.dangers.Danger;
+import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ public class DangersHandler {
     private float offset_y;
 
     private GameStage stage;
+    private LevelModel mLevelModel;
     private World world;
     private EnemyType [] enemyTypes;
     private ObstacleType [] obstacleTypes;
@@ -59,8 +60,9 @@ public class DangersHandler {
     private Pit mPit;
     private Array<GameBonus> mBonuses;
 
-    public DangersHandler(GameStage stage, Array<GameBonus> bonuses) {
+    public DangersHandler(GameStage stage, Array<GameBonus> bonuses, LevelModel levelModel) {
         this.stage = stage;
+        mLevelModel = levelModel;
         this.world = stage.getWorld();
         enemyTypes = EnemyType.values();
         obstacleTypes = ObstacleType.values();
@@ -80,6 +82,10 @@ public class DangersHandler {
     }
 
     public void init() {
+
+        allEnemies.clear();
+        allObstacles.clear();
+        allDangers.clear();
 
         for (EnemyType enemyType: enemyTypes) {
             if (enemyType.getPriority()>0) {
@@ -106,12 +112,11 @@ public class DangersHandler {
         } else {
             repositionGround(ground2, ground1);
         }
-//        ObstaclesMap.leaf();
 
         if(pit==true) {
             fillPit();
         } else {
-            startX += Constants.GROUND_PIT;
+            startX += Constants.GROUND_PIT_INIT *1.8f;
         }
 
         fillGround();
@@ -123,7 +128,7 @@ public class DangersHandler {
             for (int j = 0; j < prohibitionsMap[0].length-1; j++) {
 
                 if (fillingCell()&&!setBonus(i,j)) {
-                    System.out.println("danger is in " + i + " : " + j);
+
                     resolvedDangers.clear();
 
                     for (Danger danger : allDangers) {
@@ -149,7 +154,6 @@ public class DangersHandler {
 
 
 
-//                        Danger typeDanger = resolvedDangers.get(rand.nextInt(resolvedDangers.size()));
 
                         if (typeDanger instanceof EnemyType) {
 
@@ -198,7 +202,7 @@ public class DangersHandler {
             }
         }
 
-        if (rand.nextInt(100)>80) {
+        if (rand.nextInt(100)>94) {
 
             GameBonus gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
 
@@ -248,7 +252,6 @@ public class DangersHandler {
                         }
                     }
 
-//                    Danger typeDanger = resolvedDangers.get(rand.nextInt(resolvedDangers.size()));
 
                     if (typeDanger instanceof EnemyType) {
 
@@ -269,20 +272,20 @@ public class DangersHandler {
 
         }
 
-        startX += Constants.GROUND_PIT*1.5f;
+        startX += Constants.GROUND_PIT_INIT *1.8f;
         prohibitionsMap[0][0] = prohibitionsMap[1][0];
         prohibitionsMap[0][1] = prohibitionsMap[1][1];
     }
 
     private boolean fillingCell() {
-        return rand.nextInt(Constants.DANGERS_PROBABILITY_LIMIT) < Constants.DANGERS_PROBABILITY;
+        return rand.nextInt(Constants.DANGERS_PROBABILITY_LIMIT) < mLevelModel.mDangersProbability;
     }
 
     private void createObstacle(ObstacleType obstacleType, int i, int j, boolean overPit) {
 
         //это нужно будет переписать!
-        if (j==1&&obstacleType.getY()<0) {
-            offset_y = obstacleType.getY()*(-1);
+        if (j==0) {
+            offset_y = obstacleType.getY_offset();
         } else {
             offset_y = 0;
         }
@@ -290,15 +293,13 @@ public class DangersHandler {
         Obstacle obstacle = PoolsHandler.sObstaclePools.get(obstacleType.name()).obtain();
 
         if (overPit) {
-            obstacle.init(stage, startX - Constants.GROUND_PIT / 2, Constants.LAYOUT_Y_ONE
+            obstacle.init(stage, startX - Constants.GROUND_PIT_INIT / 2f, Constants.LAYOUT_Y_ONE
                             + Constants.LAYOUT_Y_STEP * j + offset_y);
         } else {
-            obstacle.init(stage , startX + obstacleType.getWidth() / 2 + Constants.STEP_OF_DANGERS * i,
+            obstacle.init(stage , startX + obstacleType.getWidth() / 2f + Constants.STEP_OF_DANGERS * i,
                     Constants.LAYOUT_Y_ONE   + Constants.LAYOUT_Y_STEP * j + offset_y);
         }
 
-//                        ObstaclesMap.setObstacle(0,j, obstacle.getBody()
-//                                .getFixtureList().get(0).getFilterData().categoryBits, true);
 
         prohibitionsMap[i][j+1] = (short) (prohibitionsMap[i][j+1]
                 |obstacleType.getProhibitionsMap()[0][1]);
@@ -317,7 +318,7 @@ public class DangersHandler {
         enemy = PoolsHandler.sEnemiesPools.get(enemyType.name()).obtain();
 
         if (overPit) {
-            enemy.init(stage, startX - Constants.GROUND_PIT / 2, Constants.LAYOUT_Y_ONE
+            enemy.init(stage, startX - Constants.GROUND_PIT_INIT / 2f, Constants.LAYOUT_Y_ONE
                     + Constants.LAYOUT_Y_STEP * j);
         } else {
             enemy.init(stage, startX + enemyType.getWidth() + Constants.STEP_OF_DANGERS * i,
@@ -343,10 +344,10 @@ public class DangersHandler {
 
             mPit = stage.getColumnsPit();
             mPit.setPosition(secondGround.getBody().getPosition().x +
-                    Constants.GROUND_WIDTH/2);
+                    Constants.GROUND_WIDTH_INIT /2);
             stage.addActor(mPit);
 
-            if (!mColumns1.get(Constants.COLUMNS_QUANTITY-1).getBody().isActive()) {
+            if (!mColumns1.get(Constants.COLUMNS_QUANTITY_INIT -1).getBody().isActive()) {
                 placingColumns(mColumns1, secondGround);
             } else {
                 placingColumns(mColumns2, secondGround);
@@ -355,22 +356,22 @@ public class DangersHandler {
 
             mPit = stage.getSimplePit();
             mPit.setPosition(secondGround.getBody().getPosition().x +
-                            Constants.GROUND_WIDTH/2);
+                            Constants.GROUND_WIDTH_INIT /2);
             stage.addActor(mPit);
         }
 
         firstGround.getBody().setTransform(secondGround.getBody().getPosition().x +
-                Constants.GROUND_WIDTH + pitLength, Constants.GROUND_Y, 0f);
+                Constants.GROUND_WIDTH_INIT + pitLength, Constants.GROUND_Y, 0f);
 
 
-        startX = secondGround.getBody().getPosition().x + Constants.GROUND_WIDTH/2 + pitLength;
+        startX = secondGround.getBody().getPosition().x + Constants.GROUND_WIDTH_INIT /2 + pitLength;
     }
 
     private void placingColumns(Array<Columns> columns, Ground ground) {
-        for (int i=0; i<Constants.COLUMNS_QUANTITY; i++) {
-            float x = ground.getBody().getPosition().x + Constants.GROUND_WIDTH/2
-                    + Constants.COLUMNS_PIT * (i + 1) + Constants.COLUMNS_WIDTH*i;
-            columns.get(i).getBody().setTransform(x + Constants.COLUMNS_WIDTH / 2, Constants.COLUMNS_Y, 0);
+        for (int i=0; i<Constants.COLUMNS_QUANTITY_INIT; i++) {
+            float x = ground.getBody().getPosition().x + Constants.GROUND_WIDTH_INIT /2
+                    + Constants.COLUMNS_PIT_INIT * (i + 1) + Constants.COLUMNS_WIDTH_INIT *i;
+            columns.get(i).getBody().setTransform(x + Constants.COLUMNS_WIDTH_INIT / 2, Constants.COLUMNS_Y, 0);
             columns.get(i).getBody().setActive(true);
             stage.addActor(columns.get(i));
         }
@@ -380,9 +381,9 @@ public class DangersHandler {
 
         pitLength = 0;
 
-        priorityGround = ((rand.nextInt(Constants.PRIORITY_GROUND + 1) + 1)*(int)Math.atan(Constants.PRIORITY_GROUND+1));
-        priorityPit = (rand.nextInt(Constants.PRIORITY_PIT + 1) +1)*(int)Math.atan(Constants.PRIORITY_PIT+1);
-        priorityColumns = (rand.nextInt(Constants.PRIORITY_COLUMNS + 1) + 1)*(int)Math.atan(Constants.PRIORITY_COLUMNS+1);
+        priorityGround = ((rand.nextInt(mLevelModel.mPriorityGround + 1) + 1)*(int)Math.atan(mLevelModel.mPriorityGround+1));
+        priorityPit = (rand.nextInt(mLevelModel.mPriorityPit + 1) +1)*(int)Math.atan(mLevelModel.mPriorityPit+1);
+        priorityColumns = (rand.nextInt(mLevelModel.mPriorityColumns + 1) + 1)*(int)Math.atan(mLevelModel.mPriorityColumns+1);
 
         if (priorityGround>priorityPit&&priorityGround>priorityColumns) {
             pit = false;
@@ -391,12 +392,12 @@ public class DangersHandler {
         } else if (priorityColumns>priorityPit&&priorityColumns>priorityGround) {
             columns = true;
             pit = false;
-            pitLength = Constants.COLUMNS_QUANTITY
-                    *(Constants.COLUMNS_WIDTH + Constants.COLUMNS_PIT) + Constants.COLUMNS_PIT;
+            pitLength = Constants.COLUMNS_QUANTITY_INIT
+                    *(Constants.COLUMNS_WIDTH_INIT + Constants.COLUMNS_PIT_INIT) + Constants.COLUMNS_PIT_INIT;
         } else {
             pit = true;
             columns = false;
-            pitLength = Constants.GROUND_PIT;
+            pitLength = Constants.GROUND_PIT_INIT;
         }
     }
 
@@ -404,4 +405,5 @@ public class DangersHandler {
         mColumns1 = columns1;
         mColumns2 = columns2;
     }
+
 }

@@ -1,6 +1,8 @@
 package net.uglukfearless.monk.box2d;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
 import net.uglukfearless.monk.enums.ObstacleType;
 import net.uglukfearless.monk.enums.UserDataType;
@@ -13,8 +15,6 @@ public class ObstacleUserData extends UserData {
     private Vector2 linearVelocity;
     private int gravityScale;
 
-    private final boolean isBlades;
-
     private boolean dead;
 
     private float scaleX;
@@ -22,7 +22,7 @@ public class ObstacleUserData extends UserData {
     private float offsetX;
     private float offsetY;
 
-    public ObstacleType  obstacleType;
+    private ObstacleType  obstacleType;
 
     public ObstacleUserData(ObstacleType type) {
         width = type.getWidth();
@@ -35,19 +35,22 @@ public class ObstacleUserData extends UserData {
 
         userDataType = UserDataType.OBSTACLE;
 
-        //С этим нужно что-то сделать
-        if (type==ObstacleType.BLADES) {
-            isBlades=true;
-        } else {
-            isBlades=false;
-        }
-
         scaleX = type.getTextureScaleX();
         scaleY = type.getTextureScaleY();
         offsetX = type.getTextureOffsetX();
         offsetY = type.getTextureOffsetY();
 
         obstacleType = type;
+    }
+
+    public void hitExecution(Body body, boolean isEnemy) {
+        if (!isEnemy) {
+            body.setLinearVelocity(body.getLinearVelocity().add(obstacleType.getHitExecution()));
+        } else {
+            body.setLinearVelocity(body.getLinearVelocity().add(-1f*obstacleType.getHitExecution().x,
+                    obstacleType.getHitExecution().y ));
+        }
+
     }
 
     @Override
@@ -80,10 +83,6 @@ public class ObstacleUserData extends UserData {
         return obstacleType.getDensity();
     }
 
-
-    public String[] getRegions() {
-        return obstacleType.getRegions();
-    }
 
 
     public Vector2 getLinearVelocity() {
@@ -128,10 +127,6 @@ public class ObstacleUserData extends UserData {
         this.dead = dead;
     }
 
-    public boolean isBlades() {
-        return isBlades;
-    }
-
     public float getScaleX() {
         return scaleX;
     }
@@ -166,5 +161,18 @@ public class ObstacleUserData extends UserData {
 
     public String getKEY() {
         return obstacleType.getKEY();
+    }
+
+    public ObstacleType getObstacleType() {
+        return obstacleType;
+    }
+
+    //геттеры анимаций
+    public Animation getStayAnimation() {
+        return obstacleType.getStayAnimation();
+    }
+
+    public Animation getDieAnimation() {
+        return obstacleType.getDieAnimation();
     }
 }

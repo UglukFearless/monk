@@ -9,7 +9,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import net.uglukfearless.monk.box2d.RunnerUserData;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.Constants;
-import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.enums.RunnerState;
 import net.uglukfearless.monk.stages.GameStage;
@@ -58,6 +57,7 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
     private float mBuddhaThreshold;
 
     private String mCurrentKillerKey;
+    private boolean mUseBuddhaTreshhold;
 
 
     public Runner(Body body) {
@@ -79,6 +79,7 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
         mRetribution = false;
         mBuddhaTimer = 0;
         mBuddhaThreshold = 0;
+        mUseBuddhaTreshhold = false;
 
     }
 
@@ -114,8 +115,8 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             if (!body.getWorld().isLocked()) {
                 float x = body.getPosition().x - data.getWidth()/2;
                 if (x>mGround1.getBody().getPosition().x
-                        &&x<mGround1.getBody().getPosition().x + Constants.GROUND_WIDTH/2
-                        &&x>mGround2.getBody().getPosition().x - Constants.GROUND_WIDTH/2 - data.getWidth()*1.5f) {
+                        &&x<mGround1.getBody().getPosition().x + Constants.GROUND_WIDTH_INIT /2
+                        &&x>mGround2.getBody().getPosition().x - Constants.GROUND_WIDTH_INIT /2 - data.getWidth()*1.5f) {
                     body.setTransform(Constants.RUNNER_X, body.getPosition().y, 0);
                 }
             }
@@ -126,8 +127,9 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
             if (mBuddha) {
                 mBuddhaTimer +=delta;
-                if (mBuddhaTimer>mBuddhaThreshold) {
-                    ((GameStage)getStage()).changingSpeed(Constants.WORLD_STATIC_VELOCITY.x);
+                if (mBuddhaTimer>mBuddhaThreshold&&!mUseBuddhaTreshhold) {
+                    ((GameStage)getStage()).changingSpeed(((GameStage)getStage()).getCurrentVelocity().x/2f);
+                    mUseBuddhaTreshhold = true;
                 }
 
             }
@@ -157,8 +159,8 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             case RUN:
                 if (!body.getWorld().isLocked()) {
                     float x = body.getPosition().x - data.getWidth()/2;
-                    if (x>mGround1.getBody().getPosition().x - Constants.GROUND_WIDTH/2
-                            &&x<mGround1.getBody().getPosition().x + Constants.GROUND_WIDTH/2) {
+                    if (x>mGround1.getBody().getPosition().x - Constants.GROUND_WIDTH_INIT /2
+                            &&x<mGround1.getBody().getPosition().x + Constants.GROUND_WIDTH_INIT /2) {
                         body.setTransform(Constants.RUNNER_X, body.getPosition().y, 0);
                     }
                 }
@@ -193,7 +195,7 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             case DIE:
                 dead(delta);
                 if (mBuddha) {
-                    ((GameStage)getStage()).changingSpeed(Constants.WORLD_STATIC_VELOCITY.x);
+                    ((GameStage)getStage()).changingSpeed(Constants.WORLD_STATIC_VELOCITY_INIT.x);
                     mBuddha = false;
                 }
                 break;
@@ -359,6 +361,7 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     public void setBuddha(boolean buddha) {
         mBuddha = buddha;
+        mUseBuddhaTreshhold = false;
         if (!buddha) {
             mBuddhaTimer=0;
         }
@@ -370,11 +373,16 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     public void setBuddha(boolean buddha, float workingTime, float speed) {
         mBuddha = buddha;
+        mUseBuddhaTreshhold = false;
         mBuddhaThreshold = workingTime*0.8f;
         ((GameStage) getStage()).changingSpeed(speed);
         if (!buddha) {
             mBuddhaTimer=0;
         }
+    }
+
+    public boolean isUseBuddhaTreshhold() {
+        return mUseBuddhaTreshhold;
     }
 
     public String getCurrentKillerKey() {
