@@ -4,13 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Contact;
 
+import net.uglukfearless.monk.box2d.EnemyUserData;
 import net.uglukfearless.monk.box2d.RunnerUserData;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.enums.RunnerState;
+import net.uglukfearless.monk.enums.UserDataType;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.PreferencesManager;
@@ -58,6 +64,8 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     private String mCurrentKillerKey;
     private boolean mUseBuddhaTreshhold;
+    private boolean mGhost;
+    private boolean mStrongBeat;
 
 
     public Runner(Body body) {
@@ -205,6 +213,15 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
     private void dead(float delta) {
         deadTime +=delta;
         if (deadTime>0.3f&&getStage()!=null) {
+
+            if (AssetLoader.sFreeParticleBlood.size>0) {
+                ParticleEffect effect = AssetLoader.sFreeParticleBlood.get(AssetLoader.sFreeParticleBlood.size -1);
+                AssetLoader.sFreeParticleBlood.removeIndex(AssetLoader.sFreeParticleBlood.size -1);
+                effect.getEmitters().first().setPosition(body.getPosition().x, body.getPosition().y);
+                effect.start();
+                AssetLoader.sWorkParticleBlood.add(effect);
+            }
+
             ((GameStage)getStage()).deactivationBonuses();
             GameStage stage = (GameStage) getStage();
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump1"));
@@ -284,7 +301,7 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             case RUN_STRIKE:
             case RUN:
                 data.setState(RunnerState.RUN_STRIKE);
-                AssetLoader.monkStrike.play(SoundSystem.getSoundValue());
+                AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
                 mCurrentAnimation = mAnimStrike;
                 strikeTime = 0f;
                 if (mRetribution) {
@@ -296,7 +313,7 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             case JUMP_STRIKE:
             case JUMP:
                 data.setState(RunnerState.JUMP_STRIKE);
-                AssetLoader.monkStrike.play(SoundSystem.getSoundValue());
+                AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
                 mCurrentAnimation = mAnimStrike;
                 strikeTime = 0f;
                 if (mRetribution) {
@@ -308,7 +325,7 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             case JUMP_DOUBLE_STRIKE:
             case JUMP_DOUBLE:
                 data.setState(RunnerState.JUMP_DOUBLE_STRIKE);
-                AssetLoader.monkStrike.play(SoundSystem.getSoundValue());
+                AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
                 mCurrentAnimation = mAnimStrike;
                 strikeTime = 0f;
                 if (mRetribution) {
@@ -325,8 +342,9 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
         mCurrentAnimation = mAnimDie;
         body.setFixedRotation(false);
         body.applyAngularImpulse(data.getHitAngularImpulse(), true);
-        System.out.println("hit");
         getUserData().setState(RunnerState.DIE);
+        ((GameStage) getStage()).prepareTransition(255, 255, 255, .2f);
+        ((GameStage) getStage()).screenShake(0.1f, 0.3f);
     }
 
 
@@ -387,5 +405,51 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     public String getCurrentKillerKey() {
         return mCurrentKillerKey;
+    }
+
+    public void setGhost(boolean ghost) {
+        mGhost = ghost;
+    }
+
+    public boolean isGhost() {
+        return mGhost;
+    }
+
+    public void setStrongBeat(boolean strongBeat) {
+        mStrongBeat = strongBeat;
+    }
+
+    public void beatBody(Body bBody, Contact contact) {
+
+        bBody.setFixedRotation(false);
+        if (!mStrongBeat) {
+            bBody.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_DEAD);
+            if (bBody.getGravityScale()==0) {
+                bBody.setGravityScale(10);
+            }
+        } else if (bBody!=null&&((GameStage)getStage()).getRunnerStrike()!=null) {
+
+            float coff = -1;
+            Vector2 velocityBBody = bBody.getLinearVelocityFromWorldPoint(contact.getWorldManifold().getPoints()[0]);
+            Vector2 velocityRunnerStrike = ((GameStage)getStage()).getRunnerStrike().getBody()
+                        .getLinearVelocityFromWorldPoint(contact.getWorldManifold().getPoints()[0]);
+            Vector2 impactVelocity = velocityBBody.add(velocityRunnerStrike.x * -1, velocityRunnerStrike.y * -1);
+
+
+            if (bBody.getPosition().x>body.getPosition().x) {
+                coff=-1;
+            } else {
+                coff=1;
+            }
+
+            bBody.setLinearVelocity(coff*4f * impactVelocity.x, 2.5f * impactVelocity.y);
+            bBody.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_STRIKE_FLIP);
+            ((UserData)bBody.getUserData()).setLaunched(true);
+            if (bBody.getGravityScale()==0) {
+                bBody.setGravityScale(3);
+            }
+
+            ((GameStage) getStage()).screenShake(0.1f, 0.15f);
+        }
     }
 }

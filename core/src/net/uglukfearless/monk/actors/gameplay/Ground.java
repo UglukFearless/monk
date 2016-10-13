@@ -5,7 +5,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 import net.uglukfearless.monk.box2d.GroundUserData;
+import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.gameplay.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.Movable;
 
 /**
@@ -27,6 +29,12 @@ public class Ground extends GameActor  implements Movable {
 
         mPosition.set(body.getPosition().x - getUserData().getWidth()/2,
                 body.getPosition().y - getUserData().getHeight()/2);
+
+        if (!BodyUtils.bodyInBounds(body)) {
+            if (body!=null) {
+                ((GameStage)getStage()).repositionGround();
+            }
+        }
     }
 
     @Override
@@ -39,11 +47,11 @@ public class Ground extends GameActor  implements Movable {
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
 
-        batch.disableBlending();
-        batch.draw(AssetLoader.environmentAtlas.findRegion("ground"), body.getPosition().x - userData.getWidth()*1.01f / 2,
+//        batch.disableBlending();
+        batch.draw(AssetLoader.environmentAtlas.findRegion("ground"), body.getPosition().x - userData.getWidth() * 1.01f / 2,
                 body.getPosition().y - userData.getHeight() / 2,
-                userData.getWidth()*1.01f, userData.getHeight());
-        batch.enableBlending();
+                userData.getWidth() * 1.01f, userData.getHeight()*1.08f);
+//        batch.enableBlending();
 
     }
 

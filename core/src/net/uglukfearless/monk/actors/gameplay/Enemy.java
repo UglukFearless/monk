@@ -3,16 +3,18 @@ package net.uglukfearless.monk.actors.gameplay;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
 import net.uglukfearless.monk.box2d.EnemyUserData;
+import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.enums.EnemyType;
+import net.uglukfearless.monk.enums.UserDataType;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.constants.Constants;
@@ -23,6 +25,8 @@ import net.uglukfearless.monk.utils.gameplay.ai.Situation;
 import net.uglukfearless.monk.utils.gameplay.ai.SpaceTable;
 import net.uglukfearless.monk.utils.gameplay.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
+
+import java.util.Random;
 
 
 /**
@@ -51,6 +55,8 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
     private Situation mSituation;
     private float mPreviousVelocity;
+
+    public static Random mRand = new Random();
 
 
     public Enemy(World world, EnemyType enemyType) {
@@ -110,8 +116,8 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
         batch.draw(mAnimation.getKeyFrame(stateTime, true),
                 body.getPosition().x - (data.getWidth() * data.getScaleX() / 2) + data.getOffsetX(),
-                body.getPosition().y - (data.getHeight() / 2) + data.getOffsetY(),
-                getUserData().getWidth() * 0.5f, getUserData().getHeight() * 0.5f,
+                body.getPosition().y - (data.getHeight()/ 2) + data.getOffsetY(),
+                getUserData().getWidth()* data.getScaleX()  * 0.5f, getUserData().getHeight() * data.getScaleY() * 0.5f,
                 data.getWidth() * data.getScaleX(), data.getHeight() * data.getScaleY()
                 , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
 
@@ -126,8 +132,11 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
     public void act(float delta) {
         super.act(delta);
 
-        if (body.getPosition().x < Constants.GAME_WIDTH&&!starting) {
-                start();
+        if (((body.getPosition().x < Constants.GAME_WIDTH)
+                ||(body.getPosition().x < Constants.GAME_WIDTH + mRand.nextInt(8) + 10
+                &&body.getPosition().y - userData.getHeight()/2 < Constants.LAYOUT_Y_TWO*0.93f))
+                &&!starting) {
+            start();
         }
 
         if (getUserData().isDead()) {
@@ -138,6 +147,10 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         } else {
 
             if (body.getPosition().x < Constants.GAME_WIDTH) {
+
+                if (mAnimation==mJumpAnimation&&body.getLinearVelocity().y==0) {
+                    start();
+                }
 
                 mSituation = SpaceTable.getSituation(body.getPosition().x, body.getPosition().y
                         - getUserData().getEnemyType().getY() - getUserData().getHeight() / 2f
@@ -156,7 +169,6 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
                     } else if (getUserData().getGravityScale()==0&&mSituation.stopFly){
                         standing();
                     }
-
                 }
 
                 if (mSituation.strike) {
@@ -166,7 +178,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
                 }
 
                 if (body.getLinearVelocity().x>mStage.getCurrentVelocity().x)  {
-                    body.applyForceToCenter(mStage.getCurrentVelocity().x, 0, true);
+                    body.applyForceToCenter(mStage.getCurrentVelocity().x*2f, 0, true);
                 }
 
                 if (getUserData().isStrike()||mAnimation==mStrikeAnimation) {
@@ -272,6 +284,16 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
 
         if (deadTime>0.2f&&getStage()!=null) {
+
+            //exp
+            if (AssetLoader.sFreeParticleBlood.size>0) {
+                ParticleEffect effect = AssetLoader.sFreeParticleBlood.get(AssetLoader.sFreeParticleBlood.size -1);
+                AssetLoader.sFreeParticleBlood.removeIndex(AssetLoader.sFreeParticleBlood.size -1);
+                effect.getEmitters().first().setPosition(body.getPosition().x, body.getPosition().y);
+                effect.start();
+                AssetLoader.sWorkParticleBlood.add(effect);
+            }
+
             GameStage stage = (GameStage) getStage();
             stage.removeMovable(this);
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump1"));
@@ -296,10 +318,13 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         getUserData().setDoll(false);
         starting = false;
         body.setActive(false);
+        body.setAngularVelocity(0f);
         body.setGravityScale(getUserData().getEnemyType().getGravityScale());
         body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY);
         body.setFixedRotation(true);
         body.setTransform(-10, -10, 0);
+
+        ((UserData)body.getUserData()).setLaunched(false);
     }
 
     @Override

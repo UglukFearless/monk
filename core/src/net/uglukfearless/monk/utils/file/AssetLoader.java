@@ -6,9 +6,12 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 
 import net.uglukfearless.monk.constants.Constants;
@@ -20,14 +23,12 @@ import java.util.Locale;
  */
 public class AssetLoader {
 
-    public static Texture broadbordTexture;
-    public static TextureRegion broadbord;
+    public static NinePatch broadbord;
 
     public static TextureAtlas environmentAtlas;
     public static TextureAtlas enemiesAtlas;
     public static TextureAtlas obstaclesAtlas;
     public static TextureAtlas monkAtlas;
-    public static TextureAtlas guiAtlas;
     public static TextureAtlas achieveAtlas;
     public static TextureAtlas bonusesAtlas;
     public static TextureAtlas lumpsAtlas;
@@ -40,11 +41,6 @@ public class AssetLoader {
     public static Animation playerStrike;
     public static Texture playerShell;
 
-    public static TextureRegion buttonMenuOn;
-    public static TextureRegion buttonMenuOff;
-    public static TextureRegion buttonBackOn;
-    public static TextureRegion buttonBackOff;
-
     public static Music levelMusic;
 
     public static Skin sGuiSkin;
@@ -53,14 +49,22 @@ public class AssetLoader {
     public static Texture menuBackgroundTexture;
 
     public static Texture logoPicture;
-    public static Sound logoSound;
+//    public static Sound logoSound;
+    public static Music logoSound;
 
-    public static Sound monkStrike;
-    public static Sound getBonus;
-    public static Sound balanceBonus;
-    public static Sound retributionBonus;
+    public static Sound monkStrikeSound;
+    public static Sound getBonusSound;
+    public static Sound balanceBonusSound;
+    public static Sound retributionBonusSound;
 
     public static I18NBundle sBundle;
+
+    //exp
+    public static Array<ParticleEffect> sFreeParticleBlood;
+    public static Array<ParticleEffect> sWorkParticleBlood;
+
+    public static Array<ParticleEffect> sFreeParticleDust;
+    public static Array<ParticleEffect> sWorkParticleDust;
 
     public static void initBundle() {
         FileHandle baseFileHandle = Gdx.files.internal("i18n/Bundle");
@@ -79,9 +83,6 @@ public class AssetLoader {
 
     public static void initGame() {
 
-//        environmentAtlas = new TextureAtlas(Gdx.files.internal("new/environment.atlas"));
-//        enemiesAtlas = new TextureAtlas(Gdx.files.internal("new/enemies.atlas"));
-//        obstaclesAtlas = new TextureAtlas(Gdx.files.internal("new/obstacles.atlas"));
         monkAtlas = new TextureAtlas(Gdx.files.internal("new/monk.atlas"));
         achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
         bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
@@ -99,16 +100,35 @@ public class AssetLoader {
         playerShell = new Texture(Gdx.files.internal("monkShell.png"));
 
 
-        monkStrike = Gdx.audio.newSound(Gdx.files.internal("sound/kiya.wav"));
-        getBonus = Gdx.audio.newSound(Gdx.files.internal("sound/coin.wav"));
-        balanceBonus = Gdx.audio.newSound(Gdx.files.internal("sound/beep.wav"));
-        retributionBonus = Gdx.audio.newSound(Gdx.files.internal("sound/beat.wav"));
+        monkStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/kiya.wav"));
+        getBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/coin.wav"));
+        balanceBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beep.wav"));
+        retributionBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beat.wav"));
 
         sGuiSkin = new Skin(Gdx.files.internal("gui/forskin/exp/gui_exp.json"));
 
-        broadbordTexture = new Texture(Gdx.files.internal("broadbord.png"));
-        broadbord = new TextureRegion(broadbordTexture);
+        broadbord = new NinePatch(sGuiSkin.getAtlas().createPatch("broadbord"));
 
+        //exp
+        sFreeParticleBlood = new Array<ParticleEffect>();
+
+        for (int i=0;i<6;i++) {
+            ParticleEffect effect = new ParticleEffect();
+            effect.load(Gdx.files.internal("particles/blood2v3.p"), Gdx.files.internal("particles"));
+            sFreeParticleBlood.add(effect);
+        }
+
+        sWorkParticleBlood = new Array<ParticleEffect>();
+
+        sFreeParticleDust = new Array<ParticleEffect>();
+
+        for (int i=0;i<6;i++) {
+            ParticleEffect effect = new ParticleEffect();
+            effect.load(Gdx.files.internal("particles/dust2.p"), Gdx.files.internal("particles"));
+            sFreeParticleDust.add(effect);
+        }
+
+        sWorkParticleDust = new Array<ParticleEffect>();
     }
 
     //Инициализация ресурсов уровня
@@ -128,27 +148,20 @@ public class AssetLoader {
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal("music/mainTheme.mp3"));
         menuMusic.setVolume(SoundSystem.getMusicValue());
 
-        monkStrike = Gdx.audio.newSound(Gdx.files.internal("sound/kiya.wav"));
+        monkStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/kiya.wav"));
 
         menuBackgroundTexture = new Texture(Gdx.files.internal("menuBackground.png"));
-        guiAtlas = new TextureAtlas(Gdx.files.internal("gui/gui.atlas"));
         achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
         bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
 
-        buttonMenuOff = new TextureRegion(guiAtlas.findRegion("button_off"));
-        buttonMenuOn = new TextureRegion(guiAtlas.findRegion("button_on"));
-        buttonBackOn = new TextureRegion(guiAtlas.findRegion("back_on"));
-        buttonBackOff = new TextureRegion(guiAtlas.findRegion("back_off"));
-        broadbordTexture = new Texture(Gdx.files.internal("broadbord.png"));
-        broadbord = new TextureRegion(broadbordTexture);
-
         sGuiSkin = new Skin(Gdx.files.internal("gui/forskin/exp/gui_exp.json"));
+        broadbord = new NinePatch(sGuiSkin.getAtlas().createPatch("broadbord"));
 
     }
 
     public static void initLogo() {
         logoPicture = new Texture(Gdx.files.internal("Logo.png"));
-        logoSound = Gdx.audio.newSound(Gdx.files.internal("sound/Thunder.mp3"));
+        logoSound = Gdx.audio.newMusic(Gdx.files.internal("sound/Thunder.mp3"));
     }
 
     public static void disposeLogo() {
@@ -158,13 +171,11 @@ public class AssetLoader {
 
     public static void disposeMenu() {
         menuMusic.dispose();
-        monkStrike.dispose();
+        monkStrikeSound.dispose();
         menuBackgroundTexture.dispose();
-        guiAtlas.dispose();
         achieveAtlas.dispose();
         bonusesAtlas.dispose();
         sGuiSkin.dispose();
-        broadbordTexture.dispose();
         sGuiSkin.dispose();
     }
 
@@ -174,14 +185,29 @@ public class AssetLoader {
         achieveAtlas.dispose();
         bonusesAtlas.dispose();
         lumpsAtlas.dispose();
-        broadbordTexture.dispose();
 
-        monkStrike.dispose();
-        getBonus.dispose();
-        balanceBonus.dispose();
-        retributionBonus.dispose();
+        monkStrikeSound.dispose();
+        getBonusSound.dispose();
+        balanceBonusSound.dispose();
+        retributionBonusSound.dispose();
 
         disposeLevel();
+
+        for (ParticleEffect effect : AssetLoader.sWorkParticleBlood) {
+            effect.dispose();
+        }
+
+        for (ParticleEffect effect : AssetLoader.sFreeParticleBlood) {
+            effect.dispose();
+        }
+
+        for (ParticleEffect effect : AssetLoader.sWorkParticleDust) {
+            effect.dispose();
+        }
+
+        for (ParticleEffect effect : AssetLoader.sFreeParticleDust) {
+            effect.dispose();
+        }
     }
 
     public static void disposeLevel() {

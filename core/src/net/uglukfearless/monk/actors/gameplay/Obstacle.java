@@ -3,12 +3,14 @@ package net.uglukfearless.monk.actors.gameplay;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Pool;
 
 import net.uglukfearless.monk.box2d.ObstacleUserData;
+import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.enums.ObstacleType;
@@ -122,6 +124,16 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
             mAnimation = mDieAnimation;
         }
         if ((deadTime>0.2f||getUserData().isTrap()) && getStage() != null) {
+
+            //exp
+            if (AssetLoader.sFreeParticleDust.size>0) {
+                ParticleEffect effect = AssetLoader.sFreeParticleDust.get(AssetLoader.sFreeParticleDust.size -1);
+                AssetLoader.sFreeParticleDust.removeIndex(AssetLoader.sFreeParticleDust.size -1);
+                effect.getEmitters().first().setPosition(body.getPosition().x, body.getPosition().y);
+                effect.start();
+                AssetLoader.sWorkParticleDust.add(effect);
+            }
+
             GameStage stage = (GameStage) getStage();
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump2"));
             stage.removeMovable(this);
@@ -139,11 +151,15 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
         stateTime = 0f;
         deadTime = 0f;
         body.setLinearVelocity(getUserData().getLinearVelocity());
+        body.setAngularVelocity(0f);
         body.setActive(false);
         if (!getUserData().isTrap()&&!getUserData().isArmour()) {
             body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_SIMPLE);
+        } else if (!getUserData().isTrap()&&getUserData().isArmour()) {
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_ARMOUR);
         }
         body.setTransform(-10, -10, 0);
+        ((UserData)body.getUserData()).setLaunched(false);
     }
 
     @Override

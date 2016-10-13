@@ -31,6 +31,7 @@ public class EnemyUserData extends UserData {
 
     //временное
     private EnemyType  enemyType;
+    private boolean mLanding;
 
 
     public EnemyUserData(EnemyType type) {

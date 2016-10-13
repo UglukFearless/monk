@@ -58,7 +58,7 @@ public class SelectLevelStage extends Stage {
     private int mSeekNumber;
 
     //exp
-    ParticleEffect effect;
+//    ParticleEffect effect;
 
     public SelectLevelStage(MainMenuScreen screen, float yViewportHeight) {
 
@@ -92,13 +92,13 @@ public class SelectLevelStage extends Stage {
         Gdx.input.setCatchMenuKey(true);
 
 
-        //exp
-        effect = new ParticleEffect();
-        effect.load(Gdx.files.internal("particles/explosion.p"), Gdx.files.internal("particles"));
-        effect.getEmitters().first().setPosition(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
-        effect.getEmitters().get(1).setPosition(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
-        effect.getEmitters().get(1).setContinuous(true);
-        effect.start();
+//        exp
+//        effect = new ParticleEffect();
+//        effect.load(Gdx.files.internal("particles/blood.p"), Gdx.files.internal("particles"));
+//        effect.getEmitters().first().setPosition(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
+//        effect.getEmitters().get(1).setPosition(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
+//        effect.getEmitters().first().setContinuous(true);
+//        effect.start();
     }
 
     private void findLevels() {
@@ -153,7 +153,7 @@ public class SelectLevelStage extends Stage {
         mScrollPane = new ScrollPane(mLevelsTable);
 
         mRootTable = new Table();
-        mRootTable.background(new NinePatchDrawable(new NinePatch(AssetLoader.broadbord)));
+        mRootTable.background(new NinePatchDrawable(AssetLoader.broadbord));
         mRootTable.pad(15);
         mRootTable.setBounds(100, VIEWPORT_HEIGHT / 9, VIEWPORT_WIDTH * 0.75f
                 , VIEWPORT_HEIGHT - VIEWPORT_HEIGHT / 6);
@@ -166,8 +166,8 @@ public class SelectLevelStage extends Stage {
     @Override
     public void act(float delta) {
         super.act(delta);
-        effect.update(delta);
-        effect.getEmitters().get(1).setPosition(effect.getEmitters().get(1).getX(), effect.getEmitters().get(1).getY() + 0.5f);
+//        effect.update(delta);
+//        effect.getEmitters().get(1).setPosition(effect.getEmitters().get(1).getX(), effect.getEmitters().get(1).getY() + 0.5f);
     }
 
     @Override
@@ -178,9 +178,9 @@ public class SelectLevelStage extends Stage {
             super.draw();
         }
 
-        getBatch().begin();
-        effect.draw( getBatch() );
-        getBatch().end();
+//        getBatch().begin();
+//        effect.draw( getBatch() );
+//        getBatch().end();
     }
 
     @Override
@@ -188,7 +188,7 @@ public class SelectLevelStage extends Stage {
         for(Texture texture:mLevelLogos) {
             texture.dispose();
         }
-        effect.dispose();
+//        effect.dispose();
         super.dispose();
     }
 

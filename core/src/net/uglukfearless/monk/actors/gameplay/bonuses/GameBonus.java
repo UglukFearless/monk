@@ -88,7 +88,7 @@ public abstract class GameBonus extends Actor implements Movable {
                 activation();
 //                mGuiStage.setLabel(mName + mActiveTitle, 2f);
                 mGuiStage.setLabel(mActiveTitle, 2f);
-                AssetLoader.getBonus.play(SoundSystem.getSoundValue());
+                AssetLoader.getBonusSound.play(SoundSystem.getSoundValue());
                 this.addAction(Actions.sequence(Actions.sizeBy(1.15f, 1.15f, 0.08f)
                         , Actions.sizeBy(-1.15f, -1.15f, 0.08f)));
                 this.addAction(Actions.moveTo(3f, mGameHeight - getHeight(), 0.2f));
@@ -107,7 +107,7 @@ public abstract class GameBonus extends Actor implements Movable {
                 }
 
                 if (mActiveTime>mWorkingTime) {
-                    AssetLoader.balanceBonus.play(SoundSystem.getSoundValue());
+                    AssetLoader.balanceBonusSound.play(SoundSystem.getSoundValue());
                     deactivation();
                     disabling();
                 }

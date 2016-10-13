@@ -1,10 +1,10 @@
 {
 com.badlogic.gdx.graphics.g2d.BitmapFont: { 
     default-font:       { file: digital-dream-bold-24.fnt },
-    russian-font:       { file: rus-font2-24.fnt },
+    russian-font:       { file: rus-chine-24.fnt },
     normal-font:        { file: digital-dream-bold-24.fnt },
     title-font:         { file: digital-dream-bold-64.fnt },
-  	russian-title-font: { file: rus-font2-64.fnt }
+  	russian-title-font: { file: rus-chine-64.fnt }
 },
 com.badlogic.gdx.graphics.Color: {
 	green: { a: 1, b: 0, g: 1, r: 0 },

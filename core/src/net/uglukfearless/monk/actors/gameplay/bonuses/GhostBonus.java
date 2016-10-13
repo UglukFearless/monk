@@ -27,6 +27,7 @@ public class GhostBonus extends GameBonus {
     public void activation() {
         mStage.getRunner().getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_GHOST);
         mStage.getRunner().setAlpha(0.25f);
+        mStage.getRunner().setGhost(true);
         ScoreCounter.increaseGhost();
     }
 
@@ -34,5 +35,6 @@ public class GhostBonus extends GameBonus {
     public void deactivation() {
         mStage.getRunner().getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
         mStage.getRunner().setAlpha(1f);
+        mStage.getRunner().setGhost(false);
     }
 }

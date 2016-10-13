@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
@@ -43,8 +42,8 @@ public class GameGuiStage extends Stage {
     private Label mCurrentScore, mCurrentHighScore, mCurrentTime;
     private Group mGuiGroup;
 
-    private Label mScore, mTime, mKilled, mDestroyed, mDeathLabel;
-    private Label mScoreValue, mTimeValue, mKilledValue, mDestroyedValue;
+    private Label mScore, mTime, mKilled, mDestroyed, mKillPercent, mKillingSpeed, mDeathLabel;
+    private Label mScoreValue, mTimeValue, mKilledValue, mKillPercentValue, mKillingSpeedValue, mDestroyedValue;
     private Array<Label> mLabelDeathArray;
     private Array<Label> mLabelDeathValueArray;
     private Table mContainerDeath, mMainTableDeath;
@@ -181,6 +180,16 @@ public class GameGuiStage extends Stage {
         mKilledValue = new Label(String.valueOf(ScoreCounter.getKilled()), AssetLoader.sGuiSkin);
         mLabelDeathValueArray.add(mKilledValue);
 
+        mKillPercent = new Label(AssetLoader.sBundle.get("MENU_STATS_KILL_PERCENT"), AssetLoader.sGuiSkin); //использованы строки из экрана общ.статистики
+        mLabelDeathArray.add(mKillPercent);
+        mKillPercentValue = new Label(String.valueOf(ScoreCounter.getKilled()), AssetLoader.sGuiSkin);
+        mLabelDeathValueArray.add(mKillPercentValue);
+
+        mKillingSpeed = new Label(AssetLoader.sBundle.get("MENU_STATS_KILLING_RATE"), AssetLoader.sGuiSkin); //использованы строки из экрана общ.статистики
+        mLabelDeathArray.add(mKillingSpeed);
+        mKillingSpeedValue = new Label(String.valueOf(ScoreCounter.getKilled()), AssetLoader.sGuiSkin);
+        mLabelDeathValueArray.add(mKillingSpeedValue);
+
         mDestroyed = new Label(AssetLoader.sBundle.get("MENU_DEATH_DESTROYED"), AssetLoader.sGuiSkin);
         mLabelDeathArray.add(mDestroyed);
         mDestroyedValue = new Label(String.valueOf(ScoreCounter.getDestroyed()), AssetLoader.sGuiSkin);
@@ -191,7 +200,7 @@ public class GameGuiStage extends Stage {
                 .padBottom(10).padTop(15);
         mContainerDeath.row();
 
-        for (int i = 0; i <4; i++) {
+        for (int i = 0; i <mLabelDeathArray.size; i++) {
             mContainerDeath.add(mLabelDeathArray.get(i)).fill().expand()
                     .align(Align.left).padBottom(5).padTop(5);
 
@@ -204,7 +213,7 @@ public class GameGuiStage extends Stage {
         mScrollPaneDeath = new ScrollPane(mContainerDeath);
 
         mMainTableDeath = new Table();
-        mMainTableDeath.background(new NinePatchDrawable(new NinePatch(AssetLoader.broadbord)));
+        mMainTableDeath.background(new NinePatchDrawable(AssetLoader.broadbord));
         mMainTableDeath.pad(15);
         mMainTableDeath.padBottom(100);
         mMainTableDeath.setBounds(100, VIEWPORT_HEIGHT / 5f, VIEWPORT_WIDTH * 0.75f
@@ -274,6 +283,8 @@ public class GameGuiStage extends Stage {
                     }
                     mTimeValue.setText(String.valueOf(ScoreCounter.getTime()));
                     mKilledValue.setText(String.valueOf(ScoreCounter.getKilled()));
+                    mKillPercentValue.setText(String.valueOf(ScoreCounter.getKillPercent()).concat("%"));
+                    mKillingSpeedValue.setText(String.valueOf(ScoreCounter.getKillingSpeed()));
                     mDestroyedValue.setText(String.valueOf(ScoreCounter.getDestroyed()));
 
                     for (Achievement achieve : ScoreCounter.getAchieveList()) {

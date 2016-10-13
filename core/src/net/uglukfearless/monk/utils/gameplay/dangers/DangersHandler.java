@@ -202,7 +202,7 @@ public class DangersHandler {
             }
         }
 
-        if (rand.nextInt(100)>94) {
+        if (rand.nextInt(100)>90) {
 
             GameBonus gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
 
@@ -317,12 +317,20 @@ public class DangersHandler {
 
         enemy = PoolsHandler.sEnemiesPools.get(enemyType.name()).obtain();
 
+        float flyOffsetY;
+        if (enemyType.getGravityScale()==0) {
+            flyOffsetY = -1*Enemy.mRand.nextFloat()*(enemyType.getY()-1);
+        } else {
+            flyOffsetY=0;
+        }
+
+
         if (overPit) {
             enemy.init(stage, startX - Constants.GROUND_PIT_INIT / 2f, Constants.LAYOUT_Y_ONE
-                    + Constants.LAYOUT_Y_STEP * j);
+                    + Constants.LAYOUT_Y_STEP * j + flyOffsetY);
         } else {
             enemy.init(stage, startX + enemyType.getWidth() + Constants.STEP_OF_DANGERS * i,
-                    Constants.LAYOUT_Y_ONE + Constants.LAYOUT_Y_STEP * j);
+                    Constants.LAYOUT_Y_ONE + Constants.LAYOUT_Y_STEP * j + flyOffsetY);
         }
 
 

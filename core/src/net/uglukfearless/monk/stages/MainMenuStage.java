@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import net.uglukfearless.monk.actors.menu.MenuBackground;
@@ -98,7 +99,10 @@ public class MainMenuStage extends Stage {
 
     @Override
     public boolean keyDown(int keyCode) {
-        Gdx.app.exit();
+
+        if (keyCode== Input.Keys.BACK) {
+            Gdx.app.exit();
+        }
         return super.keyDown(keyCode);
     }
 

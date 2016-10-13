@@ -333,7 +333,7 @@ public class StatisticsMenuStage extends Stage {
         mScrollPaneAch = new ScrollPane(mContainerAch);
 
         mMainTableAch = new Table();
-        mMainTableAch.background(new NinePatchDrawable(new NinePatch(AssetLoader.broadbord)));
+        mMainTableAch.background(new NinePatchDrawable(AssetLoader.broadbord));
         mMainTableAch.pad(10);
         mMainTableAch.setBounds(100, VIEWPORT_HEIGHT / 9, VIEWPORT_WIDTH * 0.75f
                 , VIEWPORT_HEIGHT / 2 - VIEWPORT_HEIGHT / 9);
@@ -401,7 +401,7 @@ public class StatisticsMenuStage extends Stage {
         mScrollPaneGlob = new ScrollPane(mContainerGlob);
 
         mMainTableGlob = new Table();
-        mMainTableGlob.background(new NinePatchDrawable(new NinePatch(AssetLoader.broadbord)));
+        mMainTableGlob.background(new NinePatchDrawable(AssetLoader.broadbord));
         mMainTableGlob.pad(10);
         mMainTableGlob.setBounds(100, VIEWPORT_HEIGHT / 9, VIEWPORT_WIDTH * 0.75f
                 , VIEWPORT_HEIGHT / 2 - VIEWPORT_HEIGHT / 9);
@@ -490,7 +490,7 @@ public class StatisticsMenuStage extends Stage {
         mScrollPaneLoc = new ScrollPane(mContainerLoc);
 
         mMainTableLoc = new Table();
-        mMainTableLoc.background(new NinePatchDrawable(new NinePatch(AssetLoader.broadbord)));
+        mMainTableLoc.background(new NinePatchDrawable(AssetLoader.broadbord));
         mMainTableLoc.pad(10);
         mMainTableLoc.setBounds(100, VIEWPORT_HEIGHT / 9, VIEWPORT_WIDTH * 0.75f
                 , VIEWPORT_HEIGHT / 2 - VIEWPORT_HEIGHT / 9);

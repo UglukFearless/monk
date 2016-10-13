@@ -25,7 +25,7 @@ mDifficultyHandler: {
 			priorityColumns: 0
 			dangersProbability: 50
 			enemiesPriority: [ 10, 0, 10, 0, 0, 0, 0, 0, 0, 0 ]
-			obstaclesPriority: [ 30, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+			obstaclesPriority: [ 25, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
 			name: 2n
@@ -44,7 +44,7 @@ mDifficultyHandler: {
 			priorityPit: 5
 			priorityColumns: 0
 			dangersProbability: 70
-			enemiesPriority: [ 20, 0, 20, 0, 0, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 20, 0, 20, 10, 0, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 20, 10, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -54,7 +54,7 @@ mDifficultyHandler: {
 			priorityPit: 7
 			priorityColumns: 0
 			dangersProbability: 80
-			enemiesPriority: [ 10, 0, 10, 10, 0, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 10, 10, 10, 10, 0, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 30, 30, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -64,7 +64,7 @@ mDifficultyHandler: {
 			priorityPit: 7
 			priorityColumns: 2
 			dangersProbability: 80
-			enemiesPriority: [ 0, 0, 10, 20, 0, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 0, 10, 10, 20, 0, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 30, 30, 10, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -143,7 +143,7 @@ mEnemiesModels:
 
     width:1.2
     height:1.2
-    y:2.6
+    y:3
     jumpingImpulse:8
     gravityScale:0
 
@@ -186,7 +186,7 @@ mEnemiesModels:
 
     prohibitionsMap: [[0,0],[0,0]]
     priority:0
-		basicXVelocity:-20
+		basicXVelocity:-15
 		block:false
     number:4
 		},

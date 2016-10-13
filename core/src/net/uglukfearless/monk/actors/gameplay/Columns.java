@@ -38,13 +38,9 @@ public class Columns extends GameActor implements Movable {
 
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-
-        batch.disableBlending();
         batch.draw(AssetLoader.environmentAtlas.findRegion("column"), body.getPosition().x - userData.getWidth() / 2,
                 body.getPosition().y - userData.getHeight() / 2,
                 userData.getWidth(), userData.getHeight());
-        batch.enableBlending();
-
     }
 
     @Override

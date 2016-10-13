@@ -3,7 +3,6 @@ package net.uglukfearless.monk.stages;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -122,7 +121,7 @@ public class OptionMenuStage extends Stage {
                 mCheckSound.setChecked(true);
                 checkSound();
                 if (!mHack) {
-                    AssetLoader.monkStrike.play(SoundSystem.getSoundValue());
+                    AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
                 }
                 mHack = !mHack;
             }
@@ -244,12 +243,11 @@ public class OptionMenuStage extends Stage {
         mScrollPane = new ScrollPane(mContainer);
 
         mMainTable = new Table();
-        mMainTable.background(new NinePatchDrawable(new NinePatch(AssetLoader.broadbord)));
+        mMainTable.background(new NinePatchDrawable(AssetLoader.broadbord));
         mMainTable.pad(15);
         mMainTable.setBounds(100, VIEWPORT_HEIGHT / 9, VIEWPORT_WIDTH * 0.75f
                 , mTitle.getY() - VIEWPORT_HEIGHT / 6);
         mMainTable.add(mScrollPane).fill().expand();
-
         addActor(mMainTable);
 
     }

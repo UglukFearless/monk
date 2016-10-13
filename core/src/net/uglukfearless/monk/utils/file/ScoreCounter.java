@@ -118,6 +118,19 @@ public class ScoreCounter {
         return enemiesAll;
     }
 
+    public static int getKillingSpeed() {
+        return (int)(killed*60/time);
+    }
+
+    public static float getKillPercent() {
+        if (enemiesAll!=0) {
+            return (((int)killed*100/enemiesAll)*100)/100f;
+        } else {
+            return 0;
+        }
+
+    }
+
     public static void setTime(int time) {
         ScoreCounter.time = time;
     }

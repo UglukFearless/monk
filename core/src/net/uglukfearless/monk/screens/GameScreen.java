@@ -74,13 +74,6 @@ public class GameScreen implements Screen {
         mGameStage.setGuiStage(mGuiStage);
 
         mMultiplexer = new InputMultiplexer();
-        mMultiplexer.addProcessor(new InputAdapter() {
-            @Override
-            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                System.out.println("click regist");
-                return super.touchDown(screenX, screenY, pointer, button);
-            }
-        });
         mMultiplexer.addProcessor(mGuiStage);
         mMultiplexer.addProcessor(mGameStage);
 

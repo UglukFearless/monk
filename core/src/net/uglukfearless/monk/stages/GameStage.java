@@ -2,8 +2,12 @@ package net.uglukfearless.monk.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -44,8 +48,10 @@ import net.uglukfearless.monk.screens.GameScreen;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.SoundSystem;
-import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.fortween.Value;
+import net.uglukfearless.monk.utils.fortween.ValueAccessor;
 import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.utils.gameplay.Shake;
 import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
 import net.uglukfearless.monk.utils.gameplay.dangers.DangersHandler;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
@@ -56,6 +62,10 @@ import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 import java.util.Random;
+
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenEquations;
+import aurelienribon.tweenengine.TweenManager;
 
 import static net.uglukfearless.monk.enums.GameState.*;
 
@@ -79,7 +89,7 @@ public class GameStage extends Stage {
     private RunnerStrike mRunnerStrike;
 
 
-    private Array<Body> bodies;
+//    private Array<Body> bodies;
 
     private boolean pit;
 
@@ -123,8 +133,14 @@ public class GameStage extends Stage {
     private int mLimitRevival;
 
     private LevelModel mLevelModel;
-    private LevelModel mLevelModel2_EXP;
 
+    //to tween
+    private TweenManager manager;
+    private Value alpha;
+    private ShapeRenderer shapeRenderer;
+    private Color transitionColor;
+
+    private Shake mShake;
 
     public GameStage(GameScreen screen, float yViewportHeight, LevelModel levelModel) {
 
@@ -138,7 +154,6 @@ public class GameStage extends Stage {
 
         mState = START;
 
-        bodies = new Array<Body>();
         mMovableArray = new Array<Movable>();
         mCurrentVelocity = Constants.WORLD_STATIC_VELOCITY_INIT;
 
@@ -152,6 +167,12 @@ public class GameStage extends Stage {
 
         Gdx.input.setCatchBackKey(false);
         Gdx.input.setCatchMenuKey(true);
+
+        alpha = new Value();
+        transitionColor = new Color();
+        prepareTransition(255,255,255,.3f);
+        shapeRenderer = new ShapeRenderer();
+        shapeRenderer.setProjectionMatrix(getCamera().combined);
     }
 
     private void setupTouchControlAreas() {
@@ -180,6 +201,12 @@ public class GameStage extends Stage {
         setUpBonuses();
         setUpDangersHandler();
 
+        setUpShake();
+
+    }
+
+    private void setUpShake() {
+        mShake = new Shake();
     }
 
     private void setUpLevel(LevelModel levelModel) {
@@ -246,6 +273,10 @@ public class GameStage extends Stage {
             PreferencesManager.increaseReceivedTimeBonuses();
         }
 
+        if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_WOS_KEY)) {
+            addStartRevival();
+        }
+
         addActor(mRevivalAvatar);
 
         mRevival = mStartRevival;
@@ -281,7 +312,7 @@ public class GameStage extends Stage {
     }
 
     private void setUpColumns() {
-        if (mLevelModel.mPriorityColumns>0) {
+
             mColumns1 = new Array<Columns>();
             mColumns2 = new Array<Columns>();
             for (int i=0; i<Constants.COLUMNS_QUANTITY_INIT; i++) {
@@ -292,15 +323,14 @@ public class GameStage extends Stage {
                 addMovable(columns1);
                 addMovable(columns2);
             }
-        }
     }
 
     private void setUpDangersHandler() {
         dangersHandler = new DangersHandler(this, mBonuses, mLevelModel);
         dangersHandler.init();
-        if (mColumns1!=null) {
-            dangersHandler.setColumns(mColumns1, mColumns2);
-        }
+
+        dangersHandler.setColumns(mColumns1, mColumns2);
+
     }
 
     private void setUpRunnerStrike() {
@@ -340,9 +370,6 @@ public class GameStage extends Stage {
     public void act(float delta) {
 
         float time = 1f / delta;
-        if (mState!=PAUSE&&time>3) {
-            super.act(delta);
-        }
 
         if (time<50) {
             System.out.println("###########################################");
@@ -359,14 +386,22 @@ public class GameStage extends Stage {
             timeMid = (timeMid + time)/2f;
         }
 
+        if (mState!=PAUSE&&time>6) {
 
-        if (mState!=PAUSE&&time>3) {
+            super.act(delta);
 
-            bodies.clear();
-            world.getBodies(bodies);
+//            bodies.clear();
+//            world.getBodies(bodies);
+//
+//            for (Body body:bodies) {
+//                update(body);
+//            }
 
-            for (Body body:bodies) {
-                update(body);
+            UserData data = (UserData) runner.getBody().getUserData();
+            if(data!=null &&  data.isDestroy()){
+                if (!world.isLocked()) {
+                    world.destroyBody(runner.getBody());
+                }
             }
 
             if (mRevivalRunner
@@ -385,8 +420,10 @@ public class GameStage extends Stage {
                 mReturnFilter = true;
             } else if (mReturnFilter) {
                 mReturnTimer +=delta;
-                if (mReturnTimer>3&&runner.getBody()!=null) {
-                    runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
+                if (mReturnTimer>3&&runner.getBody()!=null&&!runner.getUserData().isDead()) {
+                    if (!runner.isBuddha()&&!runner.isGhost()) {
+                        runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
+                    }
                     runner.setAlpha(1f);
                     mReturnTimer=0;
                     mReturnFilter = false;
@@ -399,32 +436,36 @@ public class GameStage extends Stage {
                 accumulator -= TIME_STEP;
             }
 
-            bodies.clear();
 
             SpaceTable.leaf();
 
             mLevelModel.act(delta);
 
+
+            for (ParticleEffect effect : AssetLoader.sWorkParticleBlood) {
+                effect.update(delta);
+                if (effect.isComplete()) {
+                    AssetLoader.sWorkParticleBlood.removeValue(effect, true);
+                    AssetLoader.sFreeParticleBlood.add(effect);
+                }
+             }
+
+            for (ParticleEffect effect : AssetLoader.sWorkParticleDust) {
+                effect.update(delta);
+                if (effect.isComplete()) {
+                    AssetLoader.sWorkParticleDust.removeValue(effect, true);
+                    AssetLoader.sFreeParticleDust.add(effect);
+                }
+             }
+
+            drawTransition(delta);
+
+            mShake.tick(delta, this, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         }
     }
 
-    private void update(Body body) {
-        if (!BodyUtils.bodyInBounds(body)) {
-            if (body!=null&&BodyUtils.bodyIsGround(body)) {
-                repositionGround();
-            }
-        }
 
-        UserData data = (UserData) body.getUserData();
-        if(data!=null &&  data.isDestroy()){
-            if (!world.isLocked()) {
-                world.destroyBody(body);
-            }
-        }
-
-    }
-
-    private void repositionGround() {
+    public void repositionGround() {
 
         dangersHandler.createDangers(ground1, ground2);
 
@@ -448,12 +489,19 @@ public class GameStage extends Stage {
 //        ground2.setZIndex(100);
 //        if (mState!=PAUSE) {
             super.draw();
+        getBatch().begin();
+//        effect.draw(getBatch());
+        for (ParticleEffect effect : AssetLoader.sWorkParticleBlood) {
+            effect.draw(getBatch());
+        }
+
+        for (ParticleEffect effect : AssetLoader.sWorkParticleDust) {
+            effect.draw(getBatch());
+        }
+        getBatch().end();
 //            renderer.render(world, camera.combined);
 //            System.out.println("render Calls - " + ((SpriteBatch) getBatch()).renderCalls);
 //        }
-
-
-
     }
 
     @Override
@@ -514,6 +562,7 @@ public class GameStage extends Stage {
 
     @Override
     public void dispose() {
+//        effect.dispose();
         super.dispose();
     }
 
@@ -528,6 +577,7 @@ public class GameStage extends Stage {
             }
 
             screen.setMenu();
+            mState = PAUSE;
         }
 //        else if (mState == GAME_OVER&&keyCode!=Input.Keys.BACK) {
 //            System.out.println("***********************************");
@@ -535,11 +585,13 @@ public class GameStage extends Stage {
 //            System.out.println("***********************************");
 //            screen.newGame();
 //        }
-        else if (mState == START&&keyCode!=Input.Keys.BACK&&keyCode!=Input.Keys.MENU) {
+        else if (mState == START&&keyCode!=Input.Keys.BACK&&keyCode!=Input.Keys.MENU
+                &&keyCode!=Input.Keys.VOLUME_UP&&keyCode!=Input.Keys.VOLUME_DOWN) {
 
             this.start();
 
-        } else if(mState==PAUSE&&keyCode!=Input.Keys.BACK) {
+        } else if(mState==PAUSE&&keyCode!=Input.Keys.BACK&&keyCode!=Input.Keys.MENU
+                &&keyCode!=Input.Keys.VOLUME_UP&&keyCode!=Input.Keys.VOLUME_DOWN) {
 
             mState = RUN;
 
@@ -624,8 +676,8 @@ public class GameStage extends Stage {
 
     public void retribution(int retributionLevel) {
 
-        AssetLoader.retributionBonus.play(SoundSystem.getSoundValue());
-
+        AssetLoader.retributionBonusSound.play(SoundSystem.getSoundValue());
+        screenShake(0.1f, 0.15f);
         switch (retributionLevel) {
             case 0:
                 for(Actor actor : getActors()) {
@@ -691,6 +743,7 @@ public class GameStage extends Stage {
                 }
                 break;
         }
+        prepareTransition(255, 50, 0, .1f);
 
     }
 
@@ -761,5 +814,33 @@ public class GameStage extends Stage {
 
     public DangersHandler getDangersHandler() {
         return dangersHandler;
+    }
+
+    public void prepareTransition(int r, int g, int b, float duration) {
+        transitionColor.set(r / 255.0f, g / 255.0f, b / 255.0f, 1);
+        alpha.setValue(1);
+        Tween.registerAccessor(Value.class, new ValueAccessor());
+        manager = new TweenManager();
+        Tween.to(alpha, -1, duration).target(0)
+                .ease(TweenEquations.easeOutQuad).start(manager);
+    }
+
+    private void drawTransition(float delta) {
+        if (alpha.getValue() > 0) {
+            manager.update(delta);
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(transitionColor.r, transitionColor.g,
+                    transitionColor.b, alpha.getValue());
+            shapeRenderer.rect(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+            shapeRenderer.end();
+
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+        }
+    }
+
+    public void screenShake(float power, float duration) {
+        mShake.shake(power, duration);
     }
 }

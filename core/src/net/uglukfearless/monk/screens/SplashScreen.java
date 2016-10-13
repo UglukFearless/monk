@@ -2,13 +2,14 @@ package net.uglukfearless.monk.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import net.uglukfearless.monk.RunningMonk;
 import net.uglukfearless.monk.utils.file.AssetLoader;
-import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.file.SoundSystem;
 import net.uglukfearless.monk.utils.fortween.SpriteAccessor;
 
@@ -29,17 +30,30 @@ public class SplashScreen implements Screen {
     private RunningMonk mGame;
     public SplashScreen mSplashScreen;
 
+    private Music mStartSound;
+
+
     public SplashScreen(RunningMonk game) {
         this.mGame = game;
         AssetLoader.initBundle();
         AssetLoader.initLogo();
         mSplashScreen = this;
+
+        mStartSound = Gdx.audio.newMusic(Gdx.files.internal("sound/Thunder.mp3"));
+        mStartSound.setLooping(false);
+        mStartSound.setVolume(SoundSystem.getSoundValue());
+
     }
 
 
     @Override
     public void show() {
-        AssetLoader.logoSound.play(SoundSystem.getSoundValue());
+
+//        AssetLoader.logoSound.play(SoundSystem.getSoundValue());
+        AssetLoader.logoSound.setLooping(false);
+        AssetLoader.logoSound.setVolume(SoundSystem.getSoundValue());
+        AssetLoader.logoSound.play();
+//        mStartSound.play();
 
         mSprite = new Sprite(AssetLoader.logoPicture);
         mSprite.setColor(1,1,1,0);
@@ -76,6 +90,7 @@ public class SplashScreen implements Screen {
 
     @Override
     public void render(float delta) {
+
         mTweenManager.update(delta);
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -108,5 +123,8 @@ public class SplashScreen implements Screen {
     public void dispose() {
         AssetLoader.logoSound.stop();
         AssetLoader.disposeLogo();
+
+        mStartSound.stop();
+        mStartSound.dispose();
     }
 }

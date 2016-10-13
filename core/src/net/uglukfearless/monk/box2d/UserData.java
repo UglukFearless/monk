@@ -12,6 +12,7 @@ public abstract class UserData {
     protected float height;
 
     private boolean destroy;
+    private boolean mLaunched;
 
     public UserData() {
         destroy = false;
@@ -51,4 +52,16 @@ public abstract class UserData {
         this.destroy = destroy;
     }
 
+    public void setUserDataType(UserDataType userDataType) {
+        this.userDataType = userDataType;
+    }
+
+
+    //для реализации раскидывания мощным ударом. Здесь во имя упрощения кода и оптимизации
+    public void setLaunched(boolean launched) {
+        mLaunched = launched;
+    }
+    public boolean isLaunched() {
+        return mLaunched;
+    }
 }
