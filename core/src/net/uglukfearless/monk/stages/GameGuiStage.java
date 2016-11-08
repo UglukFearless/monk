@@ -1,12 +1,16 @@
 package net.uglukfearless.monk.stages;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -14,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
@@ -21,9 +26,13 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.enums.GameState;
 import net.uglukfearless.monk.screens.GameScreen;
+import net.uglukfearless.monk.utils.BonusShow;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
+
+import java.util.HashMap;
 
 /**
  * Created by Ugluk on 22.08.2016.
@@ -55,9 +64,6 @@ public class GameGuiStage extends Stage {
 
     private CharSequence mTimeString = "0";
 
-    private Label mLabel;
-    private Image mImage;
-
     private TextButton mMenyButton, mReplayButton;
 
     private float mLabelStateTime;
@@ -67,6 +73,24 @@ public class GameGuiStage extends Stage {
 
     private Label mRevivalLabel;
     private int mCurrentHighScoreValue;
+
+    private Table mMainTableAchieve, mTableAchieve;
+    private Table mTableAchieveHelp;
+    private ScrollPane mAchieveScroll;
+    private Label mUnlockTitle, mAchieveName, mUpgradeTitle;
+    private Image mAchieveImage;
+    private Array<Table> mTableAchieveList;
+
+    private TextButton mJumpButton, mStrikeButton;
+    private BonusShow mBonusShowWindow;
+
+    private Table mMainWaitTable;
+    private Button mGameOverButton;
+    private TextButton mShowVideoButton, mPayTreasuresButton;
+    private Label mBalance;
+    private Image mTreasuresImage;
+
+    private TextButton mShopButton;
 
 
     public GameGuiStage(GameScreen screen, GameStage gameStage, float yViewportHeight) {
@@ -84,9 +108,201 @@ public class GameGuiStage extends Stage {
 
         setupLabels();
         setupButtons();
+        setupAchieveWindow(ScoreCounter.getAchieveList().get(6));
+        setupWaitMenu();
+        setupShopButton();
 
         mLabelStateTime = 0;
 
+    }
+
+    private void setupShopButton() {
+
+        mShopButton = new TextButton(AssetLoader.sBundle.get("MENU_GAME_BUTTON_SHOP"),AssetLoader.sGuiSkin);
+        mShopButton.setPosition(VIEWPORT_WIDTH/2f - mShopButton.getWidth()/2f, 0);
+        mShopButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                mGameScreen.setShop();
+            }
+        });
+        addActor(mShopButton);
+        mShopButton.setVisible(false);
+    }
+
+    private void setupWaitMenu() {
+
+        mMainWaitTable = new Table();
+        mMainWaitTable.setSize(VIEWPORT_WIDTH * 0.7f, VIEWPORT_HEIGHT * 0.4f);
+        mMainWaitTable.setPosition(VIEWPORT_WIDTH / 2 - mMainWaitTable.getWidth() / 2f, VIEWPORT_HEIGHT / 2 - mMainWaitTable.getHeight() / 2f);
+        mMainWaitTable.background(new NinePatchDrawable(AssetLoader.broadbord));
+        addActor(mMainWaitTable);
+
+        Table helpTable = new Table();
+
+        mBalance = new Label(String.valueOf(PreferencesManager.getTreasures()), AssetLoader.sGuiSkin);
+        helpTable.add(mBalance);
+        mTreasuresImage = new Image(AssetLoader.bonusesAtlas.findRegion("rupee"));
+        helpTable.add(mTreasuresImage);
+        mMainWaitTable.add(helpTable);
+
+        mMainWaitTable.row();
+
+        helpTable = new Table();
+        mGameOverButton = new Button(AssetLoader.sGuiSkin, "game_over");
+        mGameOverButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                mGameStage.realGameOver();
+            }
+        });
+        helpTable.add(mGameOverButton).prefWidth(mMainWaitTable.getHeight()*0.55f).prefHeight(mMainWaitTable.getHeight() * 0.55f);
+
+        mShowVideoButton = new TextButton("watch ads", AssetLoader.sGuiSkin);
+        helpTable.add(mShowVideoButton).prefWidth(mMainWaitTable.getHeight()*0.55f).prefHeight(mMainWaitTable.getHeight()*0.55f);
+
+        mPayTreasuresButton = new TextButton("-1 ", AssetLoader.sGuiSkin);
+        mPayTreasuresButton.add(new Image(AssetLoader.bonusesAtlas.findRegion("rupee")));
+        mPayTreasuresButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                if (PreferencesManager.purchase(1)) {
+                    mGameStage.setRevivalRunner(true);
+                    mGameStage.setState(GameState.RUN);
+                    mBalance.setText(String.valueOf(PreferencesManager.getTreasures()));
+                }
+            }
+        });
+        helpTable.add(mPayTreasuresButton).prefWidth(mMainWaitTable.getHeight()*0.55f).prefHeight(mMainWaitTable.getHeight() * 0.55f);
+
+        mMainWaitTable.add(helpTable);
+        mMainWaitTable.setVisible(false);
+    }
+
+    private void setupAchieveWindow(Achievement achieve) {
+
+        mTableAchieveList = new Array<Table>();
+
+        mTableAchieve = new Table();
+
+        mUnlockTitle = new Label(AssetLoader.sBundle.get("MENU_ACHIEVE_UNLOCK_TITLE"), AssetLoader.sGuiSkin);
+        mTableAchieve.add(mUnlockTitle).padTop(10).padBottom(10);
+        mTableAchieve.row();
+
+        mTableAchieveHelp = new Table();
+        mAchieveImage = new Image(achieve.getRegion());
+        mTableAchieveHelp.add(mAchieveImage).align(Align.right).prefWidth(60).prefHeight(60).pad(15).padBottom(5).padTop(5);
+
+        mAchieveName = new Label(achieve.getName(), AssetLoader.sGuiSkin);
+        mTableAchieveHelp.add(mAchieveName).align(Align.left).fill().expand().padBottom(5).padTop(5);
+
+        achieve.setNew(false);
+
+        mTableAchieve.add(mTableAchieveHelp);
+        mTableAchieve.row();
+
+        mUpgradeTitle = new Label(AssetLoader.sBundle.get("MENU_ACHIEVE_UPGRADE_TITLE"), AssetLoader.sGuiSkin);
+
+
+        mAchieveScroll = new ScrollPane(mTableAchieve);
+        mAchieveScroll.setScrollPercentY(0);
+
+        mMainTableAchieve = new Table();
+        mMainTableAchieve.background(new NinePatchDrawable(AssetLoader.broadbord));
+        mMainTableAchieve.pad(15);
+        mMainTableAchieve.setBounds(100, VIEWPORT_HEIGHT / 5f, VIEWPORT_WIDTH * 0.75f
+                , VIEWPORT_HEIGHT - VIEWPORT_HEIGHT / 4f);
+        mMainTableAchieve.add(mAchieveScroll).fill().expand();
+        mMainTableAchieve.setVisible(false);
+
+        mMainTableAchieve.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+
+                System.out.println(checkNewAchieve().size);
+                if (checkNewAchieve().size>0) {
+                    showAchievement(checkNewAchieve().get(0));
+                } else {
+                    mMainTableAchieve.setVisible(false);
+                    mMainTableDeath.setVisible(true);
+                    mMenyButton.setVisible(true);
+                    mReplayButton.setVisible(true);
+                }
+
+            }
+        });
+
+        addActor(mMainTableAchieve);
+    }
+
+    private Array<Achievement> checkNewAchieve() {
+        Array<Achievement> achievements = new Array<Achievement>();
+
+        for (Achievement achievement:ScoreCounter.getAchieveList()) {
+            if (achievement.isNew()) {
+                achievements.add(achievement);
+            }
+        }
+
+        return achievements;
+    }
+
+    private void showAchievement(Achievement achieve) {
+
+        clearUpdates();
+
+        mTableAchieve.add(mUnlockTitle).padTop(10).padBottom(10);
+        mTableAchieve.row();
+
+        mTableAchieveHelp = new Table();
+        mAchieveImage.setDrawable(new TextureRegionDrawable(achieve.getRegion()));
+        mTableAchieveHelp.add(mAchieveImage).align(Align.right).prefWidth(60).prefHeight(60).pad(15).padBottom(5).padTop(5);
+
+        mAchieveName.setText(achieve.getName());
+        mTableAchieveHelp.add(mAchieveName).align(Align.left).fill().expand().padBottom(5).padTop(5);
+
+        achieve.setNew(false);
+
+        mTableAchieve.add(mTableAchieveHelp);
+        mTableAchieve.row();
+
+        HashMap<String,String> updates = achieve.getUpdateList();
+
+        if (updates!=null) {
+            mTableAchieve.add(mUpgradeTitle).padTop(10).padBottom(10);
+            mTableAchieve.row();
+
+            Table updateTable = new Table();
+            for (String key:updates.keySet()) {
+
+                Image  image = new Image(AssetLoader.bonusesAtlas.findRegion(key));
+
+                updateTable.add(image).align(Align.right).prefWidth(60).prefHeight(60);
+
+                Label label = new Label(updates.get(key), AssetLoader.sGuiSkin);
+                label.setWrap(true);
+                label.setAlignment(Align.right, Align.top);
+
+                updateTable.add(label).align(Align.right).width(VIEWPORT_WIDTH * 0.55f - image.getWidth());
+
+                updateTable.row();
+            }
+            mTableAchieve.add(updateTable).align(Align.center).pad(10);
+            mTableAchieveList.add(updateTable);
+            mTableAchieve.row();
+        }
+
+    }
+
+    private void clearUpdates() {
+
+        mTableAchieve.clear();
+
+        mTableAchieveList.clear();
     }
 
     private void setupButtons() {
@@ -120,11 +336,44 @@ public class GameGuiStage extends Stage {
                 System.out.println("***********************************");
                 System.out.println("средний fps" + mGameStage.getTimeMid());
                 System.out.println("***********************************");
+                mGameStage.getLevelModel().getDifficultyHandler().reset();
                 mGameScreen.newGame();
             }
         });
 
         addActor(mReplayButton);
+
+        float helpButtonWidth = 130;
+
+        mJumpButton = new TextButton(AssetLoader.sBundle.get("MENU_GAME_BUTTON_JUMP"), AssetLoader.sGuiSkin, "help");
+//        mJumpButton.setBounds(0, 0, VIEWPORT_WIDTH/2, VIEWPORT_HEIGHT);
+        mJumpButton.setBounds(0, 20, helpButtonWidth, 80);
+        mJumpButton.setColor(1, 1, 1, 0.5f);
+        mJumpButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                System.out.println("jump click");
+                super.clicked(event, x, y);
+                event.reset();
+                mGameStage.touchDown((int) event.getStageX(), (int) event.getStageY(), event.getPointer(), Input.Buttons.LEFT);
+            }
+        });
+        addActor(mJumpButton);
+
+        mStrikeButton = new TextButton(AssetLoader.sBundle.get("MENU_GAME_BUTTON_STRIKE"), AssetLoader.sGuiSkin, "help");
+//        mStrikeButton.setBounds(VIEWPORT_WIDTH/2, 0, VIEWPORT_WIDTH/2, VIEWPORT_HEIGHT);
+        mStrikeButton.setBounds(VIEWPORT_WIDTH - helpButtonWidth, 20, helpButtonWidth, 80);
+        mStrikeButton.setColor(1, 1, 1, 0.5f);
+        mStrikeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                event.reset();
+                mGameStage.touchDown((int) event.getStageX(), (int) event.getStageY(), event.getPointer(), Input.Buttons.LEFT);
+
+            }
+        });
+        addActor(mStrikeButton);
     }
 
     private void setupLabels() {
@@ -232,6 +481,26 @@ public class GameGuiStage extends Stage {
 
     }
 
+    public void startResizeAction(int x) {
+        if (x<VIEWPORT_WIDTH/2&&mJumpButton!=null) {
+            resizeAction(mJumpButton, false);
+        } else if (x>=VIEWPORT_WIDTH/2&&mStrikeButton!=null) {
+            resizeAction(mStrikeButton, true);
+        }
+    }
+
+    private void resizeAction(TextButton resizeButton, boolean right) {
+        float offset = 0;
+        if (right) {
+            offset = VIEWPORT_WIDTH/2f;
+        }
+        resizeButton.addAction(Actions.moveTo(0 + offset, 0, 0.1f));
+        resizeButton.addAction(Actions.sizeTo(VIEWPORT_WIDTH / 2f, VIEWPORT_HEIGHT, 0.3f));
+        resizeButton.addAction(Actions.sequence(Actions.alpha(0, 0.4f), Actions.removeActor(resizeButton)));
+
+        resizeButton = null;
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -246,13 +515,30 @@ public class GameGuiStage extends Stage {
 
             switch (mGameStage.getState()) {
                 case RUN:
+                    mShopButton.setVisible(false);
+                    mMainWaitTable.setVisible(false);
                     mStartLabel.setVisible(false);
                     mMainTableDeath.setVisible(false);
                     mMenyButton.setVisible(false);
                     mReplayButton.setVisible(false);
                     mPauseLabel.setVisible(false);
+                    mMainTableAchieve.setVisible(false);
+
+                    if (mJumpButton!=null) {
+                        mJumpButton.setVisible(true);
+                    }
+
+                    if (mStrikeButton!=null) {
+                        mStrikeButton.setVisible(true);
+                    }
+
+                    if (mBonusShowWindow!=null) {
+                        mBonusShowWindow.removeTable();
+                    }
                     break;
                 case START:
+                    mShopButton.setVisible(true);
+                    mMainWaitTable.setVisible(false);
                     mStartLabel.setText(AssetLoader.sBundle.get("PLAY_START_LABEL"));
                     mStartLabel.setSize(mStartLabel.getPrefWidth(), mStartLabel.getPrefHeight());
                     mStartLabel.setPosition(VIEWPORT_WIDTH / 2f - mStartLabel.getWidth() / 2f,
@@ -263,6 +549,16 @@ public class GameGuiStage extends Stage {
                     mReplayButton.setVisible(false);
                     mPauseLabel.setVisible(false);
 
+                    mMainTableAchieve.setVisible(false);
+
+                    if (mJumpButton!=null) {
+                        mJumpButton.setVisible(true);
+                    }
+
+                    if (mStrikeButton!=null) {
+                        mStrikeButton.setVisible(true);
+                    }
+
                     for (Actor actor:mNewAchieveListObj) {
                         mContainerDeath.getCell(actor).reset();
                         mContainerDeath.removeActor(actor);
@@ -271,8 +567,12 @@ public class GameGuiStage extends Stage {
                     mNewAchieveListObj.clear();
 
                     break;
+                case WAIT:
+                    mBalance.setText(String.valueOf(PreferencesManager.getTreasures()));
+                    mMainWaitTable.setVisible(true);
+                    break;
                 case GAME_OVER:
-
+                    mMainWaitTable.setVisible(false);
                     mScoreValue.setText(String.valueOf(ScoreCounter.getScore()));
                     if (ScoreCounter.getScore()>mCurrentHighScoreValue) {
                         mCurrentHighScoreValue = ScoreCounter.getScore();
@@ -287,34 +587,40 @@ public class GameGuiStage extends Stage {
                     mKillingSpeedValue.setText(String.valueOf(ScoreCounter.getKillingSpeed()));
                     mDestroyedValue.setText(String.valueOf(ScoreCounter.getDestroyed()));
 
-                    for (Achievement achieve : ScoreCounter.getAchieveList()) {
-
-                        if (achieve.isNew()) {
-                            mLabel = new Label(achieve.getName(), AssetLoader.sGuiSkin);
-                            mContainerDeath.add(mLabel).align(Align.left).fill().expand().padBottom(5).padTop(5);
-                            mNewAchieveListObj.add(mLabel);
-
-                            mImage = new Image(achieve.getRegion());
-                            mContainerDeath.add(mImage).align(Align.right).prefWidth(60).prefHeight(60).padBottom(5).padTop(5);
-                            mNewAchieveListObj.add(mImage);
-
-                            achieve.setNew(false);
-
-                            mContainerDeath.row();
-                        }
-                    }
-
                     mScrollPaneDeath.layout();
                     mScrollPaneDeath.setScrollPercentY(0);
 
-                    mMainTableDeath.setVisible(true);
-                    mMenyButton.setVisible(true);
-                    mReplayButton.setVisible(true);
+                    if (checkNewAchieve().size>0) {
+                        showAchievement(checkNewAchieve().get(0));
+                        mMainTableAchieve.setVisible(true);
+                    } else {
+                        mMainTableDeath.setVisible(true);
+                        mMenyButton.setVisible(true);
+                        mReplayButton.setVisible(true);
+                    }
                     mStartLabel.setVisible(false);
                     mPauseLabel.setVisible(false);
+
+                    if (mJumpButton!=null) {
+                        mJumpButton.setVisible(false);
+                    }
+
+                    if (mStrikeButton!=null) {
+                        mStrikeButton.setVisible(false);
+                    }
+
                     break;
                 case PAUSE:
+
                     mPauseLabel.setVisible(true);
+
+                    if (mJumpButton!=null) {
+                        mJumpButton.setVisible(false);
+                    }
+
+                    if (mStrikeButton!=null) {
+                        mStrikeButton.setVisible(false);
+                    }
                     break;
             }
         }
@@ -350,8 +656,8 @@ public class GameGuiStage extends Stage {
 
     public void setBonusTimer(float x, float y,int timerValue) {
         mBonusLabel.setText(String.valueOf(timerValue));
-        mBonusLabel.setPosition(x*(float)(Gdx.graphics.getWidth()/Constants.GAME_WIDTH),
-                y*(float)(Gdx.graphics.getHeight()/mYGameHeight));
+        mBonusLabel.setPosition(x * (float) (Gdx.graphics.getWidth() / Constants.GAME_WIDTH),
+                y * (float) (Gdx.graphics.getHeight() / mYGameHeight));
     }
 
     public void disableBonusTimer() {
@@ -364,11 +670,16 @@ public class GameGuiStage extends Stage {
 
     public void setRevivalLabel(float x, float y,int revivalValue) {
         mRevivalLabel.setText(String.valueOf(revivalValue));
-        mRevivalLabel.setPosition(x*(float)(Gdx.graphics.getWidth()/Constants.GAME_WIDTH),
-                y*(float)(Gdx.graphics.getHeight()/mYGameHeight));
+        mRevivalLabel.setPosition(x * (float) (Gdx.graphics.getWidth() / Constants.GAME_WIDTH),
+                y * (float) (Gdx.graphics.getHeight() / mYGameHeight));
     }
 
     public void disableRevivalLabel() {
         mRevivalLabel.setVisible(false);
+    }
+
+    public void showHourBonus() {
+        mBonusShowWindow = BonusShow.showBonus(
+                this, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, AssetLoader.sBundle.get("MENU_SHOW_BONUS_EVERY_HOUR"), 1, "revival");
     }
 }

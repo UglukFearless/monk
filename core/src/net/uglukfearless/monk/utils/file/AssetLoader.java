@@ -15,6 +15,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.I18NBundle;
 
 import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.enums.ArmourType;
+import net.uglukfearless.monk.utils.gameplay.CircularList;
 
 import java.util.Locale;
 
@@ -29,17 +31,23 @@ public class AssetLoader {
     public static TextureAtlas enemiesAtlas;
     public static TextureAtlas obstaclesAtlas;
     public static TextureAtlas monkAtlas;
+    public static TextureAtlas monkArmour1Atlas;
+    public static TextureAtlas monkArmour2Atlas;
+    public static TextureAtlas monkArmour3Atlas;
     public static TextureAtlas achieveAtlas;
     public static TextureAtlas bonusesAtlas;
     public static TextureAtlas lumpsAtlas;
+    public static TextureAtlas armoursAtlas;
+
+    public static Texture playerShell;
 
     public static Animation playerStay;
     public static Animation playerRun;
-    public static TextureRegion [] playerFrames;
     public static Animation playerJump;
     public static Animation playerHit;
-    public static Animation playerStrike;
-    public static Texture playerShell;
+
+    public static CircularList<Animation> playerStrikeList;
+    public static CircularList<Animation> playerJumpStrikeList;
 
     public static Music levelMusic;
 
@@ -49,13 +57,13 @@ public class AssetLoader {
     public static Texture menuBackgroundTexture;
 
     public static Texture logoPicture;
-//    public static Sound logoSound;
     public static Music logoSound;
 
     public static Sound monkStrikeSound;
     public static Sound getBonusSound;
     public static Sound balanceBonusSound;
     public static Sound retributionBonusSound;
+    public static Sound deathSound;
 
     public static I18NBundle sBundle;
 
@@ -84,26 +92,25 @@ public class AssetLoader {
     public static void initGame() {
 
         monkAtlas = new TextureAtlas(Gdx.files.internal("new/monk.atlas"));
+        monkArmour1Atlas = new TextureAtlas(Gdx.files.internal("new/armour/monk_armour1.atlas"));
+        monkArmour2Atlas = new TextureAtlas(Gdx.files.internal("new/armour/monk_armour2.atlas"));
+        monkArmour3Atlas = new TextureAtlas(Gdx.files.internal("new/armour/monk_armour3.atlas"));
         achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
         bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
         lumpsAtlas = new TextureAtlas(Gdx.files.internal("lumps.atlas"));
 
-        playerStay  = new Animation(0.12f ,monkAtlas.findRegion(Constants.RUNNER_RUNNING_REGION_NAMES[0]));
-        playerFrames = new TextureRegion[Constants.RUNNER_RUNNING_REGION_NAMES.length];
-        for (int i=0;i< Constants.RUNNER_RUNNING_REGION_NAMES.length;i++) {
-            playerFrames[i] = monkAtlas.findRegion(Constants.RUNNER_RUNNING_REGION_NAMES[i]);
-        }
-        playerRun = new Animation(0.12f, playerFrames);
-        playerJump = new Animation(0.12f ,monkAtlas.findRegion(Constants.RUNNER_JUMPING_REGION_NAME));
-        playerHit = new Animation(0.12f ,monkAtlas.findRegion(Constants.RUNNER_HIT_REGION_NAME));
-        playerStrike = new Animation(0.12f ,monkAtlas.findRegion(Constants.RUNNER_STRIKING_REGION_NAME));
-        playerShell = new Texture(Gdx.files.internal("monkShell.png"));
+        armoursAtlas = new TextureAtlas(Gdx.files.internal("textures/armours.atlas"));
 
+        playerShell = new Texture(Gdx.files.internal("monkShell.png"));
+        menuBackgroundTexture = new Texture(Gdx.files.internal("menuBackground.png"));
+
+        loadMonkAnimations(PreferencesManager.getArmour());
 
         monkStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/kiya.wav"));
         getBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/coin.wav"));
         balanceBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beep.wav"));
         retributionBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beat.wav"));
+        deathSound = Gdx.audio.newSound(Gdx.files.internal("sound/death.mp3"));
 
         sGuiSkin = new Skin(Gdx.files.internal("gui/forskin/exp/gui_exp.json"));
 
@@ -129,6 +136,130 @@ public class AssetLoader {
         }
 
         sWorkParticleDust = new Array<ParticleEffect>();
+
+        ArmourType.init();
+    }
+
+    //загрузка анимаций монаха по типу брони
+    public static void loadMonkAnimations(ArmourType armourType) {
+
+        TextureAtlas currentMonkAtlas = null;
+
+        if (armourType!=null) {
+            switch (armourType) {
+                case ARMOUR_TYPE1:
+                    currentMonkAtlas = monkArmour1Atlas;
+                    break;
+                case ARMOUR_TYPE2:
+                    currentMonkAtlas = monkArmour2Atlas;
+                    break;
+                case ARMOUR_TYPE3:
+                    currentMonkAtlas = monkArmour3Atlas;
+                    break;
+            }
+        } else {
+            currentMonkAtlas = monkAtlas;
+        }
+
+        loadMonkAnimations(currentMonkAtlas);
+    }
+    //загрузка анимаций монаха по атласу
+    private static void loadMonkAnimations(TextureAtlas currentMonkAtlas) {
+
+        boolean stopSeek;
+        boolean stopSeekStrike;
+        int regionNum;
+        int strikeNum;
+        TextureRegion currentRegion;
+
+        Array<Animation> animations = new Array<Animation>();
+        Array<TextureRegion> regions = new Array<TextureRegion>();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i=0; i<Constants.RUNNER_ANIMATION_GROUP_NAMES.length; i++) {
+
+            stopSeek = false;
+            regions.clear();
+
+            stringBuilder.append(Constants.RUNNER_ANIMATION_GROUP_NAMES[i]);
+            regionNum = 0;
+
+            while (!stopSeek) {
+                regionNum++;
+
+                currentRegion = (currentMonkAtlas.findRegion(stringBuilder.toString()
+                        + String.valueOf(regionNum)));
+
+
+                if (currentRegion!=null) {
+                    regions.add(currentRegion);
+                } else {
+                    stopSeek = true;
+                    regionNum = 0;
+                }
+            }
+
+            stopSeek = false;
+
+            if (regions.size>0) {
+                animations.add(new Animation(0.12f, regions));
+            } else {
+                animations.add(null);
+            }
+
+            stringBuilder.delete(0, stringBuilder.length());
+        }
+
+        playerStay = animations.get(0);
+        playerRun = animations.get(1);
+        playerJump = animations.get(2);
+        playerHit = animations.get(3);
+
+
+        playerStrikeList = new CircularList<Animation>();
+        stopSeekStrike = false;
+        strikeNum = 0;
+
+        while (!stopSeekStrike&&strikeNum<100) {
+
+            strikeNum++;
+            stopSeek = false;
+            regions.clear();
+            regionNum = 0;
+
+            while (!stopSeek) {
+
+                stringBuilder.append(Constants.RUNNER_ANIMATION_STRIKE_NAMES[0]).append(strikeNum);
+
+                regionNum++;
+
+
+                stringBuilder.append(Constants.FRAME_STRING).append(regionNum);
+
+                currentRegion = (currentMonkAtlas.findRegion(stringBuilder.toString()));
+
+                if (currentRegion!=null) {
+                    regions.add(currentRegion);
+                } else {
+                    stopSeek = true;
+                    regionNum = 0;
+                }
+
+                stringBuilder.delete(0, stringBuilder.length());
+            }
+
+            stopSeek = false;
+            if (regions.size>0) {
+                playerStrikeList.add(new Animation(0.10f, regions));
+            } else {
+                stopSeekStrike=true;
+            }
+
+            stringBuilder.delete(0, stringBuilder.length());
+        }
+
+
+
     }
 
     //Инициализация ресурсов уровня
@@ -138,10 +269,11 @@ public class AssetLoader {
         enemiesAtlas = new TextureAtlas(Gdx.files.internal("textures/" + levelName + "/enemies.atlas"));
         obstaclesAtlas = new TextureAtlas(Gdx.files.internal("textures/" + levelName + "/obstacles.atlas"));
 
-        levelMusic = Gdx.audio.newMusic(Gdx.files.internal("music/" + levelName + "/music.mp3"));
-        levelMusic.setLooping(true);
-        levelMusic.setVolume(SoundSystem.getMusicValue());
-
+        if (levelMusic==null||!levelMusic.isPlaying()) {
+            levelMusic = Gdx.audio.newMusic(Gdx.files.internal("music/" + levelName + "/music.mp3"));
+            levelMusic.setLooping(true);
+            levelMusic.setVolume(SoundSystem.getMusicValue());
+        }
     }
 
     public static void initMenu() {
@@ -181,6 +313,12 @@ public class AssetLoader {
 
     public static void disposeGame() {
         monkAtlas.dispose();
+        monkArmour1Atlas.dispose();
+        monkArmour2Atlas.dispose();
+        monkArmour3Atlas.dispose();
+        menuBackgroundTexture.dispose();
+
+        armoursAtlas.dispose();
 
         achieveAtlas.dispose();
         bonusesAtlas.dispose();
@@ -190,6 +328,7 @@ public class AssetLoader {
         getBonusSound.dispose();
         balanceBonusSound.dispose();
         retributionBonusSound.dispose();
+        deathSound.dispose();
 
         disposeLevel();
 

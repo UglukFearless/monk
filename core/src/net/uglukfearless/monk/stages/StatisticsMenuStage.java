@@ -28,6 +28,7 @@ import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.screens.MainMenuScreen;
 import net.uglukfearless.monk.ui.BackButton;
+import net.uglukfearless.monk.utils.BonusShow;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
@@ -52,10 +53,10 @@ public class StatisticsMenuStage extends Stage {
     private Label mTitle;
 
     private Label mHighScore, mTime, mBestTime, mAverageTime, mKilled, mKillingRate, mDestroyed
-            ,mKillPercent , mDeaths, mEfficiency;
+            ,mKillPercent , mDeaths, mTreasures, mEfficiency;
 
     private Label mHighScoreValue, mTimeValue, mBestTimeValue, mAverageTimeValue, mKilledValue
-            ,mKillingRateValue, mDestroyedValue,mKillPercentValue, mDeathsValue, mEfficiencyValue;
+            ,mKillingRateValue, mDestroyedValue,mKillPercentValue, mDeathsValue, mTreasuresValue ,mEfficiencyValue;
 
     //по смертям
     private Label mDeathCourse;
@@ -135,7 +136,7 @@ public class StatisticsMenuStage extends Stage {
 
     private void setupDescribe() {
 
-        mDescribeWindow = new Window(AssetLoader.sBundle.get("MENU_STATS_DESCRIBE_TITLE"), AssetLoader.sGuiSkin);
+        mDescribeWindow = new Window("",AssetLoader.sGuiSkin);
         mDescribeWindow.setSize(VIEWPORT_WIDTH / 1.8f, VIEWPORT_HEIGHT / 2);
         mDescribeWindow.setPosition(VIEWPORT_WIDTH / 2 - mDescribeWindow.getWidth() / 2,
                 VIEWPORT_HEIGHT / 2 - mDescribeWindow.getHeight() / 2);
@@ -478,7 +479,10 @@ public class StatisticsMenuStage extends Stage {
         addBonusStats();
 
 
-
+        mTreasures = new Label(AssetLoader.sBundle.get("MENU_STATS_TREASURES"), AssetLoader.sGuiSkin);
+        mLabelArray.add(mTreasures);
+        mTreasuresValue = new Label(String.valueOf(PreferencesManager.getTreasuresTotal()), AssetLoader.sGuiSkin);
+        mLabelValueArray.add(mTreasuresValue);
 
         mEfficiency = new Label(AssetLoader.sBundle.get("MENU_STATS_EFFICIENCY"), AssetLoader.sGuiSkin);
         mLabelArray.add(mEfficiency);
@@ -518,25 +522,31 @@ public class StatisticsMenuStage extends Stage {
         mContainerLoc.row();
 
         for (String key : PreferencesManager.getDangersKeys().keySet()) {
-            Label labelName = new Label(AssetLoader.sBundle.format("MENU_STATS_KILLER_NAME",
-                    PreferencesManager.getEnName(key), PreferencesManager.getRuName(key))
-                    , AssetLoader.sGuiSkin);
-            mLabelArray.add(labelName);
-            Label labelValue = new Label(String.valueOf(PreferencesManager.getDeathCausePercent(key)).concat("%"), AssetLoader.sGuiSkin);
-            mLabelValueArray.add(labelValue);
+            if (PreferencesManager.getDeathCausePercent(key)>0) {
+                Label labelName = new Label(AssetLoader.sBundle.format("MENU_STATS_KILLER_NAME",
+                        PreferencesManager.getEnName(key), PreferencesManager.getRuName(key))
+                        , AssetLoader.sGuiSkin);
+                mLabelArray.add(labelName);
+                Label labelValue = new Label(String.valueOf(PreferencesManager.getDeathCausePercent(key)).concat("%"), AssetLoader.sGuiSkin);
+                mLabelValueArray.add(labelValue);
+            }
         }
 
-        Label fallLabel = new Label(AssetLoader.sBundle.get("MENU_STATS_KILLER_FALL"), AssetLoader.sGuiSkin);
-        mLabelArray.add(fallLabel);
-        Label fallValue = new Label(String.valueOf(PreferencesManager.getDeathCausePercent
-                (PreferencesConstants.STATS_CRASHED_DEATH_KEY)).concat("%"), AssetLoader.sGuiSkin);
-        mLabelValueArray.add(fallValue);
+        if (PreferencesManager.getDeathCausePercent(PreferencesConstants.STATS_CRASHED_DEATH_KEY)>0) {
+            Label fallLabel = new Label(AssetLoader.sBundle.get("MENU_STATS_KILLER_FALL"), AssetLoader.sGuiSkin);
+            mLabelArray.add(fallLabel);
+            Label fallValue = new Label(String.valueOf(PreferencesManager.getDeathCausePercent
+                    (PreferencesConstants.STATS_CRASHED_DEATH_KEY)).concat("%"), AssetLoader.sGuiSkin);
+            mLabelValueArray.add(fallValue);
+        }
 
-        Label behindLabel = new Label(AssetLoader.sBundle.get("MENU_STATS_KILLER_BEHIND"), AssetLoader.sGuiSkin);
-        mLabelArray.add(behindLabel);
-        Label behindValue = new Label(String.valueOf(PreferencesManager.getDeathCausePercent
-                (PreferencesConstants.STATS_BEHIND_DEATH_KEY)).concat("%"), AssetLoader.sGuiSkin);
-        mLabelValueArray.add(behindValue);
+        if (PreferencesManager.getDeathCausePercent(PreferencesConstants.STATS_BEHIND_DEATH_KEY)>0) {
+            Label behindLabel = new Label(AssetLoader.sBundle.get("MENU_STATS_KILLER_BEHIND"), AssetLoader.sGuiSkin);
+            mLabelArray.add(behindLabel);
+            Label behindValue = new Label(String.valueOf(PreferencesManager.getDeathCausePercent
+                    (PreferencesConstants.STATS_BEHIND_DEATH_KEY)).concat("%"), AssetLoader.sGuiSkin);
+            mLabelValueArray.add(behindValue);
+        }
     }
 
     private void addLabelsToTable() {

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 
 import net.uglukfearless.monk.constants.PreferencesConstants;
+import net.uglukfearless.monk.enums.ArmourType;
 
 import java.util.Map;
 
@@ -81,15 +82,79 @@ public class PreferencesManager {
 
     //СТАТИСТИКА*******************************************
 
-    public static void setScore(int score) {
+    public static void setLastDate(long mileSeconds) {
+        sStatistics.putLong(PreferencesConstants.STATS_LAST_DATE, mileSeconds);
+        sStatistics.flush();
+    }
+
+    public static long getLastDate() {
+        return sStatistics.getLong(PreferencesConstants.STATS_LAST_DATE, 0);
+    }
+
+    //ФИНАНСЫ И ПРЕДМЕТЫ ***************************************************************************
+    public static void addTreasures(int quantetly) {
+        if (quantetly>0) {
+            sStatistics.putInteger(PreferencesConstants.STATS_TREASURES, getTreasures() + quantetly);
+            sStatistics.flush();
+            sStatistics.putInteger(PreferencesConstants.STATS_TREASURES_TOTAL, getTreasuresTotal() + quantetly);
+            sStatistics.flush();
+        }
+    }
+
+    public static int getTreasuresTotal() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_TREASURES_TOTAL, 0);
+    }
+
+    public static int getTreasures() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_TREASURES, 0);
+    }
+
+    public static boolean purchase(int quantetly) {
+        if (quantetly>getTreasures()) {
+            return false;
+        } else {
+            sStatistics.putInteger(PreferencesConstants.STATS_TREASURES, getTreasures() - quantetly);
+            sStatistics.flush();
+            return true;
+        }
+    }
+
+    public static ArmourType getArmour() {
+        String currentArmour = sStatistics.getString(PreferencesConstants.ITEM_ARMOUR, "null");
+        if (!currentArmour.equals("null")) {
+            return ArmourType.valueOf(currentArmour);
+        }
+        return null;
+    }
+
+    public static void setArmour(ArmourType armour) {
+        sStatistics.putString(PreferencesConstants.ITEM_ARMOUR, armour.name());
+        sStatistics.flush();
+    }
+
+    public static void clearArmour() {
+        sStatistics.putString(PreferencesConstants.ITEM_ARMOUR, "null");
+        sStatistics.flush();
+    }
+
+    //МЕТРИКИ ЗАБЕГОВ ******************************************************************************
+    public static void setScore(int score, String levelName) {
         if (score>getHighScore()) {
             sStatistics.putInteger(PreferencesConstants.STATS_HIGHSCORE_KEY, score);
             sStatistics.flush();
+        }
+
+        if (score>getLevelHighScore(levelName)) {
+            sStatistics.putInteger(PreferencesConstants.STATS_HIGHSCORE_KEY.concat(levelName), score);
         }
     }
 
     public static int getHighScore() {
         return sStatistics.getInteger(PreferencesConstants.STATS_HIGHSCORE_KEY, 0);
+    }
+
+    public static int getLevelHighScore(String levelName) {
+        return sStatistics.getInteger(PreferencesConstants.STATS_HIGHSCORE_KEY.concat(levelName), 0);
     }
 
     public static int getTime() {
@@ -223,6 +288,16 @@ public class PreferencesManager {
         sStatistics.flush();
     }
 
+    //геттеры и сеттеры бонусов по человечески
+    public static void addUsingBonus(String keyBonus) {
+        sStatistics.putInteger(keyBonus, getBuddha() + 1);
+        sStatistics.flush();
+    }
+
+    public static int getUsingBonus(String keyBonus) {
+        return sStatistics.getInteger(keyBonus, 0);
+    }
+
     public static void calcAddEfficiency() {
         float efficiencyTotal;
         if (getDeaths()==0) {
@@ -275,7 +350,7 @@ public class PreferencesManager {
     }
 
     public static String getRuName(String key) {
-        return sDangersNames.getString(key.concat("_RU"),"");
+        return sDangersNames.getString(key.concat("_RU"), "");
     }
 
     //геттер для типа смерти

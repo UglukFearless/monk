@@ -8,26 +8,29 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Filter;
 
-import net.uglukfearless.monk.box2d.EnemyUserData;
 import net.uglukfearless.monk.box2d.RunnerUserData;
+import net.uglukfearless.monk.box2d.ShellUserData;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
+import net.uglukfearless.monk.enums.ArmourType;
 import net.uglukfearless.monk.enums.RunnerState;
-import net.uglukfearless.monk.enums.UserDataType;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
-import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.SoundSystem;
 import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
+
+import java.util.Random;
 
 /**
  * Created by Ugluk on 18.05.2016.
  */
-public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
+public class Runner extends GameActor {
 
 
     private RunnerUserData data;
@@ -35,12 +38,13 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
     private float stateTime;
     private float strikeTime;
     private float deadTime;
+    private float comboTime;
 
     private boolean stay;
+    private boolean doubleStrike;
 
     private Animation mAnimStay;
     private Animation mAnimRun;
-    private Animation mAnimStrike;
     private Animation mAnimJump;
     private Animation mAnimDie;
 
@@ -63,9 +67,15 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
     private float mBuddhaThreshold;
 
     private String mCurrentKillerKey;
-    private boolean mUseBuddhaTreshhold;
+    private boolean mUseBuddhaThreshold;
     private boolean mGhost;
     private boolean mStrongBeat;
+    private Random mRand;
+
+    private boolean mArmour;
+    private Filter mCustomFilter;
+    private Filter mRevivalFilter;
+    private Armour mArmourActor;
 
 
     public Runner(Body body) {
@@ -76,7 +86,6 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
         mAnimStay = AssetLoader.playerStay;
         mAnimRun = AssetLoader.playerRun;
-        mAnimStrike = AssetLoader.playerStrike;
         mAnimJump = AssetLoader.playerJump;
         mAnimDie = AssetLoader.playerHit;
 
@@ -87,8 +96,14 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
         mRetribution = false;
         mBuddhaTimer = 0;
         mBuddhaThreshold = 0;
-        mUseBuddhaTreshhold = false;
+        mUseBuddhaThreshold = false;
 
+        mArmour = false;
+
+        mCustomFilter = FilterConstants.FILTER_RUNNER;
+        mRevivalFilter = FilterConstants.FILTER_RUNNER_GHOST;
+
+        mRand = new Random();
     }
 
     @Override
@@ -102,15 +117,14 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
         mColor = batch.getColor();
         batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
         stateTime += Gdx.graphics.getDeltaTime();
-        if (data.getState()==RunnerState.RUN_STRIKE||
-            data.getState()==RunnerState.JUMP_STRIKE||
-            data.getState()==RunnerState.JUMP_DOUBLE_STRIKE) {
-            batch.draw(mCurrentAnimation.getKeyFrame(stateTime, true), x + width/3.3f, y, width*1.5f, data.getHeight()*1.05f);
-        } else {
 
-            batch.draw(mCurrentAnimation.getKeyFrame(stateTime, true), x, y, width * 0.5f, data.getHeight() * 0.5f, width,
-                    data.getHeight(), 1f, 1f, (float) Math.toDegrees(body.getAngle()));
-        }
+        batch.draw(mCurrentAnimation.getKeyFrame(stateTime, true),
+                x,
+                y,
+                getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
+                data.getWidth() *2.2f, data.getHeight() * 1.05f
+                , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+
         batch.setColor(mColor);
     }
 
@@ -135,9 +149,9 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
             if (mBuddha) {
                 mBuddhaTimer +=delta;
-                if (mBuddhaTimer>mBuddhaThreshold&&!mUseBuddhaTreshhold) {
+                if (mBuddhaTimer>mBuddhaThreshold&&!mUseBuddhaThreshold) {
                     ((GameStage)getStage()).changingSpeed(((GameStage)getStage()).getCurrentVelocity().x/2f);
-                    mUseBuddhaTreshhold = true;
+                    mUseBuddhaThreshold = true;
                 }
 
             }
@@ -148,6 +162,12 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                     ((GameStage)getStage()).StartRebutRunner();
                 } else {
                     hit(PreferencesConstants.STATS_CRASHED_DEATH_KEY);
+                    if (mArmour) {
+                        if (mArmourActor!=null) {
+                            mArmourActor.getUserData().destroyArmour();
+                        }
+                        unarmoured();
+                    }
                 }
 
             } else if (BodyUtils.runnerIsBehind(body)) {
@@ -156,6 +176,12 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                     ((GameStage)getStage()).StartRebutRunner();
                 } else {
                     hit(PreferencesConstants.STATS_CRASHED_DEATH_KEY);
+                    if (mArmour) {
+                        if (mArmourActor!=null) {
+                            mArmourActor.getUserData().destroyArmour();
+                        }
+                        unarmoured();
+                    }
                 }
             }
         }
@@ -163,6 +189,11 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
         switch (data.getState()) {
             case JUMP:
             case JUMP_DOUBLE:
+                if (comboTime<0.3) {
+                    comboTime +=delta;
+                } else {
+                    AssetLoader.playerStrikeList.resetIndex();
+                }
                 break;
             case RUN:
                 if (!body.getWorld().isLocked()) {
@@ -172,12 +203,24 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                         body.setTransform(Constants.RUNNER_X, body.getPosition().y, 0);
                     }
                 }
+                if (comboTime<0.3) {
+                    comboTime +=delta;
+                } else {
+                    AssetLoader.playerStrikeList.resetIndex();
+                }
                 break;
             case RUN_STRIKE:
                 strikeTime +=delta;
                 if (strikeTime > 0.2f) {
-                    data.setState(RunnerState.RUN);
-                    mCurrentAnimation = mAnimRun;
+                    if (doubleStrike) {
+                        mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
+                        AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
+                        doubleStrike = false;
+                    } else {
+                        data.setState(RunnerState.RUN);
+                        mCurrentAnimation = mAnimRun;
+                        comboTime = 0;
+                    }
                     stateTime = 0;
                     strikeTime = 0;
                 }
@@ -185,8 +228,15 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             case JUMP_STRIKE:
                 strikeTime +=delta;
                 if (strikeTime > 0.2f) {
-                    data.setState(RunnerState.JUMP);
-                    mCurrentAnimation = mAnimJump;
+                    if (doubleStrike) {
+                        mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
+                        AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
+                        doubleStrike = false;
+                    } else {
+                        data.setState(RunnerState.JUMP);
+                        mCurrentAnimation = mAnimJump;
+                        comboTime = 0;
+                    }
                     stateTime = 0;
                     strikeTime = 0;
                 }
@@ -194,6 +244,15 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             case JUMP_DOUBLE_STRIKE:
                 strikeTime +=delta;
                 if (strikeTime > 0.2f) {
+                    if (doubleStrike) {
+                        mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
+                        AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
+                        doubleStrike = false;
+                    } else {
+                        data.setState(RunnerState.JUMP_DOUBLE);
+                        mCurrentAnimation = mAnimJump;
+                        comboTime = 0;
+                    }
                     data.setState(RunnerState.JUMP_DOUBLE);
                     mCurrentAnimation = mAnimJump;
                     stateTime = 0;
@@ -226,9 +285,6 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             GameStage stage = (GameStage) getStage();
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump1"));
             ((UserData)body.getUserData()).setDestroy(true);
-            if (((GameStage) getStage()).getRevival()==0) {
-                PreferencesManager.addDeath();
-            }
             ((GameStage) getStage()).gameOver(mCurrentKillerKey);
             this.remove();
         }
@@ -243,6 +299,7 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
         switch (data.getState()) {
             case DIE:
+                break;
             case JUMP_DOUBLE:
             case JUMP_DOUBLE_STRIKE:
                 if (mWings&&body.getPosition().y<15) {
@@ -299,10 +356,15 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             case DIE:
                 break;
             case RUN_STRIKE:
+                doubleStrike = true;
+                break;
             case RUN:
                 data.setState(RunnerState.RUN_STRIKE);
                 AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
-                mCurrentAnimation = mAnimStrike;
+                if (comboTime>0.3) {
+                    AssetLoader.playerStrikeList.setIndex(mRand.nextInt(2)*3);
+                }
+                mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
                 strikeTime = 0f;
                 if (mRetribution) {
                     ((GameStage)getStage()).retribution(mRetributionLevel);
@@ -311,10 +373,15 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 }
                 break;
             case JUMP_STRIKE:
+                doubleStrike = true;
+                break;
             case JUMP:
                 data.setState(RunnerState.JUMP_STRIKE);
                 AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
-                mCurrentAnimation = mAnimStrike;
+                if (comboTime>0.3) {
+                    AssetLoader.playerStrikeList.setIndex(mRand.nextInt(2)*3);
+                }
+                mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
                 strikeTime = 0f;
                 if (mRetribution) {
                     ((GameStage)getStage()).retribution(mRetributionLevel);
@@ -323,10 +390,15 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 }
                 break;
             case JUMP_DOUBLE_STRIKE:
+                doubleStrike = true;
+                break;
             case JUMP_DOUBLE:
                 data.setState(RunnerState.JUMP_DOUBLE_STRIKE);
                 AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
-                mCurrentAnimation = mAnimStrike;
+                if (comboTime>0.3) {
+                    AssetLoader.playerStrikeList.setIndex(mRand.nextInt(2)*3);
+                }
+                mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
                 strikeTime = 0f;
                 if (mRetribution) {
                     ((GameStage)getStage()).retribution(mRetributionLevel);
@@ -344,7 +416,8 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
         body.applyAngularImpulse(data.getHitAngularImpulse(), true);
         getUserData().setState(RunnerState.DIE);
         ((GameStage) getStage()).prepareTransition(255, 255, 255, .2f);
-        ((GameStage) getStage()).screenShake(0.1f, 0.3f);
+        ((GameStage) getStage()).screenShake(0.1f, 0.2f);
+//        AssetLoader.deathSound.play(SoundSystem.getSoundValue());
     }
 
 
@@ -365,6 +438,11 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     public void setWings(boolean wings) {
         mWings = wings;
+        if (mArmour) {
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS_GHOST);
+        } else {
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS);
+        }
     }
 
     public void setRetribution(boolean retribution, int level) {
@@ -379,9 +457,14 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     public void setBuddha(boolean buddha) {
         mBuddha = buddha;
-        mUseBuddhaTreshhold = false;
+        mUseBuddhaThreshold = false;
         if (!buddha) {
             mBuddhaTimer=0;
+            if (mArmour) {
+                mArmourActor.unhide();
+            }
+        } else if (mArmour) {
+            mArmourActor.hide();
         }
     }
 
@@ -391,16 +474,21 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     public void setBuddha(boolean buddha, float workingTime, float speed) {
         mBuddha = buddha;
-        mUseBuddhaTreshhold = false;
+        mUseBuddhaThreshold = false;
         mBuddhaThreshold = workingTime*0.8f;
         ((GameStage) getStage()).changingSpeed(speed);
         if (!buddha) {
             mBuddhaTimer=0;
+            if (mArmour) {
+                mArmourActor.unhide();
+            }
+        } else if (mArmour){
+            mArmourActor.hide();
         }
     }
 
-    public boolean isUseBuddhaTreshhold() {
-        return mUseBuddhaTreshhold;
+    public boolean isUseBuddhaThreshold() {
+        return mUseBuddhaThreshold;
     }
 
     public String getCurrentKillerKey() {
@@ -409,6 +497,11 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
 
     public void setGhost(boolean ghost) {
         mGhost = ghost;
+        if (!ghost&&mArmour) {
+            mArmourActor.unhide();
+        } else if (mArmour) {
+            mArmourActor.hide();
+        }
     }
 
     public boolean isGhost() {
@@ -442,6 +535,10 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
                 coff=1;
             }
 
+            if (bBody.getUserData() instanceof ShellUserData) {
+                coff*=2;
+            }
+
             bBody.setLinearVelocity(coff*4f * impactVelocity.x, 2.5f * impactVelocity.y);
             bBody.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_STRIKE_FLIP);
             ((UserData)bBody.getUserData()).setLaunched(true);
@@ -450,6 +547,92 @@ public class Runner extends net.uglukfearless.monk.actors.gameplay.GameActor {
             }
 
             ((GameStage) getStage()).screenShake(0.1f, 0.15f);
+        }
+    }
+
+    public boolean isStrongBeat() {
+        return mStrongBeat;
+    }
+
+    public boolean isWings() {
+        return mWings;
+    }
+
+    public boolean isArmour() {
+        return mArmour;
+    }
+
+    public void armouring(Armour armour) {
+        mArmour = true;
+        mCustomFilter = FilterConstants.FILTER_RUNNER_GHOST;
+        mRevivalFilter = FilterConstants.FILTER_RUNNER_GHOST;
+        setCustomFilter();
+        mArmourActor = armour;
+        changeClothes(armour.getUserData().getType());
+    }
+
+    public void unarmoured() {
+
+        AssetLoader.loadMonkAnimations(null);
+
+        if (mCurrentAnimation==mAnimStay) {
+            mCurrentAnimation=AssetLoader.playerStay;
+        } else if (mCurrentAnimation==mAnimRun) {
+            mCurrentAnimation=AssetLoader.playerRun;
+        } else if (mCurrentAnimation==mAnimJump) {
+            mCurrentAnimation=AssetLoader.playerJump;
+        }else if (mCurrentAnimation==mAnimDie) {
+            mCurrentAnimation=AssetLoader.playerHit;
+        }
+
+        mAnimStay = AssetLoader.playerStay;
+        mAnimRun = AssetLoader.playerRun;
+        mAnimJump = AssetLoader.playerJump;
+        mAnimDie = AssetLoader.playerHit;
+
+        mArmour = false;
+        mCustomFilter = FilterConstants.FILTER_RUNNER;
+        mRevivalFilter = FilterConstants.FILTER_RUNNER_GHOST;
+
+        if (getStage()!=null) {
+            ((GameStage) getStage()).createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump2"));
+        }
+    }
+
+    public void changeClothes(ArmourType armourType) {
+
+        AssetLoader.loadMonkAnimations(armourType);
+        if (mCurrentAnimation==mAnimStay) {
+            mCurrentAnimation=AssetLoader.playerStay;
+        } else if (mCurrentAnimation==mAnimRun) {
+            mCurrentAnimation=AssetLoader.playerRun;
+        } else if (mCurrentAnimation==mAnimJump) {
+            mCurrentAnimation=AssetLoader.playerJump;
+        }else if (mCurrentAnimation==mAnimDie) {
+            mCurrentAnimation=AssetLoader.playerHit;
+        }
+
+        mAnimStay = AssetLoader.playerStay;
+        mAnimRun = AssetLoader.playerRun;
+        mAnimJump = AssetLoader.playerJump;
+        mAnimDie = AssetLoader.playerHit;
+    }
+
+    public void setCustomFilter() {
+        if (mWings&&!mArmour) {
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS);
+        } else if (mWings&&mArmour) {
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS_GHOST);
+        } else {
+            body.getFixtureList().get(0).setFilterData(mCustomFilter);
+        }
+    }
+
+    public void setRevivalFilter() {
+        if (mWings) {
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS_GHOST);
+        } else {
+            body.getFixtureList().get(0).setFilterData(mRevivalFilter);
         }
     }
 }

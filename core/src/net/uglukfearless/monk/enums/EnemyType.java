@@ -238,7 +238,7 @@ public enum EnemyType implements Danger {
                 mStringBuilder.delete(0, mStringBuilder.length());
             }
 
-            mShellRegion = AssetLoader.enemiesAtlas.findRegion("enemy" + number + "_shell");
+            mShellRegion = AssetLoader.enemiesAtlas.findRegion("enemy" + number + "_shell1");
 
             mStayAnimation = mAnimations.get(0);
             mRunAnimation = mAnimations.get(1);

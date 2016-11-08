@@ -29,7 +29,7 @@ public class Shell extends GameActor implements Pool.Poolable, Movable {
     public Shell(World world) {
         super(WorldUtils.createEnemyShell(world));
 
-        mRegion = AssetLoader.enemiesAtlas.findRegion("enemy2_shell");
+        mRegion = AssetLoader.enemiesAtlas.findRegion("enemy2_shell1");
 
     }
 

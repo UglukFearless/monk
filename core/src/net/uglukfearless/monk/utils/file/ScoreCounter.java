@@ -36,7 +36,6 @@ public class ScoreCounter {
     private static int killed = 0;
     private static int enemiesAll = 0;
     private static int destroyed = 0;
-    private static int deaths = 0;
     private static float efficiency = 0;
 
     private static int useBuddha = 0;
@@ -106,10 +105,6 @@ public class ScoreCounter {
         return destroyed;
     }
 
-    public static int getDeaths() {
-        return deaths;
-    }
-
     public static float getEfficiency() {
         return efficiency;
     }
@@ -124,7 +119,7 @@ public class ScoreCounter {
 
     public static float getKillPercent() {
         if (enemiesAll!=0) {
-            return (((int)killed*100/enemiesAll)*100)/100f;
+            return ((((int)killed*100/enemiesAll)*100)/100f)<100 ? (((int)killed*100/enemiesAll)*100)/100f : 100;
         } else {
             return 0;
         }
@@ -144,9 +139,6 @@ public class ScoreCounter {
     }
     public static void increaseDestroyed() {
         destroyed++;
-    }
-    public static void death() {
-        deaths++;
     }
 
     //подсчет бонусов
@@ -172,22 +164,18 @@ public class ScoreCounter {
         useWings++;
     }
 
-    public static void saveCalcStats(String currentKillerKey) {
-        saveCalcStats();
+    public static void saveCalcStats(String currentKillerKey, String levelName) {
+        saveCalcStats(levelName);
         PreferencesManager.setDeathCause(currentKillerKey);
     }
-    public static void saveCalcStats() {
+    public static void saveCalcStats(String levelName) {
 
-        PreferencesManager.setScore(score);
+        PreferencesManager.setScore(score, levelName);
         PreferencesManager.addTime(time);
         PreferencesManager.addKilled(killed);
         PreferencesManager.addDestroyed(destroyed);
         PreferencesManager.addEnemies(enemiesAll);
-        if (deaths == 0) {
-            efficiency = (killed + destroyed)/1f;
-        } else {
-            efficiency = (float)(killed + destroyed)/deaths;
-        }
+        efficiency = (killed + destroyed)/1f;
         PreferencesManager.calcAddEfficiency();
 
         //по бонусам
@@ -206,7 +194,6 @@ public class ScoreCounter {
         time = 0;
         killed = 0;
         destroyed = 0;
-        deaths = 0;
         efficiency = 0;
         enemiesAll = 0;
 

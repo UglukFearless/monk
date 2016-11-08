@@ -1,0 +1,82 @@
+
+monk_armour2.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+hit1
+  rotate: false
+  xy: 1, 167
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+jump1
+  rotate: false
+  xy: 1, 84
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+run1
+  rotate: false
+  xy: 103, 167
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+run2
+  rotate: false
+  xy: 1, 1
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+stay1
+  rotate: false
+  xy: 103, 84
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+strike1_frame1
+  rotate: false
+  xy: 205, 167
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+strike2_frame1
+  rotate: false
+  xy: 103, 1
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+strike3_frame1
+  rotate: false
+  xy: 205, 84
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+strike4_frame1
+  rotate: false
+  xy: 307, 167
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+strike5_frame1
+  rotate: false
+  xy: 205, 1
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+strike6_frame1
+  rotate: false
+  xy: 307, 84
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1

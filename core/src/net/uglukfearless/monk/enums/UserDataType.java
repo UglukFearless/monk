@@ -14,5 +14,6 @@ public enum UserDataType {
     PIT,
     SHELL,
     BUDDHA,
-    COLUMNS
+    COLUMNS,
+    ARMOUR
 }

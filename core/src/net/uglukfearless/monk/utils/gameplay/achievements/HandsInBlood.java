@@ -21,7 +21,6 @@ public class HandsInBlood extends Achievement {
         mImprovementKey = PreferencesConstants.ACHIEVE_NKF_KEY;
         mNew = false;
 
-        mUpdateList = new HashMap<String, String>();
         mRegion = Constants.ACHIEVE_HIB_REGION;
     }
 

@@ -22,6 +22,7 @@ public class FilterConstants {
     public static final short CATEGORY_ENEMY_STRIKE_FLIP = 0x00100; //256d 100000000b
     public static final short CATEGORY_OBSTACLE_ARMOUR = 0x00200; //512d 1000000000b
     public static final short CATEGORY_RUNNER_STRIKE_STRONG = 0x00400; //1024d 10000000000b
+    public static final short CATEGORY_PIT = 0x00800; //2048d 100000000000b
 
 
     public static final short MASK_GHOST = 0;
@@ -31,6 +32,10 @@ public class FilterConstants {
     public static final short MASK_RUNNER = CATEGORY_STATIC | CATEGORY_ENEMY
             | CATEGORY_ENEMY_STRIKE | CATEGORY_OBSTACLE_SIMPLE | CATEGORY_OBSTACLE_TRAP
             | CATEGORY_OBSTACLE_ARMOUR;
+
+    public static final short MASK_RUNNER_WINGS = MASK_RUNNER | CATEGORY_PIT;
+
+    public static final short MASK_PIT = CATEGORY_RUNNER;
 
     public static final short MASK_RUNNER_STRIKE  =  CATEGORY_ENEMY | CATEGORY_LUMP
             | CATEGORY_OBSTACLE_SIMPLE| CATEGORY_ENEMY_STRIKE| CATEGORY_OBSTACLE_ARMOUR;
@@ -75,6 +80,8 @@ public class FilterConstants {
 
     public static final short MASK_RUNNER_GHOST = CATEGORY_STATIC;
 
+    public static final short MASK_RUNNER_WINGS_GHOST = CATEGORY_STATIC | CATEGORY_PIT;
+
 
     public static final Filter FILTER_GHOST = FilterHandler.getFilter(CATEGORY_GHOST, MASK_GHOST);
     public static final Filter FILTER_STATIC = FilterHandler.getFilter(CATEGORY_STATIC, MASK_STATIC);
@@ -92,5 +99,9 @@ public class FilterConstants {
 
     public static final Filter FILTER_RUNNER_GHOST = FilterHandler.getFilter(CATEGORY_LUMP , MASK_RUNNER_GHOST);
     public static final Filter FILTER_RUNNER_STRIKE_STRONG = FilterHandler.getFilter(CATEGORY_RUNNER_STRIKE_STRONG, MASK_RUNNER_STRIKE_STRONG);
+
+    public static final Filter FILTER_RUNNER_WINGS = FilterHandler.getFilter(CATEGORY_RUNNER, MASK_RUNNER_WINGS);
+    public static final Filter FILTER_RUNNER_WINGS_GHOST = FilterHandler.getFilter(CATEGORY_RUNNER, MASK_RUNNER_WINGS_GHOST);
+    public static final Filter FILTER_PIT = FilterHandler.getFilter(CATEGORY_PIT, MASK_PIT);
 
 }

@@ -148,8 +148,8 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
             if (body.getPosition().x < Constants.GAME_WIDTH) {
 
-                if (mAnimation==mJumpAnimation&&body.getLinearVelocity().y==0) {
-                    start();
+                if (mAnimation==mJumpAnimation&&Math.abs(body.getLinearVelocity().y-0.5f)<1) {
+                    landed();
                 }
 
                 mSituation = SpaceTable.getSituation(body.getPosition().x, body.getPosition().y
@@ -222,6 +222,13 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
             ScoreCounter.increaseEnemies();
         }
 
+    }
+
+    private void landed() {
+        if (mRunAnimation!=null&&getUserData().getEnemyType().getBasicXVelocity()<0) {
+            mAnimation = mRunAnimation;
+            stateTime = 0;
+        }
     }
 
     private void shoot() {

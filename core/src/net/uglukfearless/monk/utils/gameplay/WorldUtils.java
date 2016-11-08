@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 
+import net.uglukfearless.monk.box2d.ArmourUserData;
 import net.uglukfearless.monk.box2d.BackgroundUserData;
 import net.uglukfearless.monk.box2d.BudhaUserData;
 import net.uglukfearless.monk.box2d.ColumnsUserData;
@@ -41,7 +42,7 @@ public class WorldUtils {
     public static Body createBackground(World world,float x, float width, float height) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.KinematicBody;
-        bodyDef.position.set(new Vector2(x + width/2f, height/2f));
+        bodyDef.position.set(new Vector2(x + width/2f, height/2f - 0.5f));
         Body body =  world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width/2f, height/2f);
@@ -83,11 +84,12 @@ public class WorldUtils {
         bodyDef.position.set(-10, -10);
         Body body =  world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(width/2f, height/2f);
+        shape.setAsBox(width / 2f, height / 2f);
         body.createFixture(shape, 0);
         body.setGravityScale(0);
         body.getFixtureList().get(0).setFriction(0);
-        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
+//        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_PIT);
         body.resetMassData();
         body.setUserData(new PitUserData(width, height));
         body.setActive(false);
@@ -110,6 +112,24 @@ public class WorldUtils {
 //        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_GHOST);
         body.resetMassData();
         body.setUserData(new RunnerUserData(Constants.RUNNER_WIDTH, Constants.RUNNER_HEIGHT));
+        shape.dispose();
+        return body;
+    }
+
+    public static Body createArmour(World world) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(new Vector2(Constants.RUNNER_X, Constants.RUNNER_Y + Constants.RUNNER_HEIGHT / 2));
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(Constants.RUNNER_WIDTH / 2, Constants.RUNNER_HEIGHT / 2);
+        Body body = world.createBody(bodyDef);
+        body.setGravityScale(0);
+        body.createFixture(shape, Constants.RUNNER_DENSITY);
+        body.getFixtureList().get(0).setFriction(0);
+        body.setFixedRotation(true);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
+        body.resetMassData();
+        body.setUserData(new ArmourUserData(Constants.RUNNER_WIDTH, Constants.RUNNER_HEIGHT));
         shape.dispose();
         return body;
     }
@@ -214,7 +234,7 @@ public class WorldUtils {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(new Vector2(Constants.RUNNER_X, -10));
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox((Constants.RUNNER_WIDTH * 1.03f)/2f, (Constants.RUNNER_HEIGHT * 1.03f)/2f);
+        shape.setAsBox((Constants.RUNNER_WIDTH * 1.03f) / 2f, (Constants.RUNNER_HEIGHT * 1.03f) / 2f);
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, Constants.RUNNER_DENSITY*10f);
         body.setGravityScale(0);

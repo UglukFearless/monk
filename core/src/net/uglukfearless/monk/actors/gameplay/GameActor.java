@@ -35,4 +35,5 @@ public abstract class GameActor extends Actor {
     public Body getBody() {
         return body;
     }
+
 }

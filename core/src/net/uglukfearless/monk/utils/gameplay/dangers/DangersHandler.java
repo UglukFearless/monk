@@ -202,7 +202,7 @@ public class DangersHandler {
             }
         }
 
-        if (rand.nextInt(100)>90) {
+        if (rand.nextInt(100)>80) {
 
             GameBonus gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
 
@@ -272,7 +272,8 @@ public class DangersHandler {
 
         }
 
-        startX += Constants.GROUND_PIT_INIT *1.8f;
+//        startX += Constants.GROUND_PIT_INIT *1.8f;
+        startX += Constants.DANGERS_START_OFFSET;
         prohibitionsMap[0][0] = prohibitionsMap[1][0];
         prohibitionsMap[0][1] = prohibitionsMap[1][1];
     }
@@ -368,8 +369,9 @@ public class DangersHandler {
             stage.addActor(mPit);
         }
 
+
         firstGround.getBody().setTransform(secondGround.getBody().getPosition().x +
-                Constants.GROUND_WIDTH_INIT + pitLength, Constants.GROUND_Y, 0f);
+                    Constants.GROUND_WIDTH_INIT + pitLength, Constants.GROUND_Y, 0f);
 
 
         startX = secondGround.getBody().getPosition().x + Constants.GROUND_WIDTH_INIT /2 + pitLength;

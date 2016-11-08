@@ -12,6 +12,8 @@ import net.uglukfearless.monk.utils.gameplay.DifficultyHandler;
 public class LevelModel {
 
     private String LEVEL_NAME;
+    private String EN_NAME;
+    private String RU_NAME;
 
     private LevelConstants mLevelConstants;
 
@@ -68,5 +70,13 @@ public class LevelModel {
 
     public String getLEVEL_NAME() {
         return LEVEL_NAME;
+    }
+
+    public String getRU_NAME() {
+        return RU_NAME;
+    }
+
+    public String getEN_NAME() {
+        return EN_NAME;
     }
 }

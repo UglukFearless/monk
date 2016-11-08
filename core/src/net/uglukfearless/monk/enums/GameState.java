@@ -7,5 +7,6 @@ public enum GameState {
     START,
     RUN,
     PAUSE,
+    WAIT,
     GAME_OVER
 }

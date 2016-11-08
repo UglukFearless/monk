@@ -13,12 +13,14 @@ com.badlogic.gdx.graphics.Color: {
 	black: { a: 1, b: 0, g: 0, r: 0 }
 },
 com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
-	default: { down: button_on, up: button_off, font: russian-font, fontColor: white, downFontColor: red}
+	default: { down: button_on, up: button_off, font: russian-font, fontColor: white, downFontColor: red},
+	help: { down: touch_button, up: touch_button, font: russian-font, fontColor: white, downFontColor: red}
 },
 com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 	default: { down: button_on, up: button_off},
 	back: { down: back_on, up: back_off},
-  	check: {  up: radio_off, checked: radio_check}
+  	check: {  up: radio_off, checked: radio_check},
+  	game_over: { down:game_over_on, up: game_over_off}
 },
 com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	default: { font: russian-font, fontColor: green },

@@ -26,9 +26,11 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
 import net.uglukfearless.monk.actors.menu.MenuBackground;
+import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.screens.MainMenuScreen;
 import net.uglukfearless.monk.ui.BackButton;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 
 public class SelectLevelStage extends Stage {
@@ -57,8 +59,6 @@ public class SelectLevelStage extends Stage {
     private boolean mStopSeek;
     private int mSeekNumber;
 
-    //exp
-//    ParticleEffect effect;
 
     public SelectLevelStage(MainMenuScreen screen, float yViewportHeight) {
 
@@ -91,14 +91,6 @@ public class SelectLevelStage extends Stage {
         Gdx.input.setCatchBackKey(true);
         Gdx.input.setCatchMenuKey(true);
 
-
-//        exp
-//        effect = new ParticleEffect();
-//        effect.load(Gdx.files.internal("particles/blood.p"), Gdx.files.internal("particles"));
-//        effect.getEmitters().first().setPosition(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
-//        effect.getEmitters().get(1).setPosition(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
-//        effect.getEmitters().first().setContinuous(true);
-//        effect.start();
     }
 
     private void findLevels() {
@@ -130,9 +122,17 @@ public class SelectLevelStage extends Stage {
             mLevelImage = new Table();
             mLevelImage.background(new TextureRegionDrawable(new TextureRegion(mLevelLogos.get(i))));
 
-            mLevelName = new Label(mLevelModels.get(i).getLEVEL_NAME(), AssetLoader.sGuiSkin);
-            mLevelName.setAlignment(Align.center);
-            mLevelImage.add(mLevelName).expand().align(Align.center).prefSize(mLevelImage.getPrefWidth(), mLevelImage.getPrefHeight());
+            mLevelName = new Label(AssetLoader.sBundle.format("MENU_SELECT_LEVEL_NAME"
+                                                            , mLevelModels.get(i).getEN_NAME()
+                                                            , mLevelModels.get(i).getRU_NAME()), AssetLoader.sGuiSkin);
+            mLevelImage.add(mLevelName).expand().align(Align.center).fill().align(Align.bottom);
+            mLevelName.setAlignment(Align.bottom);
+            mLevelImage.row();
+
+            mLevelRecord = new Label(String.valueOf(
+                    PreferencesManager.getLevelHighScore(mLevelModels.get(i).getLEVEL_NAME())), AssetLoader.sGuiSkin);
+            mLevelImage.add(mLevelRecord).expand().align(Align.center).fill();
+            mLevelRecord.setAlignment(Align.top);
 
             final LevelModel levelModel = mLevelModels.get(i);
 

@@ -1,6 +1,7 @@
 package net.uglukfearless.monk.actors.gameplay.bonuses;
 
 import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
@@ -22,11 +23,15 @@ public class WingsBonus extends GameBonus {
     @Override
     public void activation() {
         mStage.getRunner().setWings(true);
+        mStage.getRunner().getBody().setGravityScale(4.5f);
         ScoreCounter.increaseWings();
     }
 
     @Override
     public void deactivation() {
         mStage.getRunner().setWings(false);
+        mStage.getRunner().getBody().setGravityScale(Constants.RUNNER_GRAVITY_SCALE);
+//        mStage.getRunner().getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
+        mStage.getRunner().setCustomFilter();
     }
 }

@@ -19,6 +19,10 @@ public class PreferencesConstants {
 
     public static final String SET_LANGUAGE = "language";
 
+    public static final String STATS_LAST_DATE = "last_date";
+    public static final String STATS_TREASURES = "treasures";
+    public static final String STATS_TREASURES_TOTAL = "treasures_total";
+
     public static final String STATS_HIGHSCORE_KEY = "high_score";
     public static final String STATS_BEST_TIME_KEY = "best_time"; //new
     public static final String STATS_TOTALTIME_KEY = "total_time";
@@ -55,15 +59,12 @@ public class PreferencesConstants {
     public static final String ACHIEVE_WOS_KEY = "STATS_WHEEL_OF_SUMSARA_ACH";
     public static final String ACHIEVE_RUTHLESS_KEY = "STATS_RUTHLESS_ACH";
 
-//    public static final String [] ALL_ACHIEVE_KEYS =
-//            {ACHIEVE_MUSHROOM_KEY, ACHIEVE_HIB_KEY, ACHIEVE_NKF_KEY, ACHIEVE_AKF_KEY,
-//                    ACHIEVE_MKF_KEY, ACHIEVE_NT_KEY, ACHIEVE_AT_KEY, ACHIEVE_MT_KEY,
-//                    ACHIEVE_MORTAL_KEY, ACHIEVE_BIF_KEY, ACHIEVE_WOS_KEY};
-
     public static final String GENERAL_DANGER_KEY = "KEY_BY_DANGER_";
 
     public static final String STATS_CRASHED_DEATH_KEY = "crashed_death";
     public static final String STATS_BEHIND_DEATH_KEY = "behind_death";
 
+    public static final String ITEM_ARMOUR = "item_armour";
+    public static final String ITEM_WEAPON = "item_weapon";
 
 }

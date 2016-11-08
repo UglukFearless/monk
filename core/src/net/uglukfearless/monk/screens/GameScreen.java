@@ -15,7 +15,9 @@ import net.uglukfearless.monk.enums.GameState;
 import net.uglukfearless.monk.enums.ObstacleType;
 import net.uglukfearless.monk.stages.GameGuiStage;
 import net.uglukfearless.monk.stages.GameStage;
+import net.uglukfearless.monk.stages.ShopStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.file.SoundSystem;
 import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
@@ -27,25 +29,30 @@ import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
  */
 public class GameScreen implements Screen {
 
-    private LevelModel mLevelModel;
-    private GameStage mGameStage;
-    private float mYViewportHeight;
     private Game mGame;
+    private LevelModel mLevelModel;
+    private float mYViewportHeight;
+    private GameStage mGameStage;
     private GameGuiStage mGuiStage;
+    private ShopStage mShopStage;
 
     InputMultiplexer mMultiplexer;
 
     public GameScreen(Game game, LevelModel levelModel) {
-        AssetLoader.initGame();
 
-//        FileHandle fileLevel = Gdx.files.internal("levels/level1.json");
-//        FileHandle fileLevel = Gdx.files.external("level1.json");
-//        Json jsonInLevel = new Json();
-//        mLevelModel = jsonInLevel.fromJson(LevelModel.class, fileLevel);
+        mGame = game;
+
+        AssetLoader.initGame();
 
         mLevelModel = levelModel;
 
+        initGame();
+    }
+
+    private void initGame() {
+
         mLevelModel.init();
+        AssetLoader.loadMonkAnimations(PreferencesManager.getArmour());
 
 
         for (int i=0;i<10;i++) {
@@ -68,7 +75,6 @@ public class GameScreen implements Screen {
         ScoreCounter.resetStats();
 
         mGameStage = new GameStage(this, mYViewportHeight, mLevelModel);
-        mGame = game;
         mGuiStage = new GameGuiStage(this, mGameStage, mYViewportHeight);
 
         mGameStage.setGuiStage(mGuiStage);
@@ -94,14 +100,24 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        mGameStage.getViewport().apply();
+//        mGameStage.getViewport().apply();
         mGameStage.draw();
         mGameStage.act(delta);
 
-        mGuiStage.getViewport().apply();
+//        mGuiStage.getViewport().apply();
         mGuiStage.draw();
         mGuiStage.act(delta);
 
+        if (mShopStage!=null) {
+            mShopStage.draw();
+            mShopStage.act(delta);
+        }
+
+    }
+
+    public void returnGame() {
+        mShopStage.dispose();
+        initGame();
     }
 
     public void newGame() {
@@ -109,11 +125,6 @@ public class GameScreen implements Screen {
         mMultiplexer.removeProcessor(mGameStage);
         mGameStage.dispose();
 
-//        FileHandle fileLevel = Gdx.files.external("level1.json");
-//        FileHandle fileLevel = Gdx.files.internal("levels/level1.json");
-//        Json jsonInLevel = new Json();
-//        mLevelModel = jsonInLevel.fromJson(LevelModel.class, fileLevel);
-//        mLevelModel.init();
         mLevelModel.getDifficultyHandler().applyStep(0);
 
         mGameStage = new GameStage(this, mYViewportHeight, mLevelModel);
@@ -149,9 +160,9 @@ public class GameScreen implements Screen {
         AssetLoader.levelMusic.stop();
         SoundSystem.removeMusic(AssetLoader.levelMusic);
         AssetLoader.disposeGame();
-        if (( mGameStage).getState()== GameState.RUN) {
+        if (mGameStage.getState()== GameState.RUN) {
             mGameStage.saveTimePoint();
-            ScoreCounter.saveCalcStats();
+            ScoreCounter.saveCalcStats(mGameStage.getLevelModel().getLEVEL_NAME());
 
             for (Achievement achievement: ScoreCounter.getAchieveList()) {
                 achievement.checkAchieve();
@@ -165,5 +176,14 @@ public class GameScreen implements Screen {
     public void setMenu() {
         this.dispose();
         mGame.setScreen(new MainMenuScreen(mGame));
+    }
+
+    public void setShop() {
+        mMultiplexer.removeProcessor(mGameStage);
+        mMultiplexer.removeProcessor(mGuiStage);
+        mGameStage.dispose();
+        mGuiStage.dispose();
+        mShopStage = new ShopStage(this, mYViewportHeight);
+        mMultiplexer.addProcessor(mShopStage);
     }
 }

@@ -18,8 +18,8 @@ public class RevivalBonus extends GameBonus {
         mRegion = AssetLoader.bonusesAtlas.findRegion("revival");
         mName = AssetLoader.sBundle.get("PLAY_BONUS_REVIVAL");
         mActiveTitle = AssetLoader.sBundle.format("PLAY_BONUS_ACTIVE_TITLE", mName);
-        mWorkingTime = 1.5f;
-
+        mWorkingTime = 0.3f;
+        mQuantum = true;
 
 
         if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_WOS_KEY)) {

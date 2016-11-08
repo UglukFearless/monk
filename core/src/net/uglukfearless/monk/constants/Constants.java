@@ -20,8 +20,8 @@ public class Constants {
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
     public static Vector2 WORLD_STATIC_VELOCITY_INIT = new Vector2(-15f,0);
     public static final Vector2 NULL_VELOCITY = new Vector2(0, 0);
-    public static final float BACKGROUND_VELOCITY_COF = 0.67f;
-    public static final float BACKGROUND_VELOCITY_COF_2 = 0.77f;
+    public static final float BACKGROUND_VELOCITY_COF = 0.30f;
+    public static final float BACKGROUND_VELOCITY_COF_2 = 0.45f;
 
     public static final float BACKGROUND_WIDTH = 50;
     public static final float BACKGROUND_HEIGHT = 13;
@@ -54,7 +54,8 @@ public class Constants {
     public static final float LAYOUT_Y_STEP = 4;
     public static final float LAYOUT_Y_ONE = GROUND_Y + GROUND_HEIGHT/2;
     public static final float LAYOUT_Y_TWO = LAYOUT_Y_ONE + LAYOUT_Y_STEP;
-    public static float STEP_OF_DANGERS = (GROUND_WIDTH_INIT - GROUND_PIT_INIT)/2f;
+    public static final float DANGERS_START_OFFSET = 12;
+    public static float STEP_OF_DANGERS = (GROUND_WIDTH_INIT - DANGERS_START_OFFSET)/2f;
 
     public static final float RUNNER_X = 4;
     public static final float RUNNER_Y = GROUND_Y + GROUND_HEIGHT/2; // - 1f;
@@ -97,6 +98,13 @@ public class Constants {
     public static final String RUNNER_HIT_REGION_NAME = "monk_hit";
     public static final String RUNNER_JUMPING_REGION_NAME = "monk_jump";
     public static final String RUNNER_STRIKING_REGION_NAME = "monk_kick";
+
+    public static final String [] RUNNER_ANIMATION_GROUP_NAMES = new String[]
+            {"stay", "run", "jump", "hit"};
+
+    public static final String [] RUNNER_ANIMATION_STRIKE_NAMES = new String[]
+            {"strike", "jump_strike"};
+    public static final String FRAME_STRING = "_frame";
 
 
     public static final String [] ENEMY_ANIMATION_GROUP_NAMES = new String[]
@@ -142,5 +150,6 @@ public class Constants {
         COLUMNS_QUANTITY_INIT = levelConstants.COLUMNS_QUANTITY_INIT;
 
         STEP_OF_DANGERS = (GROUND_WIDTH_INIT - GROUND_PIT_INIT)/2f;
+        STEP_OF_DANGERS = (GROUND_WIDTH_INIT - DANGERS_START_OFFSET)/2f;
     }
 }

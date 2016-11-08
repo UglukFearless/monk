@@ -24,6 +24,7 @@ public abstract class GameBonus extends Actor implements Movable {
 
     protected String mName;
     protected GameStage mStage;
+    protected boolean mQuantum;
     protected float mSpeed = Constants.WORLD_STATIC_VELOCITY_INIT.x;
 
     private boolean mTouched;
@@ -52,6 +53,7 @@ public abstract class GameBonus extends Actor implements Movable {
         mTouched = false;
         mAddsActions = false;
         mActive = false;
+        mQuantum = false;
         mActiveTime = 0;
         mTimingBalance = 3;
 
@@ -86,7 +88,6 @@ public abstract class GameBonus extends Actor implements Movable {
 
             } else if (!mAddsActions){
                 activation();
-//                mGuiStage.setLabel(mName + mActiveTitle, 2f);
                 mGuiStage.setLabel(mActiveTitle, 2f);
                 AssetLoader.getBonusSound.play(SoundSystem.getSoundValue());
                 this.addAction(Actions.sequence(Actions.sizeBy(1.15f, 1.15f, 0.08f)
@@ -94,12 +95,16 @@ public abstract class GameBonus extends Actor implements Movable {
                 this.addAction(Actions.moveTo(3f, mGameHeight - getHeight(), 0.2f));
                 mAddsActions = true;
                 mActiveTime = 0;
-                mGuiStage.enableBonusTimer();
+                if (!mQuantum) {
+                    mGuiStage.enableBonusTimer();
+                }
                 mGuiStage.setBonusTimer(getX(), getY(), (int) (mWorkingTime - mActiveTime));
             } else {
                 mActiveTime += delta;
                 float timeBalance = (mWorkingTime - mActiveTime);
-                mGuiStage.setBonusTimer(getX(), getY(), (int) timeBalance);
+                if (!mQuantum) {
+                    mGuiStage.setBonusTimer(getX(), getY(), (int) timeBalance);
+                }
 
                 if (timeBalance<mTimingBalance) {
                     this.setVisible(!this.isVisible());
@@ -107,7 +112,9 @@ public abstract class GameBonus extends Actor implements Movable {
                 }
 
                 if (mActiveTime>mWorkingTime) {
-                    AssetLoader.balanceBonusSound.play(SoundSystem.getSoundValue());
+                    if (!mQuantum) {
+                        AssetLoader.balanceBonusSound.play(SoundSystem.getSoundValue());
+                    }
                     deactivation();
                     disabling();
                 }
@@ -121,7 +128,9 @@ public abstract class GameBonus extends Actor implements Movable {
     }
 
     public void disabling() {
-        mGuiStage.disableBonusTimer();
+        if (!mQuantum) {
+            mGuiStage.disableBonusTimer();
+        }
         setVisible(false);
         mTouched = false;
         mAddsActions = false;

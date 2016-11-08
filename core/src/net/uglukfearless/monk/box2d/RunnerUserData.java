@@ -17,15 +17,6 @@ public class RunnerUserData extends UserData {
 
     private RunnerState mState;
 
-    public RunnerUserData() {
-        super();
-        jumpingLinearImpulse = Constants.RUNNER_JUMPING_LINEAR_IMPULSE;
-        jumpingLinearImpulseOne = Constants.RUNNER_JUMPING_LINEAR_IMPULSE_ONE;
-        userDataType = UserDataType.RUNNER;
-
-        mState = RunnerState.STAY;
-    }
-
     public RunnerUserData(float width, float height) {
         super(width, height);
         jumpingLinearImpulse = Constants.RUNNER_JUMPING_LINEAR_IMPULSE;

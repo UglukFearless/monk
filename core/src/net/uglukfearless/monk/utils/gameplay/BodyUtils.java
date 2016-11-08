@@ -108,4 +108,9 @@ public class BodyUtils {
         return userData != null && userData.getUserDataType() == UserDataType.BUDDHA;
     }
 
+    public static boolean bodyIsArmour(Body body) {
+        UserData userData = (UserData) body.getUserData();
+        return userData != null && userData.getUserDataType() == UserDataType.ARMOUR;
+    }
+
 }

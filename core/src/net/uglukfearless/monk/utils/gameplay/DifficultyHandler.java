@@ -92,4 +92,9 @@ public class DifficultyHandler {
             currentStep++;
         }
     }
+
+    public void reset() {
+        mRuntime = mStepTime + 1;
+        applyStep(0);
+    }
 }

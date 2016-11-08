@@ -157,6 +157,8 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
             body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_SIMPLE);
         } else if (!getUserData().isTrap()&&getUserData().isArmour()) {
             body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_ARMOUR);
+        } else if (getUserData().isTrap()) {
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_OBSTACLE_TRAP);
         }
         body.setTransform(-10, -10, 0);
         ((UserData)body.getUserData()).setLaunched(false);

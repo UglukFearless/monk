@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
 import net.uglukfearless.monk.actors.gameplay.Enemy;
+import net.uglukfearless.monk.box2d.ArmourUserData;
 import net.uglukfearless.monk.box2d.EnemyUserData;
 import net.uglukfearless.monk.box2d.ObstacleUserData;
 import net.uglukfearless.monk.box2d.RunnerStrikeUserData;
@@ -106,11 +107,11 @@ public class GameContactListener implements ContactListener {
 
         } else if(BodyUtils.bodyIsShell(a)){
             //обработка столкновения снаряда с другими телами
-            shellContact(a, b);
+            shellContact(a, b, contact);
 
         } else if(BodyUtils.bodyIsShell(b)) {
 
-            shellContact(b,a);
+            shellContact(b,a, contact);
 
         } else if (BodyUtils.bodyIsObstacle(a)&&BodyUtils.bodyIsRunner(b)) {
             //Обработка столкновений монаха со статическим препятствием
@@ -179,6 +180,8 @@ public class GameContactListener implements ContactListener {
             //Обработка столкновения противника с препятствиями
             if (((ObstacleUserData)b.getUserData()).isTrap()) {
                 ((EnemyUserData)a.getUserData()).setDead(true);
+                ScoreCounter.increaseScore(1);
+                ScoreCounter.increaseKilled();
                 a.setFixedRotation(false);
                 ((ObstacleUserData) b.getUserData()).hitExecution(a, true);
 
@@ -198,6 +201,8 @@ public class GameContactListener implements ContactListener {
         } else if (BodyUtils.bodyIsObstacle(a)&&BodyUtils.bodyIsEnemy(b)) {
             if (((ObstacleUserData)a.getUserData()).isTrap()) {
                 ((EnemyUserData)b.getUserData()).setDead(true);
+                ScoreCounter.increaseScore(1);
+                ScoreCounter.increaseKilled();
                 b.setFixedRotation(false);
                 ((ObstacleUserData) a.getUserData()).hitExecution(b, true);
 
@@ -245,6 +250,10 @@ public class GameContactListener implements ContactListener {
                 ScoreCounter.increaseDestroyed();
                 ((ObstacleUserData)a.getUserData()).setDead(true);
             }
+        } else if (BodyUtils.bodyIsArmour(a)){
+            armourContact(a,b, contact);
+        } else if (BodyUtils.bodyIsArmour(b)){
+            armourContact(b,a, contact);
         } else if (BodyUtils.bodyIsRunnerStrike(a)) {
             if (((RunnerStrikeUserData)a.getUserData()).isShell()) {
                 ((RunnerStrikeUserData)a.getUserData()).setDead(true);
@@ -261,6 +270,52 @@ public class GameContactListener implements ContactListener {
             buddhaContact(b);
         } else if (BodyUtils.bodyIsBuddha(b)) {
             buddhaContact(a);
+        }
+    }
+
+    private void armourContact(Body armour, Body another, Contact contact) {
+        switch (((UserData)another.getUserData()).getUserDataType()) {
+            case GROUND:
+            case COLUMNS:
+                break;
+            case OBSTACLE:
+                if (((armour.getPosition().y - ((UserData)armour.getUserData()).getHeight()/2f)
+                        >(another.getPosition().y + ((UserData)another.getUserData()).getHeight()/2f) - 0.4f)
+                        &&!((ObstacleUserData)another.getUserData()).isTrap()) {
+                    stage.getRunner().landed();
+                    stage.getRunner().getBody().setLinearVelocity(0,6f);
+                } else {
+                    if (!((ObstacleUserData)another.getUserData()).isDead()&&!((ArmourUserData)armour.getUserData()).isHit()) {
+                        ScoreCounter.increaseScore(1);
+                        ScoreCounter.increaseDestroyed();
+                        ((ObstacleUserData)another.getUserData()).setDead(true);
+                        another.setLinearVelocity(another.getLinearVelocity().add(mRandom.nextInt(10) + 20
+                                , mRandom.nextInt(10)));
+                    }
+                    if (!((ArmourUserData)armour.getUserData()).isHit()) {
+                        ((ArmourUserData)armour.getUserData()).setHit(true);
+                    }
+                }
+
+                break;
+            case ENEMY:
+                if (!((ArmourUserData)armour.getUserData()).isHit()) {
+                    ((ArmourUserData)armour.getUserData()).setHit(true);
+                }
+                break;
+            case SHELL:
+                if (!((ArmourUserData)armour.getUserData()).isHit()) {
+                    another.setGravityScale(1);
+                    if (stage.getRunner().isStrongBeat()) {
+                        stage.getRunner().beatBody(another, contact);
+                    }
+                    another.setAngularVelocity(-1f*another.getAngularVelocity());
+                    another.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_STRIKE_FLIP);
+                }
+                if (!((ArmourUserData)armour.getUserData()).isHit()) {
+                    ((ArmourUserData)armour.getUserData()).setHit(true);
+                }
+                break;
         }
     }
 
@@ -293,7 +348,7 @@ public class GameContactListener implements ContactListener {
         }
     }
 
-    private void shellContact(Body shell, Body another) {
+    private void shellContact(Body shell, Body another, Contact contact) {
 
         switch (((UserData)another.getUserData()).getUserDataType()) {
             case GROUND:
@@ -320,6 +375,9 @@ public class GameContactListener implements ContactListener {
                 break;
             case RUNNER_STRIKE:
                 shell.setGravityScale(1);
+                if (stage.getRunner().isStrongBeat()) {
+                    stage.getRunner().beatBody(shell, contact);
+                }
                 shell.setAngularVelocity(-1f*shell.getAngularVelocity());
                 shell.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_STRIKE_FLIP);
                 break;

@@ -1,40 +1,82 @@
 
 monk.png
-format: RGBA4444
+format: RGBA8888
 filter: Linear,Linear
 repeat: none
-monk_kick
+hit1
   rotate: false
-  xy: 1, 410
-  size: 511, 407
-  orig: 511, 407
+  xy: 1, 167
+  size: 100, 81
+  orig: 100, 81
   offset: 0, 0
   index: -1
-monk_hit
+jump1
+  rotate: false
+  xy: 1, 84
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+run1
+  rotate: false
+  xy: 103, 167
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+run2
   rotate: false
   xy: 1, 1
-  size: 283, 407
-  orig: 283, 407
+  size: 100, 81
+  orig: 100, 81
   offset: 0, 0
   index: -1
-monk_jump
+stay1
   rotate: false
-  xy: 514, 410
-  size: 283, 407
-  orig: 283, 407
+  xy: 103, 84
+  size: 100, 81
+  orig: 100, 81
   offset: 0, 0
   index: -1
-monk_run1
+strike1_frame1
   rotate: false
-  xy: 286, 1
-  size: 283, 407
-  orig: 283, 407
+  xy: 205, 167
+  size: 100, 81
+  orig: 100, 81
   offset: 0, 0
   index: -1
-monk_run2
+strike4_frame1
   rotate: false
-  xy: 571, 1
-  size: 283, 407
-  orig: 283, 407
+  xy: 103, 1
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+strike2_frame1
+  rotate: false
+  xy: 205, 84
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+strike5_frame1
+  rotate: false
+  xy: 307, 167
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+strike3_frame1
+  rotate: false
+  xy: 205, 1
+  size: 100, 81
+  orig: 100, 81
+  offset: 0, 0
+  index: -1
+strike6_frame1
+  rotate: false
+  xy: 307, 84
+  size: 100, 81
+  orig: 100, 81
   offset: 0, 0
   index: -1

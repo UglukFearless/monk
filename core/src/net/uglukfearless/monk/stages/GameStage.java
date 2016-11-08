@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import net.uglukfearless.monk.actors.gameplay.Armour;
 import net.uglukfearless.monk.actors.gameplay.Background;
 import net.uglukfearless.monk.actors.gameplay.BuddhasBody;
 import net.uglukfearless.monk.actors.gameplay.Columns;
@@ -38,6 +39,7 @@ import net.uglukfearless.monk.actors.gameplay.bonuses.RevivalAvatar;
 import net.uglukfearless.monk.actors.gameplay.bonuses.RevivalBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.StrongBeatBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.ThunderFistBonus;
+import net.uglukfearless.monk.actors.gameplay.bonuses.Treasures;
 import net.uglukfearless.monk.actors.gameplay.bonuses.WingsBonus;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.FilterConstants;
@@ -82,7 +84,8 @@ public class GameStage extends Stage {
     private GameGuiStage mGameGuiStage;
 
     private World world;
-    private Background background;
+    private Background background1;
+    private Background background2;
     private Ground ground1;
     private Ground ground2;
     private Runner runner;
@@ -141,6 +144,11 @@ public class GameStage extends Stage {
     private Color transitionColor;
 
     private Shake mShake;
+    private boolean mAddedTreasures;
+    private String mLastKillerKey;
+    private float mWaitThreshold;
+
+    private Armour mArmour;
 
     public GameStage(GameScreen screen, float yViewportHeight, LevelModel levelModel) {
 
@@ -165,7 +173,7 @@ public class GameStage extends Stage {
 
         runTime = 0;
 
-        Gdx.input.setCatchBackKey(false);
+        Gdx.input.setCatchBackKey(true);
         Gdx.input.setCatchMenuKey(true);
 
         alpha = new Value();
@@ -173,6 +181,8 @@ public class GameStage extends Stage {
         prepareTransition(255,255,255,.3f);
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setProjectionMatrix(getCamera().combined);
+
+        mWaitThreshold = 50;
     }
 
     private void setupTouchControlAreas() {
@@ -197,6 +207,7 @@ public class GameStage extends Stage {
         setUpPits();
         setUpRunner();
         setUpRunnerStrike();
+        setUpArmour();
         setUpBuddhaBody();
         setUpBonuses();
         setUpDangersHandler();
@@ -205,28 +216,21 @@ public class GameStage extends Stage {
 
     }
 
+    private void setUpArmour() {
+
+        if (PreferencesManager.getArmour()!=null) {
+            mArmour = new Armour(WorldUtils.createArmour(world), runner);
+            addActor(mArmour);
+        }
+    }
+
     private void setUpShake() {
         mShake = new Shake();
     }
 
     private void setUpLevel(LevelModel levelModel) {
-
-
-
-//        FileHandle file = Gdx.files.external("level1.json");
-
-//        mLevelModel2_EXP = new LevelModel();
-//        Json jsonOut = new Json();
-//        file.writeString(jsonOut.prettyPrint(mLevelModel2_EXP), false);
-//
-//        Json jsonIn = new Json();
-//        mLevelModel = jsonIn.fromJson(LevelModel.class, file);
         mLevelModel = levelModel;
-//        System.out.println(jsonIn.prettyPrint(mLevelModel));
-
         mLevelModel.setStage(this);
-
-
     }
 
     private void setUpBuddhaBody() {
@@ -252,6 +256,7 @@ public class GameStage extends Stage {
         mBonuses.add(new ThunderFistBonus(this, VIEWPORT_HEIGHT));
         mBonuses.add(new RevivalBonus(this, VIEWPORT_HEIGHT));
         mBonuses.add(new BuddhaBonus(this, VIEWPORT_HEIGHT));
+//        mBonuses.add(new Treasures(this,  VIEWPORT_HEIGHT));
 
 
         for (GameBonus gameBonus : mBonuses) {
@@ -268,9 +273,10 @@ public class GameStage extends Stage {
         if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_REBORN_KEY)) {
             mLimitRevival+=2;
         }
-        if (PreferencesManager.getTime()/3600>PreferencesManager.getReceivedTimeBonuses()) {
+        if (PreferencesManager.getTime()/(60*60)>PreferencesManager.getReceivedTimeBonuses()) {
             addStartRevival();
             PreferencesManager.increaseReceivedTimeBonuses();
+            mGameGuiStage.showHourBonus();
         }
 
         if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_WOS_KEY)) {
@@ -339,9 +345,13 @@ public class GameStage extends Stage {
     }
 
     private void setUpBackground() {
-        background = new Background(world, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, Constants.BACKGROUND_VELOCITY_COF);
-        addActor(background);
-        addMovable(background);
+        background1 = new Background(world, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, Constants.BACKGROUND_VELOCITY_COF, true);
+        addActor(background1);
+        addMovable(background1);
+
+        background2 = new Background(world, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, Constants.BACKGROUND_VELOCITY_COF_2, false);
+        addActor(background2);
+        addMovable(background2);
     }
 
     private void setUpRunner() {
@@ -386,16 +396,9 @@ public class GameStage extends Stage {
             timeMid = (timeMid + time)/2f;
         }
 
-        if (mState!=PAUSE&&time>6) {
+        if (mState!=PAUSE&&mState!=WAIT&&time>6) {
 
             super.act(delta);
-
-//            bodies.clear();
-//            world.getBodies(bodies);
-//
-//            for (Body body:bodies) {
-//                update(body);
-//            }
 
             UserData data = (UserData) runner.getBody().getUserData();
             if(data!=null &&  data.isDestroy()){
@@ -408,7 +411,8 @@ public class GameStage extends Stage {
                     &&((Math.abs(ground1.getPosition().x)<0.5f)
                     ||(Math.abs(ground2.getPosition().x)<0.5f))) {
                 runner = new Runner(WorldUtils.createRunner(world));
-                runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_GHOST);
+//                runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_GHOST);
+                runner.setRevivalFilter();
                 runner.setAlpha(0.3f);
                 runner.setGrounds(ground1, ground2);
                 mRunnerStrike.setRunner(runner);
@@ -422,8 +426,12 @@ public class GameStage extends Stage {
                 mReturnTimer +=delta;
                 if (mReturnTimer>3&&runner.getBody()!=null&&!runner.getUserData().isDead()) {
                     if (!runner.isBuddha()&&!runner.isGhost()) {
-                        runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
+//                        runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
+                        runner.setCustomFilter();
                     }
+//                    else if (runner.isWings()) {
+//                        runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS);
+//                    }
                     runner.setAlpha(1f);
                     mReturnTimer=0;
                     mReturnFilter = false;
@@ -436,6 +444,12 @@ public class GameStage extends Stage {
                 accumulator -= TIME_STEP;
             }
 
+            if (getRunTime()>30&&!mAddedTreasures) {
+                Treasures treasures = new Treasures(this, VIEWPORT_HEIGHT);
+                treasures.setGui(mGameGuiStage);
+                mBonuses.add(treasures);
+                mAddedTreasures = true;
+            }
 
             SpaceTable.leaf();
 
@@ -499,13 +513,17 @@ public class GameStage extends Stage {
             effect.draw(getBatch());
         }
         getBatch().end();
-//            renderer.render(world, camera.combined);
+//        renderer.render(world, camera.combined);
 //            System.out.println("render Calls - " + ((SpriteBatch) getBatch()).renderCalls);
 //        }
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+
+        if (mState==RUN) {
+            mGameGuiStage.startResizeAction(screenX);
+        }
 
         translateScreenToWorldCoordinates(screenX, screenY);
 
@@ -526,17 +544,17 @@ public class GameStage extends Stage {
 
         }
 
-
         return super.touchDown(screenX, screenY, pointer, button);
 
     }
 
     private void start() {
-        mState= RUN;
+        mState = RUN;
         runner.start();
         ground1.setVelocity(Constants.GROUND_LINEAR_VELOCITY);
         ground2.setVelocity(Constants.GROUND_LINEAR_VELOCITY);
-        background.setSpeed(Constants.WORLD_STATIC_VELOCITY_INIT.x * background.getSpeedCof());
+        background1.setSpeed(Constants.WORLD_STATIC_VELOCITY_INIT.x * background1.getSpeedCof());
+        background2.setSpeed(Constants.WORLD_STATIC_VELOCITY_INIT.x * background2.getSpeedCof());
     }
 
     private void translateScreenToWorldCoordinates(int screenX, int screenY) {
@@ -571,20 +589,22 @@ public class GameStage extends Stage {
     public boolean keyDown(int keyCode) {
 
         if (keyCode==Input.Keys.ESCAPE||keyCode==Input.Keys.BACK||keyCode==Input.Keys.MENU) {
-            if (mRevival==0&&runner.getUserData().isDead()) {
-                PreferencesManager.addDeath();
-                gameOver(runner.getCurrentKillerKey());
+
+            if (mState==RUN) {
+                mState = PAUSE;
+            } else if (mState==WAIT) {
+                realGameOver(mLastKillerKey);
+                screen.setMenu();
+            } else {
+                if (mRevival==0&&runner.getUserData().isDead()) {
+                    PreferencesManager.addDeath();
+                    gameOver(runner.getCurrentKillerKey());
+                }
+
+                screen.setMenu();
             }
 
-            screen.setMenu();
-            mState = PAUSE;
         }
-//        else if (mState == GAME_OVER&&keyCode!=Input.Keys.BACK) {
-//            System.out.println("***********************************");
-//            System.out.println(timeMid);
-//            System.out.println("***********************************");
-//            screen.newGame();
-//        }
         else if (mState == START&&keyCode!=Input.Keys.BACK&&keyCode!=Input.Keys.MENU
                 &&keyCode!=Input.Keys.VOLUME_UP&&keyCode!=Input.Keys.VOLUME_DOWN) {
 
@@ -603,6 +623,7 @@ public class GameStage extends Stage {
             System.out.println("***********************************");
             System.out.println(timeMid);
             System.out.println("***********************************");
+            mLevelModel.getDifficultyHandler().reset();
             screen.newGame();
         }  else if (keyCode==Input.Keys.SHIFT_LEFT||keyCode==Input.Keys.ENTER) {
             runner.strike();
@@ -624,19 +645,15 @@ public class GameStage extends Stage {
 
     public void gameOver(String currentKillerKey) {
         if (mRevival<1) {
-            saveTimePoint();
-            ScoreCounter.death();
-            ScoreCounter.checkScore();
-            ScoreCounter.saveCalcStats(currentKillerKey);
-
-            for (Achievement achievement: ScoreCounter.getAchieveList()) {
-                achievement.checkAchieve();
+            //todo: сделать проверку наличия интернета и количества монет
+            if (PreferencesManager.getTreasures()>=1&&runTime> mWaitThreshold) {
+                mState = WAIT;
+                mLastKillerKey = currentKillerKey;
+                mWaitThreshold = runTime + 50;
+            } else {
+                realGameOver(currentKillerKey);
             }
 
-            mState = GAME_OVER;
-            mRevivalAvatar.setVisible(false);
-            mGameGuiStage.disableRevivalLabel();
-            mGameGuiStage.setRevivalLabel(mRevivalAvatar.getX(), mRevivalAvatar.getY(), mRevival);
         } else {
             mRevival--;
             mRevivalRunner = true;
@@ -647,6 +664,27 @@ public class GameStage extends Stage {
             mGameGuiStage.setRevivalLabel(mRevivalAvatar.getX(), mRevivalAvatar.getY(), mRevival);
         }
 
+    }
+
+    public void realGameOver() {
+        realGameOver(mLastKillerKey);
+    }
+
+    public void realGameOver(String currentKillerKey) {
+
+        PreferencesManager.addDeath();
+        saveTimePoint();
+        ScoreCounter.checkScore();
+        ScoreCounter.saveCalcStats(currentKillerKey, mLevelModel.getLEVEL_NAME());
+
+        for (Achievement achievement: ScoreCounter.getAchieveList()) {
+            achievement.checkAchieve();
+        }
+
+        mState = GAME_OVER;
+        mRevivalAvatar.setVisible(false);
+        mGameGuiStage.disableRevivalLabel();
+        mGameGuiStage.setRevivalLabel(mRevivalAvatar.getX(), mRevivalAvatar.getY(), mRevival);
     }
 
     public GameState getState() {
@@ -755,7 +793,7 @@ public class GameStage extends Stage {
     }
 
     public void changingSpeedHandler(float speedScale) {
-        if (runner.isBuddha()&&!runner.isUseBuddhaTreshhold()) {
+        if (runner.isBuddha()&&!runner.isUseBuddhaThreshold()) {
             speedScale*=2f;
         }
         changingSpeed(speedScale);
@@ -806,8 +844,8 @@ public class GameStage extends Stage {
     }
 
     public void StartRebutRunner() {
-        runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_GHOST);
-        runner.setAlpha(0.3f);
+//        runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS_GHOST);
+        runner.setRevivalFilter();
         mReturnTimer = 0;
         mReturnFilter = true;
     }
@@ -842,5 +880,17 @@ public class GameStage extends Stage {
 
     public void screenShake(float power, float duration) {
         mShake.shake(power, duration);
+    }
+
+    public LevelModel getLevelModel() {
+        return mLevelModel;
+    }
+
+    public void setRevivalRunner(boolean revivalRunner) {
+        mRevivalRunner = revivalRunner;
+    }
+
+    public void setState(GameState state) {
+        mState = state;
     }
 }

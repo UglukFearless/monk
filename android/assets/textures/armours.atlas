@@ -1,0 +1,26 @@
+
+armours.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+armour1
+  rotate: false
+  xy: 1, 1
+  size: 39, 52
+  orig: 39, 52
+  offset: 0, 0
+  index: -1
+armour2
+  rotate: false
+  xy: 42, 1
+  size: 39, 52
+  orig: 39, 52
+  offset: 0, 0
+  index: -1
+armour3
+  rotate: false
+  xy: 83, 1
+  size: 39, 52
+  orig: 39, 52
+  offset: 0, 0
+  index: -1
