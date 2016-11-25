@@ -72,6 +72,7 @@ public class GameGuiStage extends Stage {
     private float mYGameHeight;
 
     private Label mRevivalLabel;
+    private Label mWingsLabel;
     private int mCurrentHighScoreValue;
 
     private Table mMainTableAchieve, mTableAchieve;
@@ -393,6 +394,10 @@ public class GameGuiStage extends Stage {
         mRevivalLabel.setVisible(false);
         addActor(mRevivalLabel);
 
+        mWingsLabel = new Label("0", AssetLoader.sGuiSkin, "normal_red");
+        mWingsLabel.setVisible(false);
+        addActor(mWingsLabel);
+
         mCurrentScore = new Label(String.valueOf(ScoreCounter.getScore()), AssetLoader.sGuiSkin);
         mCurrentScore.setPosition(0, VIEWPORT_HEIGHT - mCurrentScore.getHeight());
         mGuiGroup.addActor(mCurrentScore);
@@ -676,6 +681,20 @@ public class GameGuiStage extends Stage {
 
     public void disableRevivalLabel() {
         mRevivalLabel.setVisible(false);
+    }
+
+    public void enableWingsLabel() {
+        mWingsLabel.setVisible(true);
+    }
+
+    public void setWingsLabel(float x, float y,int wingsValue) {
+        mWingsLabel.setText(String.valueOf(wingsValue));
+        mWingsLabel.setPosition(x * (float) (Gdx.graphics.getWidth() / Constants.GAME_WIDTH),
+                y * (float) (Gdx.graphics.getHeight() / mYGameHeight));
+    }
+
+    public void disableWingsLabel() {
+        mWingsLabel.setVisible(false);
     }
 
     public void showHourBonus() {

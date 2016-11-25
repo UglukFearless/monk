@@ -112,7 +112,7 @@ mEnemiesModels:
     number:1
 		},
 		{
-		name:AXEMEN
+	name:AXEMEN
     enName:Axemen
     ruName:Воин с топором
 

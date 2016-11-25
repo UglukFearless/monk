@@ -10,6 +10,8 @@ public class Situation {
     public boolean shoot = false;
     public boolean strike = false;
     public boolean jump = false;
+    public boolean start = false;
+    public boolean startFly = false;
 
     public void reset() {
         stop = false;
@@ -17,5 +19,7 @@ public class Situation {
         shoot = false;
         strike = false;
         jump = false;
+        start = false;
+        startFly = false;
     }
 }

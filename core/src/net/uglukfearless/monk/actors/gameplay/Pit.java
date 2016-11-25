@@ -35,6 +35,7 @@ public class Pit extends GameActor implements Movable {
         }
 
         SpaceTable.setPit(body.getPosition().x + userData.getWidth()/2, getUserData().isColumns());
+        SpaceTable.setPit(body.getPosition().x - userData.getWidth()/2, getUserData().isColumns());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package net.uglukfearless.monk.actors.gameplay.bonuses;
 
+import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
@@ -15,7 +16,7 @@ public class RevivalBonus extends GameBonus {
     public RevivalBonus(GameStage gameStage, float gameHeight) {
         super(gameStage, gameHeight);
 
-        mRegion = AssetLoader.bonusesAtlas.findRegion("revival");
+        mRegion = AssetLoader.bonusesAtlas.findRegion(Constants.BONUS_REVIVAL_REGION);
         mName = AssetLoader.sBundle.get("PLAY_BONUS_REVIVAL");
         mActiveTitle = AssetLoader.sBundle.format("PLAY_BONUS_ACTIVE_TITLE", mName);
         mWorkingTime = 0.3f;

@@ -15,6 +15,7 @@ import net.uglukfearless.monk.box2d.RunnerUserData;
 import net.uglukfearless.monk.box2d.ShellUserData;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.stages.GameStage;
+import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.gameplay.BodyUtils;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
@@ -294,6 +295,10 @@ public class GameContactListener implements ContactListener {
                     }
                     if (!((ArmourUserData)armour.getUserData()).isHit()) {
                         ((ArmourUserData)armour.getUserData()).setHit(true);
+
+                        AssetLoader.sHitParticle.setPosition(armour.getPosition().x, armour.getPosition().y);
+                        AssetLoader.sHitParticle.start();
+
                     }
                 }
 
@@ -301,6 +306,9 @@ public class GameContactListener implements ContactListener {
             case ENEMY:
                 if (!((ArmourUserData)armour.getUserData()).isHit()) {
                     ((ArmourUserData)armour.getUserData()).setHit(true);
+
+                    AssetLoader.sHitParticle.setPosition(armour.getPosition().x, armour.getPosition().y);
+                    AssetLoader.sHitParticle.start();
                 }
                 break;
             case SHELL:
@@ -314,6 +322,9 @@ public class GameContactListener implements ContactListener {
                 }
                 if (!((ArmourUserData)armour.getUserData()).isHit()) {
                     ((ArmourUserData)armour.getUserData()).setHit(true);
+
+                    AssetLoader.sHitParticle.setPosition(armour.getPosition().x, armour.getPosition().y);
+                    AssetLoader.sHitParticle.start();
                 }
                 break;
         }
@@ -378,8 +389,11 @@ public class GameContactListener implements ContactListener {
                 if (stage.getRunner().isStrongBeat()) {
                     stage.getRunner().beatBody(shell, contact);
                 }
-                shell.setAngularVelocity(-1f*shell.getAngularVelocity());
+                shell.setAngularVelocity(-1f * shell.getAngularVelocity());
                 shell.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_STRIKE_FLIP);
+                if (((RunnerStrikeUserData)another.getUserData()).isShell()) {
+                    ((RunnerStrikeUserData)another.getUserData()).setDead(true);
+                }
                 break;
             case ENEMY:
                 ((ShellUserData)shell.getUserData()).setDead(true);

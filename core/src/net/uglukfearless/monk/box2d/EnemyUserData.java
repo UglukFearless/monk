@@ -213,4 +213,8 @@ public class EnemyUserData extends UserData {
     public Animation getAnimation() {
         return enemyType.getAnimation();
     }
+
+    public boolean isFly() {
+        return enemyType.getGravityScale()==0;
+    }
 }

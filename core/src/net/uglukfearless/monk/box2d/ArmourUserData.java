@@ -74,6 +74,10 @@ public class ArmourUserData extends UserData {
         }
     }
 
+    public void setOnlyHit(boolean isHit) {
+        this.isHit = isHit;
+    }
+
     public boolean isWait() {
         return isWait;
     }

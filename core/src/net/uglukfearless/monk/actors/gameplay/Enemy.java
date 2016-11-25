@@ -13,6 +13,9 @@ import com.badlogic.gdx.utils.Pool;
 import net.uglukfearless.monk.box2d.EnemyUserData;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.FilterConstants;
+import net.uglukfearless.monk.enums.EnemyStateFight;
+import net.uglukfearless.monk.enums.EnemyStateMain;
+import net.uglukfearless.monk.enums.EnemyStateMove;
 import net.uglukfearless.monk.enums.EnemyType;
 import net.uglukfearless.monk.enums.UserDataType;
 import net.uglukfearless.monk.stages.GameStage;
@@ -43,20 +46,30 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
     private Animation mStrikeAnimation;
     private Animation mDieAnimation;
 
+    private Animation mSelectedAnimation;
+
     private TextureRegion mShellRegion;
 
     private float stateTime;
     private float deadTime;
-
     private float strikeTime;
-    private Vector2 jumpImpulse;
+    private float shootPause;
+    private final float SHOOTRATE;
 
-    private boolean starting;
+    private Vector2 jumpImpulse;
 
     private Situation mSituation;
     private float mPreviousVelocity;
 
     public static Random mRand = new Random();
+
+    EnemyStateMain mMainState;
+    EnemyStateMove mMoveState;
+    EnemyStateFight mFightState;
+
+    float mCurrentSpeed;
+    float mBasicSpeed;
+    float mCanonSpeed;
 
 
     public Enemy(World world, EnemyType enemyType) {
@@ -71,6 +84,10 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         mStrikeAnimation = getUserData().getStrikeAnimation();
         mDieAnimation = getUserData().getDieAnimation();
 
+        if (mStayAnimation==null) {
+            mStayAnimation = mRunAnimation;
+        }
+
         mAnimation = getUserData().getAnimation();
 
 
@@ -79,13 +96,19 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         stateTime = 0f;
         deadTime = 0f;
         strikeTime = 0f;
+        shootPause = 10f;
+        SHOOTRATE = 1f;
 
-        starting = false;
 
         jumpImpulse = new Vector2(0, getUserData().getWidth()*getUserData().getHeight()
                 *getUserData().getJumpingImpulse());
 
         mSituation = new Situation();
+
+        mSelectedAnimation = mAnimation;
+        mMainState = EnemyStateMain.WAIT;
+        mMoveState = EnemyStateMove.STAY;
+        mFightState = EnemyStateFight.FREE;
     }
 
     public void init(Stage stage, float x, float y) {
@@ -101,10 +124,14 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         body.setTransform(x, getUserData().getBasicY() + y + getUserData().getHeight() / 2f, 0);
         body.setLinearVelocity(mStage.getCurrentVelocity());
         body.setActive(true);
-        starting = false;
         mStage.addActor(this);
         mPreviousVelocity = mStage.getCurrentVelocity().x;
         mStage.addMovable(this);
+
+        mSelectedAnimation = mAnimation;
+        mMainState = EnemyStateMain.WAIT;
+        mMoveState = EnemyStateMove.STAY;
+        mFightState = EnemyStateFight.FREE;
     }
 
     @Override
@@ -116,8 +143,8 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
         batch.draw(mAnimation.getKeyFrame(stateTime, true),
                 body.getPosition().x - (data.getWidth() * data.getScaleX() / 2) + data.getOffsetX(),
-                body.getPosition().y - (data.getHeight()/ 2) + data.getOffsetY(),
-                getUserData().getWidth()* data.getScaleX()  * 0.5f, getUserData().getHeight() * data.getScaleY() * 0.5f,
+                body.getPosition().y - (data.getHeight() / 2) + data.getOffsetY(),
+                getUserData().getWidth() * data.getScaleX() * 0.5f, getUserData().getHeight() * data.getScaleY() * 0.5f,
                 data.getWidth() * data.getScaleX(), data.getHeight() * data.getScaleY()
                 , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
 
@@ -132,113 +159,231 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
     public void act(float delta) {
         super.act(delta);
 
-        if (((body.getPosition().x < Constants.GAME_WIDTH)
-                ||(body.getPosition().x < Constants.GAME_WIDTH + mRand.nextInt(8) + 10
-                &&body.getPosition().y - userData.getHeight()/2 < Constants.LAYOUT_Y_TWO*0.93f))
-                &&!starting) {
-            start();
-        }
-
-        if (getUserData().isDead()) {
-            dead(delta);
-        } else if (!BodyUtils.bodyInBounds(body)) {
-            this.remove();
-            PoolsHandler.sEnemiesPools.get(getUserData().getEnemyType().name()).free(this);
-        } else {
-
-            if (body.getPosition().x < Constants.GAME_WIDTH) {
-
-                if (mAnimation==mJumpAnimation&&Math.abs(body.getLinearVelocity().y-0.5f)<1) {
-                    landed();
+        switch (mMainState) {
+            case DIE:
+                dead(delta);
+                break;
+            case WAIT:
+                if (mayStart()) {
+                    start(true);
                 }
+                break;
+            case ACTIVE:
+
+                if (getUserData().isDead()) {
+                    mMainState = EnemyStateMain.DIE;
+                    break;
+                } else if (!BodyUtils.bodyInBounds(body)) {
+                    this.remove();
+                    PoolsHandler.sEnemiesPools.get(getUserData().getEnemyType().name()).free(this);
+                    break;
+                 }
 
                 mSituation = SpaceTable.getSituation(body.getPosition().x, body.getPosition().y
-                        - getUserData().getEnemyType().getY() - getUserData().getHeight() / 2f
-                        , getUserData().getWidth(), getUserData().getEnemyType().getCategoryBit(), mSituation);
+                            - getUserData().getEnemyType().getY() - getUserData().getHeight() / 2f
+                            , getUserData().getWidth(), getUserData().getEnemyType().getCategoryBit(), mSituation);
 
-                if (mSituation.jump
-                        &&body.getLinearVelocity().y==0
-                        &&getUserData().isJumper()) {
-
-                        jump();
-
-                } else if (body.getLinearVelocity().y==0) {
-
-                    if (getUserData().getGravityScale()!=0&&mSituation.stop) {
-                        standing();
-                    } else if (getUserData().getGravityScale()==0&&mSituation.stopFly){
-                        standing();
-                    }
+                if (shootPause<=SHOOTRATE) {
+                    shootPause +=delta;
                 }
 
-                if (mSituation.strike) {
-                    strike();
-                } else if (mSituation.shoot) {
-                    shoot();
-                }
-
-                if (body.getLinearVelocity().x>mStage.getCurrentVelocity().x)  {
-                    body.applyForceToCenter(mStage.getCurrentVelocity().x*2f, 0, true);
-                }
-
-                if (getUserData().isStrike()||mAnimation==mStrikeAnimation) {
-                    strikeTime += delta;
-
-                    if (strikeTime>0.3f) {
-                        if (mRunAnimation!=null) {
-                            mAnimation = mRunAnimation;
-                        } else if (mStayAnimation!=null) {
-                            mAnimation = mStayAnimation;
+                switch (mMoveState) {
+                    case STAY:
+                        fight(delta);
+                        //ситуации движения
+                        if (mSituation.jump) {
+                            jump();
                         }
 
-                        stateTime = 0;
-                        strikeTime = 0;
-                    }
+                        if (Math.abs(body.getLinearVelocity().y)>0.01&&body.getGravityScale()!=0) {
+                            checkFall();
+                        }
+
+                        if (mSituation.startFly&&getUserData().isFly()) {
+                            start(false);
+                        } else if (mSituation.start&&!getUserData().isFly()) {
+                            start(false);
+                        }
+
+                        //ситуации драки
+                        if (mSituation.strike) {
+                            strike();
+                        } else if (mSituation.shoot) {
+                            shoot();
+                        }
+                        break;
+                    case RUN:
+                        fight(delta);
+                        //ситуации движения
+                        if (mSituation.jump) {
+                            jump();
+                        }
+
+                        if (Math.abs(body.getLinearVelocity().y)>0.01&&body.getGravityScale()!=0) {
+                            checkFall();
+                        }
+
+                        if (mSituation.stopFly&&getUserData().isFly()&&body.getPosition().x<Constants.GAME_WIDTH) {
+                            standing();
+                        } else if (mSituation.stop&&!getUserData().isFly()&&body.getPosition().x<Constants.GAME_WIDTH) {
+                            standing();
+                        }
+
+                        checkSpeed();
+
+                        //ситуации драки
+                        if (mSituation.strike) {
+                            strike();
+                        } else if (mSituation.shoot) {
+                            shoot();
+                        }
+                        break;
+                    case JUMP:
+                        if (mSituation.strike) {
+                            strike();
+                        } else if (mSituation.shoot) {
+                            shoot();
+                        }
+
+                        if (body.getLinearVelocity().y==0) {
+                            landed();
+                        }
+                        break;
+                    case FALL:
+                        if (mSituation.strike) {
+                            strike();
+                        } else if (mSituation.shoot) {
+                            shoot();
+                        }
+
+                        if (body.getLinearVelocity().y==0) {
+                            landed();
+                        }
+                        break;
                 }
 
+                break;
+        }
 
-                if (mJumpAnimation!=null&&(mAnimation!=mStrikeAnimation&&mAnimation!=mDieAnimation
-                        &&mAnimation!=mJumpAnimation)&&body.getLinearVelocity().y!=0) {
-                    mAnimation = mJumpAnimation;
+        selectAnimation();
+    }
+
+    private void selectAnimation() {
+        switch (mMainState) {
+            case DIE:
+                mSelectedAnimation = mDieAnimation;
+                break;
+            case ACTIVE:
+            case WAIT:
+                if (mFightState!=EnemyStateFight.FREE) {
+                    mSelectedAnimation = mStrikeAnimation;
+                    break;
+                }
+                switch (mMoveState) {
+                    case JUMP:
+                    case FALL:
+                        mSelectedAnimation = mJumpAnimation;
+                        break;
+                    case RUN:
+                        mSelectedAnimation = mRunAnimation;
+                        break;
+                    case STAY:
+                        mSelectedAnimation = mStayAnimation;
+                        break;
+                }
+                break;
+        }
+
+        if (mSelectedAnimation!=null&&!mAnimation.equals(mSelectedAnimation)) {
+            mAnimation = mSelectedAnimation;
+            stateTime = 0;
+        }
+    }
+
+    private void checkSpeed() {
+        mCurrentSpeed = body.getLinearVelocity().x;
+        mBasicSpeed = getUserData().getEnemyType().getBasicXVelocity();
+        mCanonSpeed = mStage.getCurrentVelocity().x + mBasicSpeed;
+
+        if (mMoveState==EnemyStateMove.RUN) {
+            if (mBasicSpeed>0&&mCurrentSpeed<mCanonSpeed) {
+                body.setLinearVelocity(mCurrentSpeed+0.2f, 0f);
+            } else if (mBasicSpeed<0&&mCurrentSpeed>mCanonSpeed) {
+                body.setLinearVelocity(mCurrentSpeed-0.2f, 0f);
+            }
+        }
+    }
+
+    private void checkFall() {
+        if (mMoveState!=EnemyStateMove.JUMP) {
+            mMoveState = EnemyStateMove.FALL;
+        }
+    }
+
+    private void fight(float delta) {
+        switch (mFightState) {
+            case FREE:
+                break;
+            case STRIKE:
+                strikeTime += delta;
+                if (strikeTime>0.3f) {
+                    mFightState = EnemyStateFight.FREE;
                     stateTime = 0;
+                    strikeTime = 0;
                 }
+                break;
+            case SHOOT:
+                strikeTime += delta;
+                if (strikeTime>0.3f) {
+                    mFightState = EnemyStateFight.FREE;
+                    stateTime = 0;
+                    strikeTime = 0;
+                }
+                strikeTime += delta;
+                break;
+        }
+    }
+
+    private boolean mayStart() {
+        return ((body.getPosition().x < Constants.GAME_WIDTH)
+                ||(body.getPosition().x < Constants.GAME_WIDTH + mRand.nextInt(8) + 10
+                &&body.getPosition().y - userData.getHeight()/2 < Constants.LAYOUT_Y_TWO*0.93f));
+    }
+
+    private void start(boolean first) {
+        if (first||(mMoveState!=EnemyStateMove.JUMP&&mMoveState!=EnemyStateMove.FALL)) {
+
+            if (getUserData().getEnemyType().getBasicXVelocity()==0) {
+                mMoveState = EnemyStateMove.STAY;
+            } else {
+                mMoveState = EnemyStateMove.RUN;
+            }
+            body.setLinearVelocity(mStage.getCurrentVelocity().x + getUserData().getEnemyType().getBasicXVelocity(),
+                    body.getLinearVelocity().y);
+
+            if (mStage.getRunner()!=null||!mStage.getRunner().getUserData().isDead()&&first) {
+                ScoreCounter.increaseEnemies();
             }
 
-        }
-
-
-    }
-
-    private void start() {
-        if (mRunAnimation!=null&&getUserData().getEnemyType().getBasicXVelocity()<0) {
-            mAnimation = mRunAnimation;
-            stateTime = 0;
-        }
-        body.setLinearVelocity(body.getLinearVelocity().x + getUserData().getEnemyType().getBasicXVelocity(),
-                body.getLinearVelocity().y);
-        starting = true;
-
-        if (mStage.getRunner()!=null||!mStage.getRunner().getUserData().isDead()) {
-            ScoreCounter.increaseEnemies();
+            mMainState = EnemyStateMain.ACTIVE;
         }
 
     }
+
 
     private void landed() {
-        if (mRunAnimation!=null&&getUserData().getEnemyType().getBasicXVelocity()<0) {
-            mAnimation = mRunAnimation;
-            stateTime = 0;
+
+        if (body.getLinearVelocity().x - mStage.getCurrentVelocity().x==0) {
+            mMoveState = EnemyStateMove.STAY;
+        } else {
+            mMoveState = EnemyStateMove.RUN;
         }
     }
 
     private void shoot() {
-        if (getUserData().isShouter()&&!getUserData().isShoot()) {
 
-            if (mStrikeAnimation!=null) {
-                mAnimation = mStrikeAnimation;
-                strikeTime = 0;
-                stateTime = 0;
-            }
+        if (mFightState==EnemyStateFight.FREE&&getUserData().getEnemyType().isShouter()&&shootPause>SHOOTRATE) {
+
 
             getUserData().setShoot(true);
             if (mShellRegion!=null) {
@@ -248,47 +393,39 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
                 PoolsHandler.sShellPool.obtain().init(mStage, body.getPosition()
                         , body.getLinearVelocity().x, getUserData().getKEY());
             }
+
+            mFightState = EnemyStateFight.SHOOT;
+            shootPause = 0;
         }
     }
 
     private void strike() {
-        if (getUserData().isStriker()&&!getUserData().isStrike()) {
 
-            if (mStrikeAnimation!=null) {
-                mAnimation = mStrikeAnimation;
-                strikeTime = 0;
-                stateTime = 0;
-            }
-
+        if (mFightState==EnemyStateFight.FREE&&getUserData().getEnemyType().isStriker()) {
             getUserData().setStrike(true);
-
+            mFightState = EnemyStateFight.STRIKE;
         }
     }
 
     private void jump() {
-        if (!getUserData().isJumping()) {
+        if (getUserData().getEnemyType().isJumper()) {
             body.applyLinearImpulse(jumpImpulse , body.getWorldCenter(), true);
             getUserData().setJumping(true);
+
+            mMoveState = EnemyStateMove.JUMP;
         }
     }
 
     private void standing() {
-        body.setLinearVelocity(new Vector2(mStage.getCurrentVelocity().x, getUserData().getLinearVelocity().y));
-        if (mStayAnimation!=null&&mAnimation!=mStrikeAnimation&&mAnimation!=mJumpAnimation&&mAnimation!=mStayAnimation) {
-            mAnimation = mStayAnimation;
-            stateTime = 0;
+        if (mMoveState!=EnemyStateMove.JUMP&&mMoveState!=EnemyStateMove.FALL) {
+            body.setLinearVelocity(new Vector2(mStage.getCurrentVelocity().x, getUserData().getLinearVelocity().y));
+            mMoveState = EnemyStateMove.STAY;
         }
     }
 
     public void dead(float delta) {
         deadTime +=delta;
         body.applyForceToCenter(500, 50, false);
-
-        if (mDieAnimation!=null) {
-            mAnimation = mDieAnimation;
-            stateTime = 0;
-        }
-
 
         if (deadTime>0.2f&&getStage()!=null) {
 
@@ -323,7 +460,6 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         getUserData().setStrike(false);
         getUserData().setShoot(false);
         getUserData().setDoll(false);
-        starting = false;
         body.setActive(false);
         body.setAngularVelocity(0f);
         body.setGravityScale(getUserData().getEnemyType().getGravityScale());
@@ -332,6 +468,10 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         body.setTransform(-10, -10, 0);
 
         ((UserData)body.getUserData()).setLaunched(false);
+
+        mMainState = EnemyStateMain.WAIT;
+        mMoveState = EnemyStateMove.STAY;
+        mFightState = EnemyStateFight.FREE;
     }
 
     @Override

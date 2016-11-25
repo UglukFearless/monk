@@ -24,6 +24,7 @@ public class BuddhasBody extends GameActor {
         if (mRunner.isBuddha()) {
             body.setTransform(mRunner.getBody().getPosition().x,
                     mRunner.getBody().getPosition().y, 0f);
+            body.setLinearVelocity(0,0);
         } else {
             body.setTransform(-10f,-10f, 0f);
         }

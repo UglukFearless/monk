@@ -111,7 +111,7 @@ public class SpaceTable {
                 cellContent = 0;
                 for (int ii=i;ii>0;ii--) {
 //                    System.out.println("fill shell way " + sTableOld[ii][j]);
-                    cellContent = (short) (cellContent|sTableOld[ii][j ]&PlacingCategory.CATEGORY_ANY_OBJECT);
+                    cellContent = (short) (cellContent|sTableOld[ii][j]&PlacingCategory.CATEGORY_ANY_OBJECT);
                     if (ii==i) {
                         cellContent = (short) (cellContent&(~categoryBit));
                     }
@@ -147,7 +147,7 @@ public class SpaceTable {
 
             int j=0;
 
-            if (y>Constants.GROUND_HEIGHT/2f + 0.5) {
+            if (y>Constants.GROUND_HEIGHT/2f + 2f) {
                 j=1;
             }
 
@@ -161,10 +161,8 @@ public class SpaceTable {
                 }
 
                 if (x>Constants.GAME_WIDTH*(float)i/4f&&x<Constants.GAME_WIDTH*(float)(i+1)/4f) {
-
                     cellContent = 0;
                     for (int ii=i;ii>-1;ii--) {
-
                         cellContent = (short) (cellContent|sTableOld[ii][j] &(PlacingCategory.CATEGORY_ANY_OBJECT|PlacingCategory.CATEGORY_PLACING_COLUMNS));
                         if (ii==i) {
                             cellContent = (short) (cellContent&(~categoryBit));
@@ -182,19 +180,38 @@ public class SpaceTable {
                             ||((sTableOld[i][0]&PlacingCategory.ANY_PIT)!=0));
                     situation.stopFly = ((sTableOld[i][j]&PlacingCategory.CATEGORY_ANY_OBSTACLE)!=0);
 
-                    if (x<Constants.RUNNER_X + Constants.RUNNER_WIDTH + 2) {
+                    if (!situation.stop&&checkCell(x-5,y)!=-1) {
+                        situation.start = (((checkCell(x-5,y)&PlacingCategory.CATEGORY_ANY_OBSTACLE)==0)
+                        &&((checkCell(x-5,0)&PlacingCategory.ANY_PIT)==0));
+                    }
+                    if (!situation.stopFly&&checkCell(x-5,y)!=-1) {
+                        situation.startFly = ((checkCell(x-5,y)&PlacingCategory.CATEGORY_ANY_OBSTACLE)==0);
+                    }
+
+                    if ((x<Constants.RUNNER_X + Constants.RUNNER_WIDTH + 2)&&(x>1.5f)) {
                         situation.strike = true;
                     }
                 }
 
-
             }
+
         } else {
             situation.stop = true;
             situation.stopFly = true;
         }
 
         return situation;
+    }
+
+    public static void printSpaceTable() {
+
+        for (int j=0;j<2;j++) {
+            System.out.print("|");
+            for (int i=0;i<4;i++) {
+                System.out.print(" " + sTableOld[i][j] + " |");
+            }
+            System.out.println();
+        }
     }
 
 }

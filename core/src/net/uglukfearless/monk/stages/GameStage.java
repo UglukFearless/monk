@@ -40,6 +40,7 @@ import net.uglukfearless.monk.actors.gameplay.bonuses.RevivalBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.StrongBeatBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.ThunderFistBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.Treasures;
+import net.uglukfearless.monk.actors.gameplay.bonuses.WingsAvatar;
 import net.uglukfearless.monk.actors.gameplay.bonuses.WingsBonus;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.FilterConstants;
@@ -149,6 +150,8 @@ public class GameStage extends Stage {
     private float mWaitThreshold;
 
     private Armour mArmour;
+    private WingsAvatar mWingsAvatar;
+    private int mWingsBuffer;
 
     public GameStage(GameScreen screen, float yViewportHeight, LevelModel levelModel) {
 
@@ -245,6 +248,7 @@ public class GameStage extends Stage {
         }
 
         setUpRevival();
+        setUpWings();
     }
 
     private void setUpBonuses() {
@@ -293,6 +297,11 @@ public class GameStage extends Stage {
             mGameGuiStage.enableRevivalLabel();
             mGameGuiStage.setRevivalLabel(mRevivalAvatar.getX(), mRevivalAvatar.getY(), mRevival);
         }
+    }
+
+    private void setUpWings() {
+        mWingsAvatar = new WingsAvatar(this, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+        addActor(mWingsAvatar);
     }
 
     private void setUpPits() {
@@ -400,43 +409,7 @@ public class GameStage extends Stage {
 
             super.act(delta);
 
-            UserData data = (UserData) runner.getBody().getUserData();
-            if(data!=null &&  data.isDestroy()){
-                if (!world.isLocked()) {
-                    world.destroyBody(runner.getBody());
-                }
-            }
-
-            if (mRevivalRunner
-                    &&((Math.abs(ground1.getPosition().x)<0.5f)
-                    ||(Math.abs(ground2.getPosition().x)<0.5f))) {
-                runner = new Runner(WorldUtils.createRunner(world));
-//                runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_GHOST);
-                runner.setRevivalFilter();
-                runner.setAlpha(0.3f);
-                runner.setGrounds(ground1, ground2);
-                mRunnerStrike.setRunner(runner);
-                mBuddhaBonus.setRunner(runner);
-                runner.start();
-                addActor(runner);
-                mRevivalRunner = false;
-                mReturnTimer = 0;
-                mReturnFilter = true;
-            } else if (mReturnFilter) {
-                mReturnTimer +=delta;
-                if (mReturnTimer>3&&runner.getBody()!=null&&!runner.getUserData().isDead()) {
-                    if (!runner.isBuddha()&&!runner.isGhost()) {
-//                        runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
-                        runner.setCustomFilter();
-                    }
-//                    else if (runner.isWings()) {
-//                        runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS);
-//                    }
-                    runner.setAlpha(1f);
-                    mReturnTimer=0;
-                    mReturnFilter = false;
-                }
-            }
+            checkRevivalRunner(delta);
 
             accumulator += delta;
             while (accumulator>=delta) {
@@ -444,45 +417,108 @@ public class GameStage extends Stage {
                 accumulator -= TIME_STEP;
             }
 
+            SpaceTable.leaf();
+
+            mLevelModel.act(delta);
+
+            particlesAct(delta);
+
+            drawTransition(delta);
+
+            mShake.tick(delta, this, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+
             if (getRunTime()>30&&!mAddedTreasures) {
                 Treasures treasures = new Treasures(this, VIEWPORT_HEIGHT);
                 treasures.setGui(mGameGuiStage);
                 mBonuses.add(treasures);
                 mAddedTreasures = true;
             }
+        }
+    }
 
-            SpaceTable.leaf();
+    @Override
+    public void draw() {
+//        ground1.setZIndex(100);
+//        ground2.setZIndex(100);
+//        if (mState!=PAUSE) {
+        super.draw();
+        getBatch().begin();
+//        effect.draw(getBatch());
+        for (ParticleEffect effect : AssetLoader.sWorkParticleBlood) {
+            effect.draw(getBatch());
+        }
 
-            mLevelModel.act(delta);
+        for (ParticleEffect effect : AssetLoader.sWorkParticleDust) {
+            effect.draw(getBatch());
+        }
+
+        AssetLoader.sHitParticle.draw(getBatch());
+
+        getBatch().end();
+//        renderer.render(world, camera.combined);
+//            System.out.println("render Calls - " + ((SpriteBatch) getBatch()).renderCalls);
+//        }
+    }
+
+    private void particlesAct(float delta) {
+
+        for (ParticleEffect effect : AssetLoader.sWorkParticleBlood) {
+            effect.update(delta);
+            if (effect.isComplete()) {
+                AssetLoader.sWorkParticleBlood.removeValue(effect, true);
+                AssetLoader.sFreeParticleBlood.add(effect);
+            }
+        }
+
+        for (ParticleEffect effect : AssetLoader.sWorkParticleDust) {
+            effect.update(delta);
+            if (effect.isComplete()) {
+                AssetLoader.sWorkParticleDust.removeValue(effect, true);
+                AssetLoader.sFreeParticleDust.add(effect);
+            }
+        }
+
+        AssetLoader.sHitParticle.update(delta);
+    }
 
 
-            for (ParticleEffect effect : AssetLoader.sWorkParticleBlood) {
-                effect.update(delta);
-                if (effect.isComplete()) {
-                    AssetLoader.sWorkParticleBlood.removeValue(effect, true);
-                    AssetLoader.sFreeParticleBlood.add(effect);
+    private void checkRevivalRunner(float delta) {
+        if (mRevivalRunner
+                &&((Math.abs(ground1.getPosition().x)<0.3f)
+                ||(Math.abs(ground2.getPosition().x)<0.3f))) {
+            runner = new Runner(WorldUtils.createRunner(world));
+            runner.setRevivalFilter();
+            runner.setAlpha(0.3f);
+            runner.setGrounds(ground1, ground2);
+            mRunnerStrike.setRunner(runner);
+            mBuddhaBonus.setRunner(runner);
+            runner.start();
+            addActor(runner);
+            mRevivalRunner = false;
+            mReturnTimer = 0;
+            mReturnFilter = true;
+            runner.setWingsRevival(mWingsBuffer);
+            checkWingsRevival(mWingsBuffer);
+        } else if (mReturnFilter) {
+            mReturnTimer +=delta;
+            if (mReturnTimer>3&&runner.getBody()!=null&&!runner.getUserData().isDead()) {
+                if (!runner.isBuddha()&&!runner.isGhost()) {
+                    runner.setCustomFilter();
                 }
-             }
 
-            for (ParticleEffect effect : AssetLoader.sWorkParticleDust) {
-                effect.update(delta);
-                if (effect.isComplete()) {
-                    AssetLoader.sWorkParticleDust.removeValue(effect, true);
-                    AssetLoader.sFreeParticleDust.add(effect);
+                if (!runner.isGhost()) {
+                    runner.setAlpha(1f);
                 }
-             }
 
-            drawTransition(delta);
-
-            mShake.tick(delta, this, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+                mReturnTimer=0;
+                mReturnFilter = false;
+            }
         }
     }
 
 
     public void repositionGround() {
-
         dangersHandler.createDangers(ground1, ground2);
-
     }
 
 
@@ -494,28 +530,6 @@ public class GameStage extends Stage {
                 lump.init(this, parent, textureRegion);
             }
         }
-    }
-
-
-    @Override
-    public void draw() {
-//        ground1.setZIndex(100);
-//        ground2.setZIndex(100);
-//        if (mState!=PAUSE) {
-            super.draw();
-        getBatch().begin();
-//        effect.draw(getBatch());
-        for (ParticleEffect effect : AssetLoader.sWorkParticleBlood) {
-            effect.draw(getBatch());
-        }
-
-        for (ParticleEffect effect : AssetLoader.sWorkParticleDust) {
-            effect.draw(getBatch());
-        }
-        getBatch().end();
-//        renderer.render(world, camera.combined);
-//            System.out.println("render Calls - " + ((SpriteBatch) getBatch()).renderCalls);
-//        }
     }
 
     @Override
@@ -892,5 +906,29 @@ public class GameStage extends Stage {
 
     public void setState(GameState state) {
         mState = state;
+    }
+
+    public int getWingsRevival() {
+         if (runner!=null) {
+             return runner.getWingsRevival();
+         } else {
+             return 0;
+         }
+    }
+
+    public void checkWingsRevival(int wings) {
+
+        if (wings>0) {
+            mGameGuiStage.enableWingsLabel();
+            mGameGuiStage.setWingsLabel(mWingsAvatar.getX(), mWingsAvatar.getY(), wings);
+        } else {
+            mGameGuiStage.disableWingsLabel();
+            mGameGuiStage.setWingsLabel(mWingsAvatar.getX(), mWingsAvatar.getY(), wings);
+        }
+
+    }
+
+    public void setWingsBuffer(int wingsBuffer) {
+        mWingsBuffer = wingsBuffer;
     }
 }

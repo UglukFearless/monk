@@ -23,6 +23,7 @@ public class WingsBonus extends GameBonus {
     @Override
     public void activation() {
         mStage.getRunner().setWings(true);
+        mStage.getRunner().addWingsRevival();
         mStage.getRunner().getBody().setGravityScale(4.5f);
         ScoreCounter.increaseWings();
     }

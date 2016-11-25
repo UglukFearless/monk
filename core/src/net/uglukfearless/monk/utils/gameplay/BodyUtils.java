@@ -3,6 +3,7 @@ package net.uglukfearless.monk.utils.gameplay;
 import com.badlogic.gdx.physics.box2d.Body;
 
 import net.uglukfearless.monk.actors.gameplay.Columns;
+import net.uglukfearless.monk.box2d.EnemyUserData;
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.enums.UserDataType;
@@ -17,6 +18,9 @@ public class BodyUtils {
 
         switch (userData.getUserDataType()) {
             case ENEMY:
+                return (body.getPosition().x + userData.getWidth()/2f > 0)
+                        &&(body.getPosition().y + userData.getHeight()/2f > 0)
+                        &&(body.getPosition().y<25||!((EnemyUserData)body.getUserData()).isFly());
             case RUNNER:
             case OBSTACLE:
             case COLUMNS:

@@ -52,10 +52,14 @@ public class Shell extends GameActor implements Pool.Poolable, Movable {
     public void init(Stage stage, Vector2 position, float speed, String key) {
         getUserData().setKEY(key);
         body.setTransform(position.x, position.y + 0.5f, 0);
-        body.setLinearVelocity(speed - 10f, 0);
         body.setAngularVelocity(15);
         body.setActive(true);
         stage.addActor(this);
+        if (speed-10f>((GameStage)stage).getCurrentVelocity().x-14f) {
+            body.setLinearVelocity(((GameStage)stage).getCurrentVelocity().x - 14f, 0);
+        } else {
+            body.setLinearVelocity(speed - 10f, 0);
+        }
         ((GameStage)stage).addMovable(this);
         mPreviousVelocity = ((GameStage)stage).getCurrentVelocity().x;
     }
@@ -64,10 +68,14 @@ public class Shell extends GameActor implements Pool.Poolable, Movable {
         mRegion = region;
         getUserData().setKEY(key);
         body.setTransform(position.x, position.y + 0.5f, 0);
-        body.setLinearVelocity(speed - 10f, 0);
         body.setAngularVelocity(15);
         body.setActive(true);
         stage.addActor(this);
+        if (speed-10f>((GameStage)stage).getCurrentVelocity().x-14f) {
+            body.setLinearVelocity(((GameStage)stage).getCurrentVelocity().x - 14f, 0);
+        } else {
+            body.setLinearVelocity(speed - 10f, 0);
+        }
         ((GameStage)stage).addMovable(this);
         mPreviousVelocity = ((GameStage)stage).getCurrentVelocity().x;
     }

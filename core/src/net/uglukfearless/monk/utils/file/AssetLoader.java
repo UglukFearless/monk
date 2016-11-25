@@ -74,6 +74,8 @@ public class AssetLoader {
     public static Array<ParticleEffect> sFreeParticleDust;
     public static Array<ParticleEffect> sWorkParticleDust;
 
+    public static ParticleEffect sHitParticle;
+
     public static void initBundle() {
         FileHandle baseFileHandle = Gdx.files.internal("i18n/Bundle");
         if (PreferencesManager.getLanguage()=="") {
@@ -136,6 +138,9 @@ public class AssetLoader {
         }
 
         sWorkParticleDust = new Array<ParticleEffect>();
+
+        sHitParticle = new ParticleEffect();
+        sHitParticle.load(Gdx.files.internal("particles/hit.p"), Gdx.files.internal("particles"));
 
         ArmourType.init();
     }
@@ -347,6 +352,8 @@ public class AssetLoader {
         for (ParticleEffect effect : AssetLoader.sFreeParticleDust) {
             effect.dispose();
         }
+
+        sHitParticle.dispose();
     }
 
     public static void disposeLevel() {

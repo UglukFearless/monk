@@ -123,6 +123,13 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
         if (mDieAnimation!=null) {
             mAnimation = mDieAnimation;
         }
+
+        if (body.getPosition().x < Constants.GAME_WIDTH) {
+
+            SpaceTable.setCell(body.getPosition().x, body.getPosition().y - getUserData().getObstacleType().getY() - getUserData().getHeight()/2f
+                    , getUserData().getWidth(),getUserData().getObstacleType().getCategoryBit());
+        }
+
         if ((deadTime>0.2f||getUserData().isTrap()) && getStage() != null) {
 
             //exp
