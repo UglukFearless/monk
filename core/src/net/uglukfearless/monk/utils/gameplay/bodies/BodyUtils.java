@@ -1,4 +1,4 @@
-package net.uglukfearless.monk.utils.gameplay;
+package net.uglukfearless.monk.utils.gameplay.bodies;
 
 import com.badlogic.gdx.physics.box2d.Body;
 
@@ -13,30 +13,32 @@ import net.uglukfearless.monk.enums.UserDataType;
  */
 public class BodyUtils {
 
-    public static boolean bodyInBounds(Body body) {
-        UserData userData = (UserData) body.getUserData();
+    private static UserData mUserData;
 
-        switch (userData.getUserDataType()) {
+    public static boolean bodyInBounds(Body body) {
+        mUserData = (UserData) body.getUserData();
+
+        switch (mUserData.getUserDataType()) {
             case ENEMY:
-                return (body.getPosition().x + userData.getWidth()/2f > 0)
-                        &&(body.getPosition().y + userData.getHeight()/2f > 0)
+                return (body.getPosition().x + mUserData.getWidth()/2f > 0)
+                        &&(body.getPosition().y + mUserData.getHeight()/2f > 0)
                         &&(body.getPosition().y<25||!((EnemyUserData)body.getUserData()).isFly());
             case RUNNER:
             case OBSTACLE:
             case COLUMNS:
-                return (body.getPosition().x + userData.getWidth()/2f > 0)
-                        &&(body.getPosition().y + userData.getHeight()/2f > 0);
+                return (body.getPosition().x + mUserData.getWidth()/2f > 0)
+                        &&(body.getPosition().y + mUserData.getHeight()/2f > 0);
             case LUMP:
-                return (body.getPosition().x + userData.getWidth()/2f + 4f > 0)
-                        &&(body.getPosition().y + userData.getHeight()/2f > 0);
+                return (body.getPosition().x + mUserData.getWidth()/2f + 4f > 0)
+                        &&(body.getPosition().y + mUserData.getHeight()/2f > 0);
             case GROUND:
             case PIT:
-                return (body.getPosition().x + userData.getWidth()/2f > 0);
+                return (body.getPosition().x + mUserData.getWidth()/2f > 0);
             case RUNNER_STRIKE:
             case SHELL:
-                return (body.getPosition().x + userData.getWidth()/2f > 0
-                        &&body.getPosition().x - userData.getWidth()/2f < Constants.GAME_WIDTH + 5f
-                        &&body.getPosition().y + userData.getHeight()/2f > 0);
+                return (body.getPosition().x + mUserData.getWidth()/2f > 0
+                        &&body.getPosition().x - mUserData.getWidth()/2f < Constants.GAME_WIDTH + 5f
+                        &&body.getPosition().y + mUserData.getHeight()/2f > 0);
         }
 
         return true;
@@ -117,4 +119,10 @@ public class BodyUtils {
         return userData != null && userData.getUserDataType() == UserDataType.ARMOUR;
     }
 
+    public static boolean bodyInFall(Body body) {
+
+        mUserData = (UserData) body.getUserData();
+
+        return (body.getPosition().y + mUserData.getHeight()/2f > 0);
+    }
 }

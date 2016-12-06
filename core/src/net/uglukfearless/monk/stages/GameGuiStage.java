@@ -34,6 +34,7 @@ import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
 
 import java.util.HashMap;
 
+
 /**
  * Created by Ugluk on 22.08.2016.
  */
@@ -121,6 +122,9 @@ public class GameGuiStage extends Stage {
 
         mShopButton = new TextButton(AssetLoader.sBundle.get("MENU_GAME_BUTTON_SHOP"),AssetLoader.sGuiSkin);
         mShopButton.setPosition(VIEWPORT_WIDTH/2f - mShopButton.getWidth()/2f, 0);
+        if (mShopButton.getWidth()<VIEWPORT_WIDTH*0.15f) {
+            mShopButton.setSize(VIEWPORT_WIDTH*0.15f, VIEWPORT_HEIGHT*0.135f);
+        }
         mShopButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -309,7 +313,7 @@ public class GameGuiStage extends Stage {
     private void setupButtons() {
 
         mMenyButton = new TextButton(AssetLoader.sBundle.get("MENU_DEATH_BUTTON_GO_MENU"), AssetLoader.sGuiSkin);
-        mMenyButton.setBounds(100, mMainTableDeath.getY(), 200, 100);
+        mMenyButton.setBounds(VIEWPORT_WIDTH * 0.125f, mMainTableDeath.getY(), 200, 100);
         mMenyButton.setVisible(false);
         mMenyButton.setColor(100, 200, 0, 1);
         mMenyButton.addListener(new ClickListener() {
@@ -326,7 +330,7 @@ public class GameGuiStage extends Stage {
         addActor(mMenyButton);
 
         mReplayButton = new TextButton(AssetLoader.sBundle.get("MENU_DEATH_BUTTON_REPLAY"), AssetLoader.sGuiSkin);
-        mReplayButton.setBounds(100 + mMainTableDeath.getWidth() - 200, mMainTableDeath.getY(), 200, 100);
+        mReplayButton.setBounds(VIEWPORT_WIDTH * 0.125f + mMainTableDeath.getWidth() - 200, mMainTableDeath.getY(), 200, 100);
         mReplayButton.setVisible(false);
         mReplayButton.setColor(100, 200, 0, 1);
         mReplayButton.addListener(new ClickListener() {
@@ -470,7 +474,7 @@ public class GameGuiStage extends Stage {
         mMainTableDeath.background(new NinePatchDrawable(AssetLoader.broadbord));
         mMainTableDeath.pad(15);
         mMainTableDeath.padBottom(100);
-        mMainTableDeath.setBounds(100, VIEWPORT_HEIGHT / 5f, VIEWPORT_WIDTH * 0.75f
+        mMainTableDeath.setBounds(VIEWPORT_WIDTH * 0.125f, VIEWPORT_HEIGHT / 5f, VIEWPORT_WIDTH * 0.75f
                 , VIEWPORT_HEIGHT - VIEWPORT_HEIGHT / 4f);
         mMainTableDeath.add(mScrollPaneDeath).fill().expand();
         mMainTableDeath.setVisible(false);
@@ -542,6 +546,7 @@ public class GameGuiStage extends Stage {
                     }
                     break;
                 case START:
+                    disableWingsLabel();
                     mShopButton.setVisible(true);
                     mMainWaitTable.setVisible(false);
                     mStartLabel.setText(AssetLoader.sBundle.get("PLAY_START_LABEL"));
@@ -579,6 +584,7 @@ public class GameGuiStage extends Stage {
                 case GAME_OVER:
                     mMainWaitTable.setVisible(false);
                     mScoreValue.setText(String.valueOf(ScoreCounter.getScore()));
+                    disableWingsLabel();
                     if (ScoreCounter.getScore()>mCurrentHighScoreValue) {
                         mCurrentHighScoreValue = ScoreCounter.getScore();
                         mCurrentHighScore.setText(String.valueOf(mCurrentHighScoreValue));

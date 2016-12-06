@@ -11,22 +11,21 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Pool;
 
 import net.uglukfearless.monk.box2d.EnemyUserData;
-import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.enums.EnemyStateFight;
 import net.uglukfearless.monk.enums.EnemyStateMain;
 import net.uglukfearless.monk.enums.EnemyStateMove;
 import net.uglukfearless.monk.enums.EnemyType;
-import net.uglukfearless.monk.enums.UserDataType;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
-import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.Movable;
+import net.uglukfearless.monk.utils.gameplay.Retributable;
 import net.uglukfearless.monk.utils.gameplay.ai.Situation;
 import net.uglukfearless.monk.utils.gameplay.ai.SpaceTable;
-import net.uglukfearless.monk.utils.gameplay.WorldUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 import java.util.Random;
@@ -35,7 +34,7 @@ import java.util.Random;
 /**
  * Created by Ugluk on 20.05.2016.
  */
-public class Enemy extends GameActor implements Pool.Poolable, Movable {
+public class Enemy extends GameActor implements Pool.Poolable, Movable, Retributable {
 
     private GameStage mStage;
 
@@ -115,6 +114,10 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
 
         mStage = (GameStage)stage;
 
+        getUserData().setDead(false);
+        getUserData().setStruck(false);
+        getUserData().setTerribleDeath(false);
+
         if (mStayAnimation!=null) {
             mAnimation = mStayAnimation;
         } else if (mRunAnimation!=null){
@@ -127,6 +130,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         mStage.addActor(this);
         mPreviousVelocity = mStage.getCurrentVelocity().x;
         mStage.addMovable(this);
+        mStage.addRetributable(this);
 
         mSelectedAnimation = mAnimation;
         mMainState = EnemyStateMain.WAIT;
@@ -173,7 +177,11 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
                 if (getUserData().isDead()) {
                     mMainState = EnemyStateMain.DIE;
                     break;
-                } else if (!BodyUtils.bodyInBounds(body)) {
+                } else if (!BodyUtils.bodyInFall(body)) {
+                    mMainState = EnemyStateMain.DIE;
+                    getUserData().setStruck(true);
+                    break;
+                 } else if (!BodyUtils.bodyInBounds(body)) {
                     this.remove();
                     PoolsHandler.sEnemiesPools.get(getUserData().getEnemyType().name()).free(this);
                     break;
@@ -245,7 +253,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
                             shoot();
                         }
 
-                        if (body.getLinearVelocity().y==0) {
+                        if (Math.abs(body.getLinearVelocity().y)<0.02&&body.getGravityScale()!=0) {
                             landed();
                         }
                         break;
@@ -256,7 +264,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
                             shoot();
                         }
 
-                        if (body.getLinearVelocity().y==0) {
+                        if (Math.abs(body.getLinearVelocity().y)<0.02&&body.getGravityScale()!=0) {
                             landed();
                         }
                         break;
@@ -321,6 +329,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
     }
 
     private void fight(float delta) {
+
         switch (mFightState) {
             case FREE:
                 break;
@@ -361,7 +370,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
             body.setLinearVelocity(mStage.getCurrentVelocity().x + getUserData().getEnemyType().getBasicXVelocity(),
                     body.getLinearVelocity().y);
 
-            if (mStage.getRunner()!=null||!mStage.getRunner().getUserData().isDead()&&first) {
+            if ((mStage.getRunner()!=null||!mStage.getRunner().getUserData().isDead())&&first) {
                 ScoreCounter.increaseEnemies();
             }
 
@@ -424,25 +433,53 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
     }
 
     public void dead(float delta) {
+
         deadTime +=delta;
-        body.applyForceToCenter(500, 50, false);
+        if (getUserData().isDemon()&&!getUserData().isStruck()) {
+            body.setFixedRotation(true);
 
-        if (deadTime>0.2f&&getStage()!=null) {
-
-            //exp
-            if (AssetLoader.sFreeParticleBlood.size>0) {
-                ParticleEffect effect = AssetLoader.sFreeParticleBlood.get(AssetLoader.sFreeParticleBlood.size -1);
-                AssetLoader.sFreeParticleBlood.removeIndex(AssetLoader.sFreeParticleBlood.size -1);
-                effect.getEmitters().first().setPosition(body.getPosition().x, body.getPosition().y);
-                effect.start();
-                AssetLoader.sWorkParticleBlood.add(effect);
+            if (body.getPosition().x>Constants.RUNNER_X) {
+                body.applyForceToCenter(1000*getUserData().getWidth()*getUserData().getHeight(), 0, false);
             }
 
-            GameStage stage = (GameStage) getStage();
-            stage.removeMovable(this);
-            stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump1"));
-            this.remove();
-            PoolsHandler.sEnemiesPools.get(getUserData().getEnemyType().name()).free(this);
+            if (getUserData().getEnemyType().getGravityScale()==0) {
+                body.setGravityScale(0);
+            }
+
+        }
+        body.applyForceToCenter(500, 50, false);
+
+        if ((deadTime>0.2f||getUserData().isTerribleDeath())&&getStage()!=null) {
+            if (getUserData().isDemon()&&!getUserData().isStruck()&&!getUserData().isTerribleDeath()) {
+                getUserData().setDead(false);
+                getUserData().setStruck(true);
+                body.setTransform(body.getPosition(), 0);
+                body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY);
+                mMainState = EnemyStateMain.ACTIVE;
+                mMoveState = EnemyStateMove.RUN;
+                start(false);
+            } else {
+                //exp
+                if (AssetLoader.sFreeParticleBlood.size>0) {
+                    ParticleEffect effect = AssetLoader.sFreeParticleBlood.get(AssetLoader.sFreeParticleBlood.size -1);
+                    AssetLoader.sFreeParticleBlood.removeIndex(AssetLoader.sFreeParticleBlood.size -1);
+                    effect.getEmitters().first().setPosition(body.getPosition().x, body.getPosition().y);
+                    effect.start();
+                    AssetLoader.sWorkParticleBlood.add(effect);
+                }
+
+                GameStage stage = (GameStage) getStage();
+                stage.removeMovable(this);
+                stage.removeRetributable(this);
+                stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump1"));
+                this.remove();
+                PoolsHandler.sEnemiesPools.get(getUserData().getEnemyType().name()).free(this);
+
+                ScoreCounter.increaseScore(1);
+                ScoreCounter.increaseKilled();
+            }
+
+
         }
 
     }
@@ -451,6 +488,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
     public void reset() {
         if (getStage()!=null) {
             ((GameStage)getStage()).removeMovable(this);
+            ((GameStage)getStage()).removeRetributable(this);
         }
         stateTime = 0f;
         deadTime = 0f;
@@ -460,6 +498,10 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         getUserData().setStrike(false);
         getUserData().setShoot(false);
         getUserData().setDoll(false);
+        getUserData().setLaunched(false);
+        getUserData().setStruck(false);
+        getUserData().setTerribleDeath(false);
+
         body.setActive(false);
         body.setAngularVelocity(0f);
         body.setGravityScale(getUserData().getEnemyType().getGravityScale());
@@ -467,7 +509,6 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         body.setFixedRotation(true);
         body.setTransform(-10, -10, 0);
 
-        ((UserData)body.getUserData()).setLaunched(false);
 
         mMainState = EnemyStateMain.WAIT;
         mMoveState = EnemyStateMove.STAY;
@@ -480,5 +521,18 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable {
         body.setLinearVelocity(body.getLinearVelocity().x
                 + (speedScale-(mPreviousVelocity)), body.getLinearVelocity().y);
         mPreviousVelocity  = speedScale;
+    }
+
+    @Override
+    public void punish(int retributionLevel) {
+        switch (retributionLevel) {
+            case 0:
+            case 1:
+            case 2:
+                if (getBody().getPosition().x<Constants.GAME_WIDTH&&!getUserData().isDead()) {
+                    getUserData().setDead(true);
+                }
+                break;
+        }
     }
 }

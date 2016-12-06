@@ -11,5 +11,6 @@ public enum RunnerState {
     JUMP_STRIKE,
     JUMP_DOUBLE,
     JUMP_DOUBLE_STRIKE,
-    DIE
+    DIE,
+    THE_DRAGON
 }

@@ -10,7 +10,7 @@ import net.uglukfearless.monk.utils.file.AssetLoader;
 public enum ArmourType {
     ARMOUR_TYPE1("Light armor", "Легкая броня", 1, 1, 1),
     ARMOUR_TYPE2("Middle armor", "Средняя броня", 2, 2, 2),
-    ARMOUR_TYPE3("Heavy armor", "Тяжолая броня", 3, 3, 3);
+    ARMOUR_TYPE3("Heavy armor", "Тяжелая броня", 3, 3, 3);
 
     private final String sEnName;
     private final String sRuName;
@@ -26,12 +26,12 @@ public enum ArmourType {
         this.sPrice = price;
         this.sGrade = grade;
         this.sStrength = strength;
-        this.sImage = AssetLoader.armoursAtlas.findRegion("armour".concat(String.valueOf(grade)));
+        this.sImage = AssetLoader.itemsAtlas.findRegion("armour".concat(String.valueOf(grade)));
     }
 
     public static void init() {
         for (ArmourType armourType: ArmourType.values()) {
-            armourType.setImage(AssetLoader.armoursAtlas.findRegion("armour".concat(String.valueOf(armourType.getGrade()))));
+            armourType.setImage(AssetLoader.itemsAtlas.findRegion("armour".concat(String.valueOf(armourType.getGrade()))));
         }
     }
 

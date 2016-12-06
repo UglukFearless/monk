@@ -52,7 +52,7 @@ public class GameScreen implements Screen {
     private void initGame() {
 
         mLevelModel.init();
-        AssetLoader.loadMonkAnimations(PreferencesManager.getArmour());
+        AssetLoader.loadMonkAnimations(PreferencesManager.getArmour(), PreferencesManager.getWeapon());
 
 
         for (int i=0;i<10;i++) {

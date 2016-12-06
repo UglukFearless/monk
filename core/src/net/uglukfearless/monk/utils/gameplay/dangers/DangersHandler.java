@@ -1,6 +1,7 @@
 package net.uglukfearless.monk.utils.gameplay.dangers;
 
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
 import net.uglukfearless.monk.actors.gameplay.Columns;
@@ -195,25 +196,27 @@ public class DangersHandler {
 
     private boolean setBonus(float i,float j) {
 
-        for (GameBonus bonus : mBonuses) {
-            if (bonus.isActive()) {
+        if (stage.getRunner()!=null&&!stage.getRunner().getUserData().isDead()) {
+            for (GameBonus bonus : mBonuses) {
+                if (bonus.isActive()) {
 
-                return false;
-            }
-        }
-
-        if (rand.nextInt(100)>80) {
-
-            GameBonus gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
-
-            while ((gameBonus instanceof RevivalBonus)&&(mBonuses.size>1)&&stage.getRevival()==stage.getLimitRevival()) {
-                gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
+                    return false;
+                }
             }
 
-            gameBonus.init(startX + Constants.STEP_OF_DANGERS * i,
-                    Constants.LAYOUT_Y_ONE + Constants.LAYOUT_Y_STEP * j);
+            if (rand.nextInt(100)>80) {
 
-            return true;
+                GameBonus gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
+
+                while ((gameBonus instanceof RevivalBonus)&&(mBonuses.size>1)&&stage.getRevival()==stage.getLimitRevival()) {
+                    gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
+                }
+
+                gameBonus.init(startX + Constants.STEP_OF_DANGERS * i,
+                        Constants.LAYOUT_Y_ONE + Constants.LAYOUT_Y_STEP * j);
+
+                return true;
+            }
         }
 
         return false;

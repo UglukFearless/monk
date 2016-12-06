@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.ColorAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -24,8 +25,11 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import net.uglukfearless.monk.actors.ParticleActor;
 import net.uglukfearless.monk.actors.menu.MenuBackground;
+import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.screens.MainMenuScreen;
 import net.uglukfearless.monk.ui.BackButton;
@@ -35,7 +39,7 @@ import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 
 public class SelectLevelStage extends Stage {
 
-    private static int VIEWPORT_WIDTH;
+    private static int VIEWPORT_WIDTH = Constants.APP_WIDTH;
     private static int VIEWPORT_HEIGHT;
     private final MainMenuScreen mScreen;
     private final BackButton mBackButton;
@@ -62,11 +66,11 @@ public class SelectLevelStage extends Stage {
 
     public SelectLevelStage(MainMenuScreen screen, float yViewportHeight) {
 
-        super(new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
-                new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight())));
+        super(new FitViewport(VIEWPORT_WIDTH, yViewportHeight,
+                new OrthographicCamera(VIEWPORT_WIDTH, yViewportHeight)));
 
-        VIEWPORT_WIDTH = Gdx.graphics.getWidth();
-        VIEWPORT_HEIGHT = Gdx.graphics.getHeight();
+        VIEWPORT_WIDTH = Constants.APP_WIDTH;
+        VIEWPORT_HEIGHT = (int)yViewportHeight;
 
         mYGameHeight = yViewportHeight;
         mScreen = screen;
@@ -77,7 +81,10 @@ public class SelectLevelStage extends Stage {
         mLevelLogos = new Array<Texture>();
 
         Gdx.input.setInputProcessor(this);
-        addActor(new MenuBackground());
+        addActor(new MenuBackground(AssetLoader.menuBackgroundTexture1, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, yViewportHeight, true));
+        setupParticles(AssetLoader.sSnowParticleBack);
+        addActor(new MenuBackground(AssetLoader.menuBackgroundTexture2, VIEWPORT_WIDTH, Constants.APP_HEIGHT, yViewportHeight, false));
+        setupParticles(AssetLoader.sSnowParticle);
 
         findLevels();
 
@@ -200,5 +207,12 @@ public class SelectLevelStage extends Stage {
             mScreen.mainMenu();
         }
         return super.keyDown(keyCode);
+    }
+
+    private void setupParticles(ParticleEffect particleEffect) {
+        ParticleActor particleActor = new ParticleActor(particleEffect);
+        particleActor.setPosition(VIEWPORT_WIDTH/2, VIEWPORT_HEIGHT);
+        addActor(particleActor);
+        particleActor.start();
     }
 }

@@ -60,6 +60,7 @@ public class ArmourUserData extends UserData {
 
     public void destroyArmour() {
         isActive = false;
+        PreferencesManager.clearArmour();
     }
 
     public boolean isHit() {
@@ -92,5 +93,22 @@ public class ArmourUserData extends UserData {
 
     public void setHitted(boolean hitted) {
         mHitted = hitted;
+    }
+
+    public void reset(ArmourType armourType) {
+
+        mType = armourType;
+        mTotalStrength = mType.getStrength();
+        mCurrentStrength = mTotalStrength;
+        isActive = true;
+        isHit = false;
+
+    }
+
+    public void nullReset() {
+        isHit = false;
+        mHitted = false;
+        isWait = true;
+        isActive=false;
     }
 }

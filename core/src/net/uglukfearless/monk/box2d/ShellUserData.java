@@ -9,6 +9,7 @@ public class ShellUserData extends UserData {
 
     private boolean mDead;
     private String KEY;
+    private boolean mStrong;
 
     public ShellUserData(float width, float height) {
         super(width, height);
@@ -30,5 +31,13 @@ public class ShellUserData extends UserData {
 
     public void setKEY(String key) {
         this.KEY = new String(key);
+    }
+
+    public void setStrong(boolean strong) {
+        mStrong = strong;
+    }
+
+    public boolean isStrong() {
+        return mStrong;
     }
 }

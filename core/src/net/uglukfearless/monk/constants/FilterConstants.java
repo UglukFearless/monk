@@ -3,7 +3,7 @@ package net.uglukfearless.monk.constants;
 
 import com.badlogic.gdx.physics.box2d.Filter;
 
-import net.uglukfearless.monk.utils.gameplay.FilterHandler;
+import net.uglukfearless.monk.utils.gameplay.bodies.FilterHandler;
 
 /**
  * Created by Ugluk on 01.06.2016.
@@ -42,7 +42,7 @@ public class FilterConstants {
 
     public static final short MASK_RUNNER_STRIKE_STRONG  =  CATEGORY_ENEMY | CATEGORY_LUMP
             | CATEGORY_OBSTACLE_SIMPLE| CATEGORY_ENEMY_STRIKE | CATEGORY_OBSTACLE_ARMOUR
-            | CATEGORY_OBSTACLE_ARMOUR;
+            | CATEGORY_OBSTACLE_TRAP;
 
     public static final short MASK_ENEMY_DEAD = CATEGORY_STATIC | CATEGORY_RUNNER_STRIKE
             | CATEGORY_OBSTACLE_SIMPLE | CATEGORY_OBSTACLE_TRAP | CATEGORY_ENEMY
@@ -103,5 +103,7 @@ public class FilterConstants {
     public static final Filter FILTER_RUNNER_WINGS = FilterHandler.getFilter(CATEGORY_RUNNER, MASK_RUNNER_WINGS);
     public static final Filter FILTER_RUNNER_WINGS_GHOST = FilterHandler.getFilter(CATEGORY_RUNNER, MASK_RUNNER_WINGS_GHOST);
     public static final Filter FILTER_PIT = FilterHandler.getFilter(CATEGORY_PIT, MASK_PIT);
+
+    public static final Filter FILTER_DRAGON = FilterHandler.getFilter(CATEGORY_ENEMY_STRIKE_FLIP, MASK_RUNNER_STRIKE_STRONG);
 
 }

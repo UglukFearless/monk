@@ -62,6 +62,7 @@ public abstract class GameBonus extends Actor implements Movable {
         mRunnerBounds = new Rectangle(Constants.RUNNER_X, Constants.RUNNER_Y
                 , Constants.RUNNER_WIDTH, Constants.RUNNER_HEIGHT);
         mBonusBounds = new Rectangle(getX(), getY(), getWidth(), getHeight());
+
     }
 
     @Override
@@ -71,14 +72,25 @@ public abstract class GameBonus extends Actor implements Movable {
         if (this.getX()<Constants.GAME_WIDTH&&this.getX()+getWidth()>0) {
             if (!mTouched) {
 
-                if (mStage.getState()!= GameState.GAME_OVER&&!mStage.getRunner().getUserData().isDead()) {
+                this.setX(this.getX() + mSpeed*delta);
 
-                    this.setX(this.getX() + mSpeed*delta);
+                if (mStage.getState()!= GameState.GAME_OVER&&!mStage.getRunner().getUserData().isDead()
+                        && (mStage.getRunner().getBody()!=null)) {
 
-                    mRunnerBounds.setPosition(mStage.getRunner().getBody().getPosition().x
-                            - ((RunnerUserData) mStage.getRunner().getBody().getUserData()).getWidth() / 2f
+                    mRunnerBounds
+                            .setPosition(
+                                    mStage
+                                            .getRunner()
+                                            .getBody()
+                                            .getPosition().x
+
+//                            - ((RunnerUserData) mStage.getRunner().getBody()
+//                                            .getUserData())
+//                                            .getWidth() / 2f
+                                    - Constants.RUNNER_WIDTH/2f
                             , mStage.getRunner().getBody().getPosition().y
-                            - ((RunnerUserData) mStage.getRunner().getBody().getUserData()).getHeight() / 2f);
+//                            - ((RunnerUserData) mStage.getRunner().getBody().getUserData()).getHeight() / 2f);
+                                            - Constants.RUNNER_HEIGHT/2f);
                     mBonusBounds.setPosition(getX(), getY());
 
                     if (mRunnerBounds.overlaps(mBonusBounds)) {

@@ -9,14 +9,14 @@ background1
   size: 800, 480
   orig: 800, 480
   offset: 0, 0
-  index: -1
-background2
+  index: 1
+background1
   rotate: false
   xy: 1, 1
   size: 800, 480
   orig: 800, 480
   offset: 0, 0
-  index: -1
+  index: 2
 column
   rotate: false
   xy: 803, 742
@@ -26,6 +26,25 @@ column
   index: -1
 
 environment2.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+background2
+  rotate: false
+  xy: 1, 483
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 1
+background2
+  rotate: false
+  xy: 1, 1
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 2
+
+environment3.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none

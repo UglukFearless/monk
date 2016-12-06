@@ -32,6 +32,6 @@ public class GeniusTamesivari extends Achievement {
 
     @Override
     public boolean checkCondition() {
-        return (PreferencesManager.getDestroyed()>=25000&&!isUnlock());
+        return (PreferencesManager.getDestroyed()>=15000&&!isUnlock());
     }
 }

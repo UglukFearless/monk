@@ -4,6 +4,8 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 import net.uglukfearless.monk.box2d.ArmourUserData;
 import net.uglukfearless.monk.constants.FilterConstants;
+import net.uglukfearless.monk.enums.ArmourType;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
 
 /**
  * Created by Ugluk on 07.11.2016.
@@ -13,14 +15,18 @@ public class Armour extends GameActor {
     private Runner mRunner;
 
     private float mHitTime;
-    private float mHitThreshold;
+    private final float mHitThreshold;
     private boolean mBroken;
 
     public Armour(Body body, Runner runner) {
         super(body);
 
         mRunner = runner;
-        mRunner.armouring(this);
+        if (PreferencesManager.getArmour()!=null) {
+            mRunner.armouring(this);
+        } else {
+            mRunner.setArmour(this);
+        }
 
         mHitTime = 0;
         mHitThreshold = 2;
@@ -94,5 +100,27 @@ public class Armour extends GameActor {
     public void unhide() {
         body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
         getUserData().setWait(false);
+    }
+
+    public void activate(ArmourType armourType) {
+
+        mHitTime = 0;
+
+        mBroken=false;
+
+        getUserData().reset(armourType);
+
+    }
+
+    public void setRunner(Runner runner) {
+        mRunner = runner;
+    }
+
+    public void setRunnerPassive(Runner runner) {
+        mRunner = runner;
+
+        mHitTime = 0;
+
+        getUserData().nullReset();
     }
 }

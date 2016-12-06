@@ -26,7 +26,7 @@ mDifficultyHandler: {
 			priorityPit: 0
 			priorityColumns: 0
 			dangersProbability: 50
-			enemiesPriority: [ 10, 0, 10, 0, 0, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 10, 0, 10, 0, 10, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 25, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -36,7 +36,7 @@ mDifficultyHandler: {
 			priorityPit: 2
 			priorityColumns: 0
 			dangersProbability: 60
-			enemiesPriority: [ 20, 0, 20, 10, 0, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 20, 0, 20, 10, 15, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 20, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -46,7 +46,7 @@ mDifficultyHandler: {
 			priorityPit: 5
 			priorityColumns: 0
 			dangersProbability: 70
-			enemiesPriority: [ 20, 5, 20, 10, 0, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 20, 5, 20, 10, 15, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 20, 10, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -56,7 +56,7 @@ mDifficultyHandler: {
 			priorityPit: 7
 			priorityColumns: 0
 			dangersProbability: 80
-			enemiesPriority: [ 10, 10, 10, 10, 0, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 10, 10, 10, 10, 20, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 30, 30, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -66,7 +66,7 @@ mDifficultyHandler: {
 			priorityPit: 7
 			priorityColumns: 2
 			dangersProbability: 80
-			enemiesPriority: [ 0, 10, 10, 20, 0, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 0, 10, 10, 20, 20, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 30, 30, 10, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -76,7 +76,7 @@ mDifficultyHandler: {
 			priorityPit: 7
 			priorityColumns: 5
 			dangersProbability: 90
-			enemiesPriority: [ 10, 30, 10, 20, 0, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 10, 30, 10, 20, 30, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 20, 60, 10, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 	]
@@ -85,17 +85,17 @@ mDifficultyHandler: {
 mEnemiesModels:
 	[
 		{
-		name:SPEARMEN
+	name:SPEARMEN
     enName:Spearmen
     ruName:Копейщик
 
-    width:1.3
+    width:1.2
     height:3
     y:0
     jumpingImpulse:8
     gravityScale:2
 
-    armour:false
+    demon:false
     jumper:false
     shouter:false
     striker:true
@@ -122,7 +122,7 @@ mEnemiesModels:
     jumpingImpulse:8
     gravityScale:2
 
-    armour:false
+	demon:false
     jumper:true
     shouter:true
     striker:true
@@ -139,7 +139,7 @@ mEnemiesModels:
     number:2
 		},
 		{
-		name:EAGLE
+	name:EAGLE
     enName:Eagle
     ruName:Орел
 
@@ -149,7 +149,7 @@ mEnemiesModels:
     jumpingImpulse:8
     gravityScale:0
 
-    armour:false
+	demon:false
     jumper:false
     shouter:false
     striker:true
@@ -159,14 +159,14 @@ mEnemiesModels:
     textureOffsetX:0.4
     textureOffsetY:-0.5
 
-    prohibitionsMap: [[0,0],[0,0]]
+    prohibitionsMap: [[0,4],[4,0]]
     priority:0
 		basicXVelocity:-10
 		block:false
     number:3
 		},
 		{
-		name:DOG
+	name:DOG
     enName:Dog
     ruName:Пес
 
@@ -176,7 +176,7 @@ mEnemiesModels:
     jumpingImpulse:8
     gravityScale:2
 
-    armour:false
+	demon:false
     jumper:true
     shouter:false
     striker:true
@@ -193,34 +193,34 @@ mEnemiesModels:
     number:4
 		},
 		{
-		name:SPEARMEN
-    enName:Spearmen
-    ruName:Копейщик
+	name:RED_DEMON
+			enName:Red demon
+			ruName:Красный демон
 
-    width:1.3
-    height:3
-    y:0
-    jumpingImpulse:8
-    gravityScale:2
+			width:2.6
+			height:4.2
+			y:0
+			jumpingImpulse:8
+			gravityScale:2
 
-    armour:false
-    jumper:false
-    shouter:false
-    striker:true
+			demon:true
+			jumper:true
+			shouter:true
+			striker:true
 
-    textureScaleX:1.8
-    textureScaleY:1.1
-    textureOffsetX:-0.2
-    textureOffsetY:0
+			textureScaleX:1.8
+			textureScaleY:1.1
+			textureOffsetX:-0.2
+			textureOffsetY:0
 
-    prohibitionsMap: [[0,0],[0,0]]
-    priority:0
-		basicXVelocity:-10
-		block:true
-    number:5
+			prohibitionsMap: [[0,0],[0,0]]
+			priority:0
+			basicXVelocity:-8
+			block:false
+			number:5
 		},
 		{
-		name:SPEARMEN
+	name:SPEARMEN
     enName:Spearmen
     ruName:Копейщик
 
@@ -230,7 +230,7 @@ mEnemiesModels:
     jumpingImpulse:8
     gravityScale:2
 
-    armour:false
+	demon:false
     jumper:false
     shouter:false
     striker:true
@@ -247,7 +247,7 @@ mEnemiesModels:
     number:6
 		},
 		{
-		name:SPEARMEN
+	name:SPEARMEN
     enName:Spearmen
     ruName:Копейщик
 
@@ -257,7 +257,7 @@ mEnemiesModels:
     jumpingImpulse:8
     gravityScale:2
 
-    armour:false
+	demon:false
     jumper:false
     shouter:false
     striker:true
@@ -274,7 +274,7 @@ mEnemiesModels:
     number:7
 		},
 		{
-		name:SPEARMEN
+	name:SPEARMEN
     enName:Spearmen
     ruName:Копейщик
 
@@ -284,7 +284,7 @@ mEnemiesModels:
     jumpingImpulse:8
     gravityScale:2
 
-    armour:false
+	demon:false
     jumper:false
     shouter:false
     striker:true
@@ -301,7 +301,7 @@ mEnemiesModels:
     number:8
 		},
 		{
-		name:SPEARMEN
+	name:SPEARMEN
     enName:Spearmen
     ruName:Копейщик
 
@@ -311,7 +311,7 @@ mEnemiesModels:
     jumpingImpulse:8
     gravityScale:2
 
-    armour:false
+	demon:false
     jumper:false
     shouter:false
     striker:true
@@ -329,7 +329,7 @@ mEnemiesModels:
 
 		},
 		{
-		name:SPEARMEN
+	name:SPEARMEN
     enName:Spearmen
     ruName:Копейщик
 
@@ -339,7 +339,7 @@ mEnemiesModels:
     jumpingImpulse:8
     gravityScale:2
 
-    armour:false
+	demon:false
     jumper:false
     shouter:false
     striker:true
@@ -380,6 +380,7 @@ mEnemiesModels:
     	armour:false
     	isTrap:false
     	isSphere:false
+    	isContainer:true
 
     	textureScaleX:1
     	textureScaleY:1

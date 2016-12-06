@@ -17,6 +17,7 @@ public class AndroidLauncher extends AndroidApplication {
 		config.useAccelerometer = false;
 		config.useCompass = false;
 		config.useWakelock = true;
+//		config.numSamples = 2;
 		initialize(new RunningMonk(), config);
 	}
 }

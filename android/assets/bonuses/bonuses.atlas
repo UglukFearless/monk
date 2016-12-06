@@ -10,51 +10,58 @@ buddha
   orig: 64, 64
   offset: 0, 0
   index: -1
-faith_wings
+dragon
   rotate: false
   xy: 1, 67
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-ghost
+faith_wings
   rotate: false
   xy: 67, 133
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-retribution
+ghost
   rotate: false
   xy: 1, 1
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-revival
+retribution
   rotate: false
   xy: 67, 67
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-rupee
+revival
   rotate: false
   xy: 133, 133
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-strong_beat
+rupee
   rotate: false
   xy: 67, 1
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-thunder_fist
+strong_beat
   rotate: false
   xy: 133, 67
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+thunder_fist
+  rotate: false
+  xy: 133, 1
   size: 64, 64
   orig: 64, 64
   offset: 0, 0

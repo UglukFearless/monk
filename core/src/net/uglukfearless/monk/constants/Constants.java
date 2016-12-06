@@ -66,6 +66,7 @@ public class Constants {
     public static final Vector2 RUNNER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 40f);
     public static final Vector2 RUNNER_JUMPING_LINEAR_IMPULSE_ONE = new Vector2(0, 65f);
     public static final float RUNNER_HIT_ANGULAR_IMPULSE = 20f;
+    public static final float DRAGON_X = -4f;
 
     public static final int DANGERS_PRIORITY_NEVER = 0;
     public static final int DANGERS_PRIORITY_VERY_SELDOM = 3;
@@ -138,6 +139,7 @@ public class Constants {
     public static final String BONUS_REVIVAL_REGION = "revival";
     public static final String BONUS_STRONG_BEAT_REGION = "strong_beat";
     public static final String BONUS_THUNDER_FIST_REGION = "thunder_fist";
+    public static final String BONUS_DRAGON_FORM_REGION = "dragon";
 
     public static void init(LevelConstants levelConstants) {
 

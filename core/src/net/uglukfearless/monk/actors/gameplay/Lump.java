@@ -12,7 +12,7 @@ import net.uglukfearless.monk.box2d.LumpUserData;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.gameplay.Movable;
-import net.uglukfearless.monk.utils.gameplay.WorldUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 import java.util.Random;

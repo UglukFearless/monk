@@ -191,6 +191,9 @@ public class SpaceTable {
                     if ((x<Constants.RUNNER_X + Constants.RUNNER_WIDTH + 2)&&(x>1.5f)) {
                         situation.strike = true;
                     }
+
+                    situation.strongBeat = situation.stop&&(((sTableOld[i][j]&PlacingCategory.CATEGORY_HARD_OBSTACLE)==0)
+                            &&((sTableOld[i][0]&PlacingCategory.ANY_PIT)==0));
                 }
 
             }

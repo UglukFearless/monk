@@ -71,6 +71,7 @@ public enum ObstacleType implements Danger {
     private Animation mStayAnimation;
     private Animation mDieAnimation;
     private boolean mBlock;
+    private boolean isConteiner;
 
     ObstacleType() {
     }
@@ -138,6 +139,8 @@ public enum ObstacleType implements Danger {
         prohibitionsMap[1][0] = (short) (prohibitionsMap[1][0] | obstacleModel.prohibitionsMap [1][0]);
 
         this.isSphere = obstacleModel.isSphere;
+
+        this.isConteiner = obstacleModel.isContainer;
 
         priority = obstacleModel.priority;
 
@@ -269,6 +272,10 @@ public enum ObstacleType implements Danger {
         return isSphere;
     }
 
+    public boolean isConteiner() {
+        return isConteiner;
+    }
+
     public float getTextureScaleX() {
         return textureScaleX;
     }
@@ -310,5 +317,17 @@ public enum ObstacleType implements Danger {
 
     public void setBlock(boolean block) {
         mBlock = block;
+    }
+
+    public String getRuName() {
+        return ruName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEnName() {
+        return enName;
     }
 }

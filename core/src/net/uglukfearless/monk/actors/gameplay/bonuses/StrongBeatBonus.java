@@ -28,14 +28,14 @@ public class StrongBeatBonus extends GameBonus {
 
     @Override
     public void activation() {
-        mStage.getRunnerStrike().getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_STRIKE_STRONG);
+        mStage.setStrikeFilter(FilterConstants.FILTER_RUNNER_STRIKE_STRONG);
         mStage.getRunner().setStrongBeat(true);
         ScoreCounter.increaseStrongBeat();
     }
 
     @Override
     public void deactivation() {
-        mStage.getRunnerStrike().getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_STRIKE);
+        mStage.setStrikeFilter(FilterConstants.FILTER_RUNNER_STRIKE);
         mStage.getRunner().setStrongBeat(false);
     }
 }

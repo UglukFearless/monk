@@ -5,6 +5,7 @@ import com.badlogic.gdx.Preferences;
 
 import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.enums.ArmourType;
+import net.uglukfearless.monk.enums.WeaponType;
 
 import java.util.Map;
 
@@ -127,13 +128,31 @@ public class PreferencesManager {
         return null;
     }
 
+    public static WeaponType getWeapon() {
+        String currentWeapon = sStatistics.getString(PreferencesConstants.ITEM_WEAPON, "null");
+        if (!currentWeapon.equals("null")) {
+            return WeaponType.valueOf(currentWeapon);
+        }
+        return null;
+    }
+
     public static void setArmour(ArmourType armour) {
         sStatistics.putString(PreferencesConstants.ITEM_ARMOUR, armour.name());
         sStatistics.flush();
     }
 
+    public static void setWeapon(WeaponType weapon) {
+        sStatistics.putString(PreferencesConstants.ITEM_WEAPON, weapon.name());
+        sStatistics.flush();
+    }
+
     public static void clearArmour() {
         sStatistics.putString(PreferencesConstants.ITEM_ARMOUR, "null");
+        sStatistics.flush();
+    }
+
+    public static void clearWeapon() {
+        sStatistics.putString(PreferencesConstants.ITEM_WEAPON, "null");
         sStatistics.flush();
     }
 
@@ -229,6 +248,9 @@ public class PreferencesManager {
     public static int getWings() {
         return sStatistics.getInteger(PreferencesConstants.STATS_USE_WINGS_KEY, 0);
     }
+    public static int getDragon() {
+        return sStatistics.getInteger(PreferencesConstants.STATS_USE_DRAGON_KEY, 0);
+    }
 
     public static void addTime(int time) {
         sStatistics.putInteger(PreferencesConstants.STATS_TOTALTIME_KEY, getTime() + time);
@@ -285,6 +307,11 @@ public class PreferencesManager {
     }
     public static void addWings(int wings) {
         sStatistics.putInteger(PreferencesConstants.STATS_USE_WINGS_KEY, getWings() + wings);
+        sStatistics.flush();
+    }
+
+    public static void addDragon(int dragon) {
+        sStatistics.putInteger(PreferencesConstants.STATS_USE_DRAGON_KEY, getDragon() + dragon);
         sStatistics.flush();
     }
 

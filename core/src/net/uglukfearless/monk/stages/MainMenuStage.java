@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import net.uglukfearless.monk.actors.ParticleActor;
 import net.uglukfearless.monk.actors.menu.MenuBackground;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.listeners.baction.MenuOptionAction;
@@ -38,8 +40,6 @@ public class MainMenuStage extends Stage {
 
     private MainMenuScreen screen;
 
-    private  Batch mBatch;
-
     private Vector3 touchPoint;
 
     private MenuTextButtonLib mTextButtonPlay;
@@ -58,8 +58,16 @@ public class MainMenuStage extends Stage {
         VIEWPORT_HEIGHT = (int) yViewportHeight;
 
         this.screen = screen;
-        addActor(new MenuBackground());
+        addActor(new MenuBackground(AssetLoader.menuBackgroundTexture1, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, yViewportHeight, true));
         Gdx.input.setInputProcessor(this);
+
+        setupParticles(AssetLoader.sSnowParticleBack, VIEWPORT_WIDTH/2, VIEWPORT_HEIGHT);
+
+        addActor(new MenuBackground(AssetLoader.menuBackgroundTexture2, VIEWPORT_WIDTH, Constants.APP_HEIGHT, yViewportHeight, false));
+
+        setupParticles(AssetLoader.sCandleParticle, 630, 144);
+
+        setupParticles(AssetLoader.sSnowParticle, VIEWPORT_WIDTH/2, VIEWPORT_HEIGHT);
 
         touchPoint = new Vector3();
 
@@ -72,6 +80,13 @@ public class MainMenuStage extends Stage {
         Gdx.input.setCatchBackKey(true);
         Gdx.input.setCatchMenuKey(true);
 
+    }
+
+    private void setupParticles(ParticleEffect particleEffect, float x, float y) {
+        ParticleActor particleActor = new ParticleActor(particleEffect);
+        particleActor.setPosition(x, y);
+        addActor(particleActor);
+        particleActor.start();
     }
 
     private void setupTreasures() {
@@ -156,4 +171,13 @@ public class MainMenuStage extends Stage {
         return super.keyDown(keyCode);
     }
 
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+    }
+
+    @Override
+    public void draw() {
+        super.draw();
+    }
 }

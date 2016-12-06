@@ -34,7 +34,6 @@ public class BuddhaBonus extends GameBonus {
     @Override
     public void deactivation() {
         mStage.getRunner().setBuddha(false);
-//        mStage.getRunner().getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER);
         mStage.getRunner().setCustomFilter();
     }
 

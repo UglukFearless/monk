@@ -3,6 +3,7 @@ package net.uglukfearless.monk.stages;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import net.uglukfearless.monk.actors.ParticleActor;
 import net.uglukfearless.monk.actors.menu.MenuBackground;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.screens.MainMenuScreen;
@@ -72,7 +74,10 @@ public class OptionMenuStage extends Stage {
 
         mScreen = screen;
 
-        addActor(new MenuBackground());
+        addActor(new MenuBackground(AssetLoader.menuBackgroundTexture1, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, yViewportHeight, true));
+        setupParticles(AssetLoader.sSnowParticleBack);
+        addActor(new MenuBackground(AssetLoader.menuBackgroundTexture2, VIEWPORT_WIDTH, Constants.APP_HEIGHT, yViewportHeight, false));
+        setupParticles(AssetLoader.sSnowParticle);
         Gdx.input.setInputProcessor(this);
 
         mTouchPoint = new Vector3();
@@ -90,6 +95,13 @@ public class OptionMenuStage extends Stage {
 
         Gdx.input.setCatchBackKey(true);
         Gdx.input.setCatchMenuKey(true);
+    }
+
+    private void setupParticles(ParticleEffect particleEffect) {
+        ParticleActor particleActor = new ParticleActor(particleEffect);
+        particleActor.setPosition(VIEWPORT_WIDTH/2, VIEWPORT_HEIGHT);
+        addActor(particleActor);
+        particleActor.start();
     }
 
     private void setupSliders() {
@@ -121,7 +133,7 @@ public class OptionMenuStage extends Stage {
                 mCheckSound.setChecked(true);
                 checkSound();
                 if (!mHack) {
-                    AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
+                    AssetLoader.menuTestValueSound.play(SoundSystem.getSoundValue());
                 }
                 mHack = !mHack;
             }

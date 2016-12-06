@@ -7,7 +7,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import net.uglukfearless.monk.box2d.GroundUserData;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
-import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.Movable;
 
 /**

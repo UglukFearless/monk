@@ -1,6 +1,7 @@
 package net.uglukfearless.monk.actors.menu;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
@@ -12,12 +13,28 @@ import net.uglukfearless.monk.utils.file.AssetLoader;
  */
 public class MenuBackground extends Actor {
 
-    public static int VIEWPORT_WIDTH;
-    public static int VIEWPORT_HEIGHT;
+    private float VIEWPORT_WIDTH;
+    private float VIEWPORT_HEIGHT;
 
-    public MenuBackground() {
+    private Texture mTexture;
+
+    public MenuBackground(Texture texture, int VIEWPORT_WIDTH, int VIEWPORT_HEIGHT, float yViewportHeight , boolean first) {
+        this.VIEWPORT_WIDTH = VIEWPORT_WIDTH;
+        if (first) {
+            this.VIEWPORT_HEIGHT = yViewportHeight;
+        } else {
+            this.VIEWPORT_HEIGHT = VIEWPORT_HEIGHT;
+        }
+
+
+        mTexture = texture;
+    }
+
+    public MenuBackground(Texture texture) {
         VIEWPORT_WIDTH = Gdx.graphics.getWidth();
         VIEWPORT_HEIGHT = Gdx.graphics.getHeight();
+
+        mTexture = texture;
     }
     @Override
     public void draw(Batch batch, float parentAlpha) {
@@ -25,7 +42,7 @@ public class MenuBackground extends Actor {
         //страшный костыль, боюсь, что так делать низя нихья. Это связано с использованием ScrollPane... хз как она меняет цвет
         batch.setColor(1f, 1f, 1f, 1f);
 
-        batch.draw(AssetLoader.menuBackgroundTexture, 0, 0,
+        batch.draw(mTexture, 0, 0,
                 VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
         super.draw(batch, parentAlpha);

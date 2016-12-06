@@ -9,19 +9,19 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Pool;
 
 import net.uglukfearless.monk.box2d.ShellUserData;
-import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
-import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.Movable;
-import net.uglukfearless.monk.utils.gameplay.WorldUtils;
+import net.uglukfearless.monk.utils.gameplay.Retributable;
+import net.uglukfearless.monk.utils.gameplay.bodies.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 /**
  * Created by Ugluk on 05.09.2016.
  */
-public class Shell extends GameActor implements Pool.Poolable, Movable {
+public class Shell extends GameActor implements Pool.Poolable, Movable, Retributable {
 
     private TextureRegion mRegion;
     private float mPreviousVelocity;
@@ -41,9 +41,11 @@ public class Shell extends GameActor implements Pool.Poolable, Movable {
     @Override
     public void reset() {
         ((GameStage)getStage()).removeMovable(this);
+        ((GameStage)getStage()).removeRetributable(this);
         body.setActive(false);
         this.remove();
         getUserData().setDead(false);
+        getUserData().setStrong(false);
         body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_STRIKE);
         body.setGravityScale(0);
         body.setTransform(-10, -10, 0);
@@ -61,6 +63,7 @@ public class Shell extends GameActor implements Pool.Poolable, Movable {
             body.setLinearVelocity(speed - 10f, 0);
         }
         ((GameStage)stage).addMovable(this);
+        ((GameStage)stage).addRetributable(this);
         mPreviousVelocity = ((GameStage)stage).getCurrentVelocity().x;
     }
 
@@ -77,6 +80,7 @@ public class Shell extends GameActor implements Pool.Poolable, Movable {
             body.setLinearVelocity(speed - 10f, 0);
         }
         ((GameStage)stage).addMovable(this);
+        ((GameStage)stage).addRetributable(this);
         mPreviousVelocity = ((GameStage)stage).getCurrentVelocity().x;
     }
 
@@ -105,5 +109,10 @@ public class Shell extends GameActor implements Pool.Poolable, Movable {
         body.setLinearVelocity(body.getLinearVelocity().x
                 + (speedScale-(mPreviousVelocity)), body.getLinearVelocity().y);
         mPreviousVelocity = speedScale;
+    }
+
+    @Override
+    public void punish(int retributionLevel) {
+        getUserData().setDead(true);
     }
 }

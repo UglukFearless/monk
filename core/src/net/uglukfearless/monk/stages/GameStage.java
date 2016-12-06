@@ -13,8 +13,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -23,14 +23,14 @@ import net.uglukfearless.monk.actors.gameplay.Armour;
 import net.uglukfearless.monk.actors.gameplay.Background;
 import net.uglukfearless.monk.actors.gameplay.BuddhasBody;
 import net.uglukfearless.monk.actors.gameplay.Columns;
-import net.uglukfearless.monk.actors.gameplay.Enemy;
+import net.uglukfearless.monk.actors.gameplay.Dragon;
 import net.uglukfearless.monk.actors.gameplay.Ground;
 import net.uglukfearless.monk.actors.gameplay.Lump;
 import net.uglukfearless.monk.actors.gameplay.Runner;
 import net.uglukfearless.monk.actors.gameplay.RunnerStrike;
-import net.uglukfearless.monk.actors.gameplay.Obstacle;
 import net.uglukfearless.monk.actors.gameplay.Pit;
-import net.uglukfearless.monk.actors.gameplay.Shell;
+import net.uglukfearless.monk.actors.gameplay.bonuses.DragonFormBonus;
+import net.uglukfearless.monk.actors.gameplay.bonuses.item.ArmourItem;
 import net.uglukfearless.monk.actors.gameplay.bonuses.BuddhaBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.GameBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.GhostBonus;
@@ -42,10 +42,10 @@ import net.uglukfearless.monk.actors.gameplay.bonuses.ThunderFistBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.Treasures;
 import net.uglukfearless.monk.actors.gameplay.bonuses.WingsAvatar;
 import net.uglukfearless.monk.actors.gameplay.bonuses.WingsBonus;
-import net.uglukfearless.monk.box2d.UserData;
-import net.uglukfearless.monk.constants.FilterConstants;
+import net.uglukfearless.monk.actors.gameplay.bonuses.item.WeaponItem;
 import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.enums.GameState;
+import net.uglukfearless.monk.enums.WeaponDistance;
 import net.uglukfearless.monk.listeners.GameContactListener;
 import net.uglukfearless.monk.screens.GameScreen;
 import net.uglukfearless.monk.utils.file.AssetLoader;
@@ -54,13 +54,14 @@ import net.uglukfearless.monk.utils.file.SoundSystem;
 import net.uglukfearless.monk.utils.fortween.Value;
 import net.uglukfearless.monk.utils.fortween.ValueAccessor;
 import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.utils.gameplay.Retributable;
 import net.uglukfearless.monk.utils.gameplay.Shake;
 import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
 import net.uglukfearless.monk.utils.gameplay.dangers.DangersHandler;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.gameplay.Movable;
 import net.uglukfearless.monk.utils.gameplay.ai.SpaceTable;
-import net.uglukfearless.monk.utils.gameplay.WorldUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
@@ -90,12 +91,10 @@ public class GameStage extends Stage {
     private Ground ground1;
     private Ground ground2;
     private Runner runner;
-    private RunnerStrike mRunnerStrike;
 
-
-//    private Array<Body> bodies;
-
-    private boolean pit;
+    private RunnerStrike mRunnerStrikeShort;
+    private RunnerStrike mRunnerStrikeMiddle;
+    private RunnerStrike mRunnerStrikeLong;
 
     private final float TIME_STEP = 1/300f;
     private float accumulator = 0f;
@@ -152,6 +151,11 @@ public class GameStage extends Stage {
     private Armour mArmour;
     private WingsAvatar mWingsAvatar;
     private int mWingsBuffer;
+    private ArmourItem mArmourBonus;
+    private WeaponItem mWeaponBonus;
+    private Array<Retributable> mRetributableList;
+
+    private Dragon mDragon;
 
     public GameStage(GameScreen screen, float yViewportHeight, LevelModel levelModel) {
 
@@ -166,6 +170,8 @@ public class GameStage extends Stage {
         mState = START;
 
         mMovableArray = new Array<Movable>();
+        mRetributableList = new Array<Retributable>();
+
         mCurrentVelocity = Constants.WORLD_STATIC_VELOCITY_INIT;
 
         setUpLevel(levelModel);
@@ -221,10 +227,8 @@ public class GameStage extends Stage {
 
     private void setUpArmour() {
 
-        if (PreferencesManager.getArmour()!=null) {
-            mArmour = new Armour(WorldUtils.createArmour(world), runner);
-            addActor(mArmour);
-        }
+        mArmour = new Armour(WorldUtils.createArmour(world), runner);
+        addActor(mArmour);
     }
 
     private void setUpShake() {
@@ -239,6 +243,10 @@ public class GameStage extends Stage {
     private void setUpBuddhaBody() {
         mBuddhaBonus = new BuddhasBody(WorldUtils.createBuddhasBody(world), runner);
         addActor(mBuddhaBonus);
+
+        mDragon = new Dragon(WorldUtils.createDragon(world), this);
+        mDragon.trend();
+        addActor(mDragon);
     }
 
     public void setGuiStage(GameGuiStage guiStage) {
@@ -246,6 +254,8 @@ public class GameStage extends Stage {
         for (GameBonus bonus : mBonuses) {
             bonus.setGui(mGameGuiStage);
         }
+        mArmourBonus.setGui(mGameGuiStage);
+        mWeaponBonus.setGui(mGameGuiStage);
 
         setUpRevival();
         setUpWings();
@@ -260,8 +270,11 @@ public class GameStage extends Stage {
         mBonuses.add(new ThunderFistBonus(this, VIEWPORT_HEIGHT));
         mBonuses.add(new RevivalBonus(this, VIEWPORT_HEIGHT));
         mBonuses.add(new BuddhaBonus(this, VIEWPORT_HEIGHT));
-//        mBonuses.add(new Treasures(this,  VIEWPORT_HEIGHT));
+        mBonuses.add(new DragonFormBonus(this, VIEWPORT_HEIGHT));
+//        mBonuses.add(monk Treasures(this,  VIEWPORT_HEIGHT));
 
+        mArmourBonus = new ArmourItem(this, VIEWPORT_HEIGHT);
+        mWeaponBonus = new WeaponItem(this, VIEWPORT_HEIGHT);
 
         for (GameBonus gameBonus : mBonuses) {
             addMovable(gameBonus);
@@ -349,8 +362,15 @@ public class GameStage extends Stage {
     }
 
     private void setUpRunnerStrike() {
-        mRunnerStrike = new RunnerStrike(WorldUtils.createRunnerStrike(world), runner);
-        addActor(mRunnerStrike);
+
+        mRunnerStrikeShort = new RunnerStrike(WorldUtils.createRunnerStrike(world, WeaponDistance.SHORT), runner);
+        addActor(mRunnerStrikeShort);
+
+        mRunnerStrikeMiddle = new RunnerStrike(WorldUtils.createRunnerStrike(world, WeaponDistance.MIDDLE), runner);
+        addActor(mRunnerStrikeMiddle);
+
+        mRunnerStrikeLong = new RunnerStrike(WorldUtils.createRunnerStrike(world, WeaponDistance.LONG), runner);
+        addActor(mRunnerStrikeLong);
     }
 
     private void setUpBackground() {
@@ -387,6 +407,8 @@ public class GameStage extends Stage {
 
     @Override
     public void act(float delta) {
+
+//        delta /=3.5f;
 
         float time = 1f / delta;
 
@@ -490,8 +512,12 @@ public class GameStage extends Stage {
             runner.setRevivalFilter();
             runner.setAlpha(0.3f);
             runner.setGrounds(ground1, ground2);
-            mRunnerStrike.setRunner(runner);
+            mRunnerStrikeShort.setRunner(runner);
+            mRunnerStrikeMiddle.setRunner(runner);
+            mRunnerStrikeLong.setRunner(runner);
             mBuddhaBonus.setRunner(runner);
+            mArmour.setRunnerPassive(runner);
+            runner.setArmour(mArmour);
             runner.start();
             addActor(runner);
             mRevivalRunner = false;
@@ -502,9 +528,9 @@ public class GameStage extends Stage {
         } else if (mReturnFilter) {
             mReturnTimer +=delta;
             if (mReturnTimer>3&&runner.getBody()!=null&&!runner.getUserData().isDead()) {
-                if (!runner.isBuddha()&&!runner.isGhost()) {
-                    runner.setCustomFilter();
-                }
+
+                runner.setCustomFilter();
+
 
                 if (!runner.isGhost()) {
                     runner.setAlpha(1f);
@@ -551,11 +577,12 @@ public class GameStage extends Stage {
 
         } else if (rightSideTouched(touchPoint.x, touchPoint.y)) {
             runner.strike();
+            mDragon.headDown();
 
         } else if (leftSideTouched(touchPoint.x, touchPoint.y)) {
 
             runner.jump();
-
+            mDragon.headUp();
         }
 
         return super.touchDown(screenX, screenY, pointer, button);
@@ -633,6 +660,7 @@ public class GameStage extends Stage {
             mState = PAUSE;
         }  else if (keyCode== Input.Keys.SPACE) {
             runner.jump();
+            mDragon.headUp();
         } else if (keyCode==Input.Keys.N) {
             System.out.println("***********************************");
             System.out.println(timeMid);
@@ -641,6 +669,7 @@ public class GameStage extends Stage {
             screen.newGame();
         }  else if (keyCode==Input.Keys.SHIFT_LEFT||keyCode==Input.Keys.ENTER) {
             runner.strike();
+            mDragon.headDown();
         }
 
         return super.keyDown(keyCode);
@@ -686,6 +715,9 @@ public class GameStage extends Stage {
 
     public void realGameOver(String currentKillerKey) {
 
+        mGameGuiStage.disableWingsLabel();
+        mWingsAvatar.remove();
+
         PreferencesManager.addDeath();
         saveTimePoint();
         ScoreCounter.checkScore();
@@ -718,7 +750,25 @@ public class GameStage extends Stage {
     }
 
     public RunnerStrike getRunnerStrike() {
-        return mRunnerStrike;
+
+        if (runner.getWeaponType()!=null) {
+            if (mRunnerStrikeMiddle.getDistance().equals(runner.getWeaponType().getDistance())) {
+                return mRunnerStrikeMiddle;
+            } else if (mRunnerStrikeLong.getDistance().equals(runner.getWeaponType().getDistance())) {
+                return mRunnerStrikeLong;
+            }
+        }
+
+        return mRunnerStrikeShort;
+    }
+
+    public void setStrikeFilter(Filter filter) {
+        mRunnerStrikeShort.getBody().getFixtureList().get(0).setFilterData(filter);
+        mRunnerStrikeShort.getRunnerDefBody().getFixtureList().get(0).setFilterData(filter);
+        mRunnerStrikeMiddle.getBody().getFixtureList().get(0).setFilterData(filter);
+        mRunnerStrikeMiddle.getRunnerDefBody().getFixtureList().get(0).setFilterData(filter);
+        mRunnerStrikeLong.getBody().getFixtureList().get(0).setFilterData(filter);
+        mRunnerStrikeLong.getRunnerDefBody().getFixtureList().get(0).setFilterData(filter);
     }
 
     //временное
@@ -730,70 +780,74 @@ public class GameStage extends Stage {
 
         AssetLoader.retributionBonusSound.play(SoundSystem.getSoundValue());
         screenShake(0.1f, 0.15f);
-        switch (retributionLevel) {
-            case 0:
-                for(Actor actor : getActors()) {
-                    if (actor instanceof Enemy) {
-                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-                                &&!(((Enemy)actor).getUserData()).isDead()) {
-                            (((Enemy)actor).getUserData()).setDead(true);
-                            ScoreCounter.increaseScore(1);
-                            ScoreCounter.increaseKilled();
-                        }
-                    } else if ((actor instanceof Obstacle)
-                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-                            &&!(((Obstacle)actor).getUserData()).isTrap()
-                            &&!(((Obstacle)actor).getUserData()).isArmour()
-                            &&!(((Obstacle)actor).getUserData()).isDead()) {
-                        (((Obstacle)actor).getUserData()).setDead(true);
-                        ScoreCounter.increaseScore(1);
-                        ScoreCounter.increaseDestroyed();
-                    } else if (actor instanceof Shell) {
-                        ((Shell) actor).getUserData().setDead(true);
-                    }
-                }
-                break;
-            case 1:
-                for(Actor actor : getActors()) {
-                    if (actor instanceof Enemy) {
-                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-                                &&!(((Enemy)actor).getUserData()).isDead()) {
-                            (((Enemy)actor).getUserData()).setDead(true);
-                            ScoreCounter.increaseScore(1);
-                            ScoreCounter.increaseKilled();
-                        }
-                    } else if ((actor instanceof Obstacle)
-                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-                            &&!(((Obstacle)actor).getUserData()).isTrap()
-                            &&!(((Obstacle)actor).getUserData()).isDead()) {
-                        (((Obstacle)actor).getUserData()).setDead(true);
-                        ScoreCounter.increaseScore(1);
-                        ScoreCounter.increaseDestroyed();
-                    } else if (actor instanceof Shell) {
-                        ((Shell) actor).getUserData().setDead(true);
-                    }
-                }
-                break;
-            case 2:
-                for(Actor actor : getActors()) {
-                    if (actor instanceof Enemy) {
-                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-                                &&!(((Enemy)actor).getUserData()).isDead()) {
-                            (((Enemy)actor).getUserData()).setDead(true);
-                            ScoreCounter.increaseScore(1);
-                            ScoreCounter.increaseKilled();
-                        }
-                    } else if ((actor instanceof Obstacle)
-                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-                            &&!(((Obstacle)actor).getUserData()).isDead()) {
-                        (((Obstacle)actor).getUserData()).setDead(true);
-                        ScoreCounter.increaseScore(1);
-                        ScoreCounter.increaseDestroyed();
-                    } else if (actor instanceof Shell) {
-                        ((Shell) actor).getUserData().setDead(true);
-                    }
-                }
-                break;
+//        switch (retributionLevel) {
+//            case 0:
+//                for(Actor actor : getActors()) {
+//                    if (actor instanceof Enemy) {
+//                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
+//                                &&!(((Enemy)actor).getUserData()).isDead()) {
+//                            (((Enemy)actor).getUserData()).setDead(true);
+////                            ScoreCounter.increaseScore(1);
+////                            ScoreCounter.increaseKilled();
+//                        }
+//                    } else if ((actor instanceof Obstacle)
+//                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
+//                            &&!(((Obstacle)actor).getUserData()).isTrap()
+//                            &&!(((Obstacle)actor).getUserData()).isArmour()
+//                            &&!(((Obstacle)actor).getUserData()).isDead()) {
+//                        (((Obstacle)actor).getUserData()).setDead(true);
+//                        ScoreCounter.increaseScore(1);
+//                        ScoreCounter.increaseDestroyed();
+//                    } else if (actor instanceof Shell) {
+//                        ((Shell) actor).getUserData().setDead(true);
+//                    }
+//                }
+//                break;
+//            case 1:
+//                for(Actor actor : getActors()) {
+//                    if (actor instanceof Enemy) {
+//                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
+//                                &&!(((Enemy)actor).getUserData()).isDead()) {
+//                            (((Enemy)actor).getUserData()).setDead(true);
+////                            ScoreCounter.increaseScore(1);
+////                            ScoreCounter.increaseKilled();
+//                        }
+//                    } else if ((actor instanceof Obstacle)
+//                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
+//                            &&!(((Obstacle)actor).getUserData()).isTrap()
+//                            &&!(((Obstacle)actor).getUserData()).isDead()) {
+//                        (((Obstacle)actor).getUserData()).setDead(true);
+//                        ScoreCounter.increaseScore(1);
+//                        ScoreCounter.increaseDestroyed();
+//                    } else if (actor instanceof Shell) {
+//                        ((Shell) actor).getUserData().setDead(true);
+//                    }
+//                }
+//                break;
+//            case 2:
+//                for(Actor actor : getActors()) {
+//                    if (actor instanceof Enemy) {
+//                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
+//                                &&!(((Enemy)actor).getUserData()).isDead()) {
+//                            (((Enemy)actor).getUserData()).setDead(true);
+////                            ScoreCounter.increaseScore(1);
+////                            ScoreCounter.increaseKilled();
+//                        }
+//                    } else if ((actor instanceof Obstacle)
+//                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
+//                            &&!(((Obstacle)actor).getUserData()).isDead()) {
+//                        (((Obstacle)actor).getUserData()).setDead(true);
+//                        ScoreCounter.increaseScore(1);
+//                        ScoreCounter.increaseDestroyed();
+//                    } else if (actor instanceof Shell) {
+//                        ((Shell) actor).getUserData().setDead(true);
+//                    }
+//                }
+//                break;
+//        }
+
+        for (Retributable retributable : mRetributableList) {
+            retributable.punish(retributionLevel);
         }
         prepareTransition(255, 50, 0, .1f);
 
@@ -804,6 +858,7 @@ public class GameStage extends Stage {
         for (Movable movable:mMovableArray) {
             movable.changingStaticSpeed(speedScale);
         }
+        System.out.println("speed = " + mCurrentVelocity);
     }
 
     public void changingSpeedHandler(float speedScale) {
@@ -930,5 +985,37 @@ public class GameStage extends Stage {
 
     public void setWingsBuffer(int wingsBuffer) {
         mWingsBuffer = wingsBuffer;
+    }
+
+    public void initItem(float x, float y) {
+        if (rand.nextInt(100)>95) {
+            if (rand.nextBoolean()) {
+                if (!mWeaponBonus.isInitialized()&&runner.getWeaponType()==null) {
+                    mWeaponBonus.init(x, y);
+                }
+            } else {
+                if (!mArmourBonus.isInitialized()&&!runner.isArmour()) {
+                    mArmourBonus.init(x, y);
+                }
+            }
+
+        }
+
+    }
+
+    public void addRetributable(Retributable retributable) {
+        mRetributableList.add(retributable);
+    }
+
+    public void removeRetributable(Retributable retributable) {
+        mRetributableList.removeValue(retributable, false);
+    }
+
+    public Dragon getDragon() {
+        return mDragon;
+    }
+
+    public void setReturnFilter(boolean returnFilter) {
+        mReturnFilter = returnFilter;
     }
 }

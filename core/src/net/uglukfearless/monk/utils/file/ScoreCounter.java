@@ -45,6 +45,7 @@ public class ScoreCounter {
     private static int useStrongBeat = 0;
     private static int useThunderFist = 0;
     private static int useWings = 0;
+    private static int useDragon = 0;
 
     private static Array<Achievement> sAchievementList;
 
@@ -163,6 +164,9 @@ public class ScoreCounter {
     public static void increaseWings() {
         useWings++;
     }
+    public static void increaseDragon() {
+        useDragon++;
+    }
 
     public static void saveCalcStats(String currentKillerKey, String levelName) {
         saveCalcStats(levelName);
@@ -186,6 +190,7 @@ public class ScoreCounter {
         PreferencesManager.addThunder(useThunderFist);
         PreferencesManager.addStrong(useStrongBeat);
         PreferencesManager.addWings(useWings);
+        PreferencesManager.addDragon(useWings);
     }
 
     public static void resetStats() {
@@ -204,6 +209,7 @@ public class ScoreCounter {
         useStrongBeat = 0;
         useThunderFist = 0;
         useWings = 0;
+        useDragon = 0;
     }
 
     public static Array<Achievement> getAchieveList() {

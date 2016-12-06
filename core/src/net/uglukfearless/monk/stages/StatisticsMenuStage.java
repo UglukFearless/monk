@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -23,6 +25,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import net.uglukfearless.monk.actors.ParticleActor;
 import net.uglukfearless.monk.actors.menu.MenuBackground;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
@@ -63,9 +66,9 @@ public class StatisticsMenuStage extends Stage {
 
     //по бонусам
     private Label mBonuses;
-    private Label mBuddha, mGhost, mRetribution, mRevival, mThunder, mStrong, mWings;
+    private Label mBuddha, mGhost, mRetribution, mRevival, mThunder, mStrong, mWings, mDragon;
     private Label mBuddhaValue, mGhostValue, mRetributionValue, mRevivalValue, mThunderValue
-            , mStrongValue, mWingsValue;
+            , mStrongValue, mWingsValue, mDragonValue;
 
     private Cell<Label> mCell;
     private Label mLabel;
@@ -92,11 +95,13 @@ public class StatisticsMenuStage extends Stage {
     private Rectangle mDescribeWindowBounds;
     private Label mTitleDescribe, mMainDescribe, mCondition, mBonusUpdate;
     private Image mBonusImage, mAchieveImage;
+    private Rectangle mDescribeRectangle;
 
     private Table mTableDescribe;
     private ScrollPane mDescribeScroll;
 
     private Array<Table> mUpdateTables;
+    private Vector3 touchPoint;
 
 
     public StatisticsMenuStage(MainMenuScreen screen, float yViewportHeight) {
@@ -106,7 +111,10 @@ public class StatisticsMenuStage extends Stage {
 
         mScreen = screen;
 
-        addActor(new MenuBackground());
+        addActor(new MenuBackground(AssetLoader.menuBackgroundTexture1, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, yViewportHeight, true));
+        setupParticles(AssetLoader.sSnowParticleBack);
+        addActor(new MenuBackground(AssetLoader.menuBackgroundTexture2, VIEWPORT_WIDTH, Constants.APP_HEIGHT, yViewportHeight, false));
+        setupParticles(AssetLoader.sSnowParticle);
         Gdx.input.setInputProcessor(this);
 
         mTouchPoint = new Vector3();
@@ -130,8 +138,17 @@ public class StatisticsMenuStage extends Stage {
 
         mResized = false;
 
+        touchPoint = new Vector3();
+
         Gdx.input.setCatchBackKey(true);
         Gdx.input.setCatchMenuKey(true);
+    }
+
+    private void setupParticles(ParticleEffect particleEffect) {
+        ParticleActor particleActor = new ParticleActor(particleEffect);
+        particleActor.setPosition(VIEWPORT_WIDTH/2, VIEWPORT_HEIGHT);
+        addActor(particleActor);
+        particleActor.start();
     }
 
     private void setupDescribe() {
@@ -583,7 +600,7 @@ public class StatisticsMenuStage extends Stage {
 
             mLabel = mLabelValueArray.get(i);
             mLabel.setVisible(false);
-            mCell = mContainerLoc.add(mLabel).size(0,0);
+            mCell = mContainerLoc.add(mLabel).size(0, 0);
             mCell.align(Align.right);
 
             mContainerLoc.row();
@@ -636,6 +653,11 @@ public class StatisticsMenuStage extends Stage {
         mLabelArray.add(mWings);
         mWingsValue = new Label(String.valueOf(PreferencesManager.getWings()), AssetLoader.sGuiSkin);
         mLabelValueArray.add(mWingsValue);
+
+        mDragon = new Label(AssetLoader.sBundle.get("MENU_STATS_USE_DRAGON"), AssetLoader.sGuiSkin);
+        mLabelArray.add(mDragon);
+        mDragonValue = new Label(String.valueOf(PreferencesManager.getDragon()), AssetLoader.sGuiSkin);
+        mLabelValueArray.add(mDragonValue);
     }
 
     private String getTimeString() {
@@ -688,11 +710,17 @@ public class StatisticsMenuStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
-        if (mDescribeWindow.isVisible()&&!mDescribeWindowBounds.contains(screenX, screenY)) {
+        translateScreenToStageCoordinates(screenX, screenY);
+
+        if (mDescribeWindow.isVisible()&&!mDescribeWindowBounds.contains(touchPoint.x, touchPoint.y)) {
             mDescribeWindow.setVisible(false);
         }
 
         return super.touchDown(screenX, screenY, pointer, button);
 
+    }
+
+    private void translateScreenToStageCoordinates(int screenX, int screenY) {
+        getCamera().unproject(touchPoint.set(screenX, screenY, 0));
     }
 }

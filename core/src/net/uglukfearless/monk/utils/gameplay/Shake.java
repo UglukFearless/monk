@@ -12,7 +12,6 @@ import java.util.Random;
 public class Shake {
 
     private float mTime;
-    private Random mRandom;
     private float x, y;
     private float mCurrentTime;
     private float mPower;
@@ -25,12 +24,10 @@ public class Shake {
         mCurrentTime = 10;
         mPower = 0;
         mCurrentPower = 0;
-        mRandom = new Random();
         mPassive = true;
     }
 
     public void shake(float power, float time) {
-        mRandom = new Random();
         mPower = power;
         mTime = time;
         mPassive = false;
@@ -42,11 +39,10 @@ public class Shake {
         if(mCurrentTime <= mTime) {
             mCurrentPower = mPower * ((mTime - mCurrentTime) / mTime);
 
-            x = (mRandom.nextFloat() - 0.5f) * 2f * mCurrentPower;
-            y = (mRandom.nextFloat() - 0.5f) * 2f * mCurrentPower;
+            y = (float) (1.4*mCurrentPower*Math.cos((double)18.84f*(mCurrentTime/mTime)));
 
 
-            stage.getCamera().translate(-x, -y, 0);
+            stage.getCamera().translate(0, -y, 0);
             stage.getCamera().update();
             mCurrentTime += delta;
         } else if (!mPassive) {

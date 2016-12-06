@@ -16,16 +16,18 @@ import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.enums.ObstacleType;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
-import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.file.ScoreCounter;
+import net.uglukfearless.monk.utils.gameplay.bodies.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.Movable;
+import net.uglukfearless.monk.utils.gameplay.Retributable;
 import net.uglukfearless.monk.utils.gameplay.ai.SpaceTable;
-import net.uglukfearless.monk.utils.gameplay.WorldUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 /**
  * Created by Ugluk on 07.06.2016.
  */
-public class Obstacle extends GameActor implements Pool.Poolable, Movable{
+public class Obstacle extends GameActor implements Pool.Poolable, Movable, Retributable {
 
     private float deadTime;
     private float stateTime;
@@ -72,6 +74,7 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
         body.setActive(true);
         stage.addActor(this);
         ((GameStage)stage).addMovable(this);
+        ((GameStage)stage).addRetributable(this);
     }
 
     @Override
@@ -130,7 +133,7 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
                     , getUserData().getWidth(),getUserData().getObstacleType().getCategoryBit());
         }
 
-        if ((deadTime>0.2f||getUserData().isTrap()) && getStage() != null) {
+        if (((deadTime>0.2f||getUserData().isTrap())||getUserData().isTerribleDeath()) && getStage() != null) {
 
             //exp
             if (AssetLoader.sFreeParticleDust.size>0) {
@@ -142,8 +145,14 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
             }
 
             GameStage stage = (GameStage) getStage();
+
+            if (getUserData().isConteiner()) {
+                stage.initItem(body.getPosition().x, body.getPosition().y);
+            }
+
             stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump2"));
             stage.removeMovable(this);
+            stage.removeRetributable(this);
             this.remove();
             PoolsHandler.sObstaclePools.get(getUserData().getObstacleType().name()).free(this);
         }
@@ -153,8 +162,10 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
     public void reset() {
         if (getStage()!=null) {
             ((GameStage)getStage()).removeMovable(this);
+            ((GameStage)getStage()).removeRetributable(this);
         }
         getUserData().setDead(false);
+        getUserData().setTerribleDeath(false);
         stateTime = 0f;
         deadTime = 0f;
         body.setLinearVelocity(getUserData().getLinearVelocity());
@@ -176,4 +187,41 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable{
         getUserData().setLinearVelocity(speedScale, 0);
         body.setLinearVelocity(getUserData().getLinearVelocity().x, body.getLinearVelocity().y);
     }
+
+    @Override
+    public void punish(int retributionLevel) {
+        switch (retributionLevel) {
+            case 0:
+                if (getBody().getPosition().x<Constants.GAME_WIDTH
+                            &&!getUserData().isTrap()
+                            &&!getUserData().isArmour()
+                            &&!getUserData().isDead()) {
+
+                        getUserData().setDead(true);
+                        ScoreCounter.increaseScore(1);
+                        ScoreCounter.increaseDestroyed();
+                    }
+                break;
+            case 1:
+                if (getBody().getPosition().x<Constants.GAME_WIDTH
+                            &&!getUserData().isTrap()
+                            &&!getUserData().isDead()) {
+
+                        getUserData().setDead(true);
+                        ScoreCounter.increaseScore(1);
+                        ScoreCounter.increaseDestroyed();
+                    }
+                break;
+            case 2:
+                if (getBody().getPosition().x<Constants.GAME_WIDTH
+                            &&!getUserData().isDead()) {
+
+                        getUserData().setDead(true);
+                        ScoreCounter.increaseScore(1);
+                        ScoreCounter.increaseDestroyed();
+                    }
+                break;
+        }
+    }
+
 }

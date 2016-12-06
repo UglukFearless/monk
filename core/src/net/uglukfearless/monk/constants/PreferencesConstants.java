@@ -24,7 +24,7 @@ public class PreferencesConstants {
     public static final String STATS_TREASURES_TOTAL = "treasures_total";
 
     public static final String STATS_HIGHSCORE_KEY = "high_score";
-    public static final String STATS_BEST_TIME_KEY = "best_time"; //new
+    public static final String STATS_BEST_TIME_KEY = "best_time"; //monk
     public static final String STATS_TOTALTIME_KEY = "total_time";
     public static final String STATS_KILLED_KEY = "killed";
     public static final String STATS_DESTROYED_KEY = "destroyed";
@@ -41,6 +41,7 @@ public class PreferencesConstants {
     public static final String STATS_USE_STRONG_KEY = "use_strong";
     public static final String STATS_USE_THUNDER_KEY = "use_thunder";
     public static final String STATS_USE_WINGS_KEY = "use_wings";
+    public static final String STATS_USE_DRAGON_KEY = "use_dragon";
 
 
     public static final String ACHIEVE_MUSHROOM_KEY = "STATS_MUSHROOM_ACH";

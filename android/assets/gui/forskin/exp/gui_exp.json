@@ -2,14 +2,16 @@
 com.badlogic.gdx.graphics.g2d.BitmapFont: { 
     default-font:       { file: digital-dream-bold-24.fnt },
     russian-font:       { file: rus-chine-24.fnt },
+    russian-font-dark:  { file: rus-chine2-24.fnt },
     normal-font:        { file: digital-dream-bold-24.fnt },
     title-font:         { file: digital-dream-bold-64.fnt },
-  	russian-title-font: { file: rus-chine-64.fnt }
+  	russian-title-font: { file: rus-chine3-64.fnt }
 },
 com.badlogic.gdx.graphics.Color: {
 	green: { a: 1, b: 0, g: 1, r: 0 },
 	white: { a: 1, b: 1, g: 1, r: 1 },
 	red: { a: 1, b: 0, g: 0, r: 1 },
+	orange: { a: 1, b: 0, g: 0.57, r: 1 },
 	black: { a: 1, b: 0, g: 0, r: 0 }
 },
 com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
@@ -23,7 +25,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
   	game_over: { down:game_over_on, up: game_over_off}
 },
 com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
-	default: { font: russian-font, fontColor: green },
+	default: { font: russian-font-dark, fontColor: white },
 	normal_red: { font: russian-font, fontColor: red },
 	title: { font: russian-title-font, fontColor: green }
 },
@@ -35,6 +37,6 @@ com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
   default: {}
 },
 com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
-  default: { titleFont: russian-font, background: broadbord, titleFontColor: green }
+  default: { titleFont: russian-font-dark, background: broadbord, titleFontColor: green }
 }
 }

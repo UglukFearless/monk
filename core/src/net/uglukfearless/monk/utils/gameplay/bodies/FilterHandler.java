@@ -1,4 +1,4 @@
-package net.uglukfearless.monk.utils.gameplay;
+package net.uglukfearless.monk.utils.gameplay.bodies;
 
 import com.badlogic.gdx.physics.box2d.Filter;
 

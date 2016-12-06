@@ -17,7 +17,7 @@ public class EnemyModel {
     public float jumpingImpulse;
     public int gravityScale;
 
-    public boolean armour;
+    public boolean demon;
     public boolean jumper;
     public boolean shouter;
     public boolean striker;

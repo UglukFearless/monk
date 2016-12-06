@@ -31,6 +31,6 @@ public class GeniusKunFu extends Achievement {
 
     @Override
     public boolean checkCondition() {
-        return  (PreferencesManager.getKilled()>=50000&&!isUnlock());
+        return  (PreferencesManager.getKilled()>=30000&&!isUnlock());
     }
 }

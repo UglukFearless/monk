@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.I18NBundle;
 
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.enums.ArmourType;
+import net.uglukfearless.monk.enums.WeaponType;
 import net.uglukfearless.monk.utils.gameplay.CircularList;
 
 import java.util.Locale;
@@ -37,7 +38,8 @@ public class AssetLoader {
     public static TextureAtlas achieveAtlas;
     public static TextureAtlas bonusesAtlas;
     public static TextureAtlas lumpsAtlas;
-    public static TextureAtlas armoursAtlas;
+    public static TextureAtlas itemsAtlas;
+    public static TextureAtlas dragonAtlas;
 
     public static Texture playerShell;
 
@@ -47,23 +49,30 @@ public class AssetLoader {
     public static Animation playerHit;
 
     public static CircularList<Animation> playerStrikeList;
-    public static CircularList<Animation> playerJumpStrikeList;
 
     public static Music levelMusic;
 
     public static Skin sGuiSkin;
 
     public static Music menuMusic;
-    public static Texture menuBackgroundTexture;
+    public static Texture menuBackgroundTexture1;
+    public static Texture menuBackgroundTexture2;
 
     public static Texture logoPicture;
     public static Music logoSound;
 
-    public static Sound monkStrikeSound;
+//    public static Sound monkStrikeSound1;
+    public static Sound monkStrikeSound2;
+    public static Sound monkStrikeSound3;
+    public static Sound monkStrikeSound4;
+    public static Sound monkStrikeSound5;
+    public static Array<Sound> monkStrikeSounds;
+
     public static Sound getBonusSound;
     public static Sound balanceBonusSound;
     public static Sound retributionBonusSound;
     public static Sound deathSound;
+    public static Sound menuTestValueSound;
 
     public static I18NBundle sBundle;
 
@@ -75,6 +84,10 @@ public class AssetLoader {
     public static Array<ParticleEffect> sWorkParticleDust;
 
     public static ParticleEffect sHitParticle;
+
+    public static ParticleEffect sSnowParticle;
+    public static ParticleEffect sSnowParticleBack;
+    public static ParticleEffect sCandleParticle;
 
     public static void initBundle() {
         FileHandle baseFileHandle = Gdx.files.internal("i18n/Bundle");
@@ -93,22 +106,36 @@ public class AssetLoader {
 
     public static void initGame() {
 
-        monkAtlas = new TextureAtlas(Gdx.files.internal("new/monk.atlas"));
-        monkArmour1Atlas = new TextureAtlas(Gdx.files.internal("new/armour/monk_armour1.atlas"));
-        monkArmour2Atlas = new TextureAtlas(Gdx.files.internal("new/armour/monk_armour2.atlas"));
-        monkArmour3Atlas = new TextureAtlas(Gdx.files.internal("new/armour/monk_armour3.atlas"));
+        monkAtlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/monk.atlas"));
+        monkArmour1Atlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/armour/monk_armour1.atlas"));
+        monkArmour2Atlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/armour/monk_armour2.atlas"));
+        monkArmour3Atlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/armour/monk_armour3.atlas"));
         achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
         bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
         lumpsAtlas = new TextureAtlas(Gdx.files.internal("lumps.atlas"));
+        dragonAtlas = new TextureAtlas(Gdx.files.internal("textures/dragon.atlas"));
 
-        armoursAtlas = new TextureAtlas(Gdx.files.internal("textures/armours.atlas"));
+        itemsAtlas = new TextureAtlas(Gdx.files.internal("textures/items.atlas"));
 
         playerShell = new Texture(Gdx.files.internal("monkShell.png"));
-        menuBackgroundTexture = new Texture(Gdx.files.internal("menuBackground.png"));
+        menuBackgroundTexture1 = new Texture(Gdx.files.internal("textures/menu/menu_background1.png"));
+        menuBackgroundTexture2 = new Texture(Gdx.files.internal("textures/menu/menu_background2.png"));
 
-        loadMonkAnimations(PreferencesManager.getArmour());
+        loadMonkAnimations(PreferencesManager.getArmour(), PreferencesManager.getWeapon());
 
-        monkStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/kiya.wav"));
+        monkStrikeSounds = new Array<Sound>();
+//        monkStrikeSound1 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya1.wav"));
+        monkStrikeSound2 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya2.wav"));
+        monkStrikeSound3 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya3.wav"));
+        monkStrikeSound4 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya4.wav"));
+        monkStrikeSound5 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya5.wav"));
+//        monkStrikeSounds.add(monkStrikeSound1);
+        monkStrikeSounds.add(monkStrikeSound2);
+        monkStrikeSounds.add(monkStrikeSound3);
+        monkStrikeSounds.add(monkStrikeSound4);
+        monkStrikeSounds.add(monkStrikeSound5);
+
+
         getBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/coin.wav"));
         balanceBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beep.wav"));
         retributionBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beat.wav"));
@@ -142,11 +169,18 @@ public class AssetLoader {
         sHitParticle = new ParticleEffect();
         sHitParticle.load(Gdx.files.internal("particles/hit.p"), Gdx.files.internal("particles"));
 
+        sSnowParticle = new ParticleEffect();
+        sSnowParticle.load(Gdx.files.internal("particles/snow.p"), Gdx.files.internal("particles"));
+
+        sSnowParticleBack = new ParticleEffect();
+        sSnowParticleBack.load(Gdx.files.internal("particles/snow_back.p"), Gdx.files.internal("particles"));
+
         ArmourType.init();
+        WeaponType.init();
     }
 
-    //загрузка анимаций монаха по типу брони
-    public static void loadMonkAnimations(ArmourType armourType) {
+    //загрузка анимаций монаха по типу брони и оружия
+    public static void loadMonkAnimations(ArmourType armourType, WeaponType weaponType) {
 
         TextureAtlas currentMonkAtlas = null;
 
@@ -166,10 +200,11 @@ public class AssetLoader {
             currentMonkAtlas = monkAtlas;
         }
 
-        loadMonkAnimations(currentMonkAtlas);
+        loadMonkAnimations(currentMonkAtlas, weaponType);
+
     }
     //загрузка анимаций монаха по атласу
-    private static void loadMonkAnimations(TextureAtlas currentMonkAtlas) {
+    private static void loadMonkAnimations(TextureAtlas currentMonkAtlas, WeaponType weaponType) {
 
         boolean stopSeek;
         boolean stopSeekStrike;
@@ -181,89 +216,91 @@ public class AssetLoader {
         Array<TextureRegion> regions = new Array<TextureRegion>();
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i=0; i<Constants.RUNNER_ANIMATION_GROUP_NAMES.length; i++) {
+            for (int i=0; i<Constants.RUNNER_ANIMATION_GROUP_NAMES.length; i++) {
 
-            stopSeek = false;
-            regions.clear();
+                stopSeek = false;
+                regions.clear();
 
-            stringBuilder.append(Constants.RUNNER_ANIMATION_GROUP_NAMES[i]);
-            regionNum = 0;
-
-            while (!stopSeek) {
-                regionNum++;
-
-                currentRegion = (currentMonkAtlas.findRegion(stringBuilder.toString()
-                        + String.valueOf(regionNum)));
-
-
-                if (currentRegion!=null) {
-                    regions.add(currentRegion);
-                } else {
-                    stopSeek = true;
-                    regionNum = 0;
+                if (weaponType!=null) {
+                    stringBuilder.append("weapon").append(weaponType.getGrade()).append("_");
                 }
-            }
 
-            stopSeek = false;
+                stringBuilder.append(Constants.RUNNER_ANIMATION_GROUP_NAMES[i]);
+                regionNum = 0;
 
-            if (regions.size>0) {
-                animations.add(new Animation(0.12f, regions));
-            } else {
-                animations.add(null);
-            }
+                while (!stopSeek) {
+                    regionNum++;
 
-            stringBuilder.delete(0, stringBuilder.length());
-        }
+                    currentRegion = (currentMonkAtlas.findRegion(stringBuilder.toString()
+                            + String.valueOf(regionNum)));
+                    if (currentRegion!=null) {
+                        regions.add(currentRegion);
+                    } else {
+                        stopSeek = true;
+                        regionNum = 0;
+                    }
+                }
 
-        playerStay = animations.get(0);
-        playerRun = animations.get(1);
-        playerJump = animations.get(2);
-        playerHit = animations.get(3);
-
-
-        playerStrikeList = new CircularList<Animation>();
-        stopSeekStrike = false;
-        strikeNum = 0;
-
-        while (!stopSeekStrike&&strikeNum<100) {
-
-            strikeNum++;
-            stopSeek = false;
-            regions.clear();
-            regionNum = 0;
-
-            while (!stopSeek) {
-
-                stringBuilder.append(Constants.RUNNER_ANIMATION_STRIKE_NAMES[0]).append(strikeNum);
-
-                regionNum++;
-
-
-                stringBuilder.append(Constants.FRAME_STRING).append(regionNum);
-
-                currentRegion = (currentMonkAtlas.findRegion(stringBuilder.toString()));
-
-                if (currentRegion!=null) {
-                    regions.add(currentRegion);
+                stopSeek = false;
+                if (regions.size>0) {
+                    animations.add(new Animation(0.12f, regions));
                 } else {
-                    stopSeek = true;
-                    regionNum = 0;
+                    animations.add(null);
                 }
 
                 stringBuilder.delete(0, stringBuilder.length());
             }
 
-            stopSeek = false;
-            if (regions.size>0) {
-                playerStrikeList.add(new Animation(0.10f, regions));
-            } else {
-                stopSeekStrike=true;
+            playerStay = animations.get(0);
+            playerRun = animations.get(1);
+            playerJump = animations.get(2);
+            playerHit = animations.get(3);
+
+            playerStrikeList = new CircularList<Animation>();
+            stopSeekStrike = false;
+            strikeNum = 0;
+
+            while (!stopSeekStrike&&strikeNum<100) {
+
+                strikeNum++;
+                stopSeek = false;
+                regions.clear();
+                regionNum = 0;
+
+                while (!stopSeek) {
+
+                    if (weaponType!=null) {
+                        stringBuilder.append("weapon").append(weaponType.getGrade()).append("_");
+                    }
+
+                    stringBuilder.append(Constants.RUNNER_ANIMATION_STRIKE_NAMES[0]).append(strikeNum);
+
+                    regionNum++;
+
+
+                    stringBuilder.append(Constants.FRAME_STRING).append(regionNum);
+
+                    currentRegion = (currentMonkAtlas.findRegion(stringBuilder.toString()));
+
+                    if (currentRegion!=null) {
+                        regions.add(currentRegion);
+                    } else {
+                        stopSeek = true;
+                        regionNum = 0;
+                    }
+
+                    stringBuilder.delete(0, stringBuilder.length());
+                }
+
+                stopSeek = false;
+                if (regions.size>0) {
+                    playerStrikeList.add(new Animation(0.10f, regions));
+                } else {
+                    stopSeekStrike=true;
+                }
+
+                stringBuilder.delete(0, stringBuilder.length());
             }
-
-            stringBuilder.delete(0, stringBuilder.length());
-        }
-
-
 
     }
 
@@ -285,14 +322,24 @@ public class AssetLoader {
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal("music/mainTheme.mp3"));
         menuMusic.setVolume(SoundSystem.getMusicValue());
 
-        monkStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/kiya.wav"));
+        menuTestValueSound = Gdx.audio.newSound(Gdx.files.internal("sound/kiya3.wav"));
 
-        menuBackgroundTexture = new Texture(Gdx.files.internal("menuBackground.png"));
+        menuBackgroundTexture1 = new Texture(Gdx.files.internal("textures/menu/menu_background1.png"));
+        menuBackgroundTexture2 = new Texture(Gdx.files.internal("textures/menu/menu_background2.png"));
         achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
         bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
 
         sGuiSkin = new Skin(Gdx.files.internal("gui/forskin/exp/gui_exp.json"));
         broadbord = new NinePatch(sGuiSkin.getAtlas().createPatch("broadbord"));
+
+        sSnowParticle = new ParticleEffect();
+        sSnowParticle.load(Gdx.files.internal("particles/snow.p"), Gdx.files.internal("particles"));
+
+        sSnowParticleBack = new ParticleEffect();
+        sSnowParticleBack.load(Gdx.files.internal("particles/snow_back.p"), Gdx.files.internal("particles"));
+
+        sCandleParticle = new ParticleEffect();
+        sCandleParticle.load(Gdx.files.internal("particles/candle2.p"), Gdx.files.internal("particles"));
 
     }
 
@@ -308,12 +355,16 @@ public class AssetLoader {
 
     public static void disposeMenu() {
         menuMusic.dispose();
-        monkStrikeSound.dispose();
-        menuBackgroundTexture.dispose();
+        menuTestValueSound.dispose();
+        menuBackgroundTexture1.dispose();
+        menuBackgroundTexture2.dispose();
         achieveAtlas.dispose();
         bonusesAtlas.dispose();
         sGuiSkin.dispose();
         sGuiSkin.dispose();
+        sSnowParticle.dispose();
+        sSnowParticleBack.dispose();
+        sCandleParticle.dispose();
     }
 
     public static void disposeGame() {
@@ -321,15 +372,23 @@ public class AssetLoader {
         monkArmour1Atlas.dispose();
         monkArmour2Atlas.dispose();
         monkArmour3Atlas.dispose();
-        menuBackgroundTexture.dispose();
+        menuBackgroundTexture1.dispose();
+        menuBackgroundTexture2.dispose();
 
-        armoursAtlas.dispose();
+        itemsAtlas.dispose();
 
         achieveAtlas.dispose();
         bonusesAtlas.dispose();
         lumpsAtlas.dispose();
 
-        monkStrikeSound.dispose();
+        dragonAtlas.dispose();
+
+//        monkStrikeSound1.dispose();
+        monkStrikeSound2.dispose();
+        monkStrikeSound3.dispose();
+        monkStrikeSound4.dispose();
+        monkStrikeSound5.dispose();
+
         getBonusSound.dispose();
         balanceBonusSound.dispose();
         retributionBonusSound.dispose();
@@ -354,6 +413,9 @@ public class AssetLoader {
         }
 
         sHitParticle.dispose();
+
+        sSnowParticle.dispose();
+        sSnowParticleBack.dispose();
     }
 
     public static void disposeLevel() {

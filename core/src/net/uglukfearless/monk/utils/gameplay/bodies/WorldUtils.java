@@ -1,12 +1,17 @@
-package net.uglukfearless.monk.utils.gameplay;
+package net.uglukfearless.monk.utils.gameplay.bodies;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
+import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
 
 import net.uglukfearless.monk.box2d.ArmourUserData;
 import net.uglukfearless.monk.box2d.BackgroundUserData;
@@ -24,6 +29,7 @@ import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.enums.EnemyType;
 import net.uglukfearless.monk.enums.ObstacleType;
+import net.uglukfearless.monk.enums.WeaponDistance;
 
 import java.util.Random;
 
@@ -218,7 +224,39 @@ public class WorldUtils {
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(new Vector2(Constants.RUNNER_X, -10));
         CircleShape shape = new CircleShape();
-        shape.setRadius(Constants.RUNNER_WIDTH * 1.2f);
+        shape.setRadius(Constants.RUNNER_WIDTH * WeaponDistance.SHORT.getDISTANCE());
+        Body body = world.createBody(bodyDef);
+        body.createFixture(shape, Constants.RUNNER_DENSITY);
+        body.setGravityScale(0);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_STRIKE);
+        body.resetMassData();
+        body.setUserData(new RunnerStrikeUserData(WeaponDistance.SHORT));
+        shape.dispose();
+        return body;
+    }
+
+    public static Body createRunnerStrike(World world, WeaponDistance weaponDistance) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
+        bodyDef.position.set(new Vector2(Constants.RUNNER_X, -10));
+        CircleShape shape = new CircleShape();
+        shape.setRadius(Constants.RUNNER_WIDTH * weaponDistance.getDISTANCE());
+        Body body = world.createBody(bodyDef);
+        body.createFixture(shape, Constants.RUNNER_DENSITY);
+        body.setGravityScale(0);
+        body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_STRIKE);
+        body.resetMassData();
+        body.setUserData(new RunnerStrikeUserData(weaponDistance));
+        shape.dispose();
+        return body;
+    }
+
+    public static Body createRunnerDefStrike(World world) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
+        bodyDef.position.set(new Vector2(Constants.RUNNER_X, -10));
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(Constants.RUNNER_WIDTH*1.2f / 2f, Constants.RUNNER_HEIGHT *1.2f / 2f);
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, Constants.RUNNER_DENSITY);
         body.setGravityScale(0);
@@ -245,6 +283,154 @@ public class WorldUtils {
                 , (Constants.RUNNER_HEIGHT * 1.03f)/2f));
         shape.dispose();
         return body;
+    }
+
+    public static DragonBody createDragon(World world) {
+
+        DragonBody dragonBody = new DragonBody();
+
+        BodyDef bodyDef = new BodyDef();
+
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
+        bodyDef.position.set(new Vector2(Constants.DRAGON_X - 0.1f , 9));
+        CircleShape shapeAnrhor = new CircleShape();
+        shapeAnrhor.setRadius((Constants.RUNNER_HEIGHT) / 2f);
+        Body bodyAnchor = world.createBody(bodyDef);
+        bodyAnchor.createFixture(shapeAnrhor, Constants.RUNNER_DENSITY);
+        bodyAnchor.setGravityScale(0f);
+        bodyAnchor.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_DRAGON);
+        bodyAnchor.setFixedRotation(false);
+        bodyAnchor.resetMassData();
+        bodyAnchor.setUserData(new BudhaUserData((Constants.RUNNER_HEIGHT)
+                , (Constants.RUNNER_HEIGHT), true));
+        shapeAnrhor.dispose();
+        dragonBody.setAnchor(bodyAnchor);
+
+        Body [] bodies = new Body[5];
+
+        PolygonShape shape;
+
+        for (int i=0;i<bodies.length;i++) {
+
+            bodyDef.type = BodyDef.BodyType.DynamicBody;
+            bodyDef.position.set(new Vector2(Constants.DRAGON_X + 1f + 1.5f*i, 9));
+            shape = new PolygonShape();
+            shape.setAsBox((Constants.RUNNER_HEIGHT) / 4f, (Constants.RUNNER_HEIGHT) / 2f);
+            bodies[i] = world.createBody(bodyDef);
+            bodies[i].createFixture(shape, Constants.RUNNER_DENSITY/10f);
+            bodies[i].setGravityScale(0f);
+            bodies[i].getFixtureList().get(0).setFilterData(FilterConstants.FILTER_DRAGON);
+            bodies[i].setFixedRotation(false);
+            bodies[i].resetMassData();
+            bodies[i].setUserData(new BudhaUserData((Constants.RUNNER_HEIGHT)/2f
+                    , (Constants.RUNNER_HEIGHT), true));
+            shape.dispose();
+        }
+
+        dragonBody.setSpine(bodies);
+
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(new Vector2(Constants.DRAGON_X + 8.5f, 9));
+        shape = new PolygonShape();
+        shape.setAsBox((Constants.RUNNER_HEIGHT) / 4f, (Constants.RUNNER_HEIGHT) / 2f);
+        Body bodyFirst = world.createBody(bodyDef);
+        bodyFirst.createFixture(shape, Constants.RUNNER_DENSITY/10f);
+        bodyFirst.setGravityScale(0f);
+        bodyFirst.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_DRAGON);
+        bodyFirst.setFixedRotation(false);
+        bodyFirst.resetMassData();
+        bodyFirst.setUserData(new BudhaUserData((Constants.RUNNER_HEIGHT)/2f
+                , (Constants.RUNNER_HEIGHT), true));
+        shape.dispose();
+
+        dragonBody.setFirstSegment(bodyFirst);
+
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(new Vector2(Constants.DRAGON_X + 11.5f, 9));
+        shapeAnrhor = new CircleShape();
+        shapeAnrhor.setRadius((Constants.RUNNER_HEIGHT) / 4f);
+        Body bodyHeadAnchor = world.createBody(bodyDef);
+        bodyHeadAnchor.createFixture(shapeAnrhor, Constants.RUNNER_DENSITY);
+        bodyHeadAnchor.setGravityScale(1f);
+        bodyHeadAnchor.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
+        bodyHeadAnchor.setFixedRotation(true);
+        bodyHeadAnchor.setUserData(new BudhaUserData((Constants.RUNNER_HEIGHT)/2f
+                , (Constants.RUNNER_HEIGHT)/2f, true));
+        shapeAnrhor.dispose();
+
+        dragonBody.setHeadAnchor(bodyHeadAnchor);
+
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(new Vector2(Constants.DRAGON_X + 11.5f, 9));
+//        shape = new PolygonShape();
+//        shape.setAsBox((Constants.RUNNER_HEIGHT*1.5f) / 2f, (Constants.RUNNER_HEIGHT) / 2f);
+
+        ChainShape chainShape = new ChainShape();
+        chainShape.createLoop(new Vector2 [] {
+                new Vector2(-2.25f, 1.5f),
+                new Vector2(0, 1.5f),
+                new Vector2(3, 0.25f),
+                new Vector2(3, -1.5f),
+                new Vector2(-2.25f, -1.5f)
+        });
+
+        Body bodyHead = world.createBody(bodyDef);
+        bodyHead.createFixture(chainShape, Constants.RUNNER_DENSITY/10f);
+        bodyHead.setGravityScale(0f);
+        bodyHead.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_DRAGON);
+        bodyHead.setFixedRotation(false);
+        bodyHead.setUserData(new BudhaUserData((Constants.RUNNER_HEIGHT*1.5f)
+                , (Constants.RUNNER_HEIGHT), true));
+        chainShape.dispose();
+
+        dragonBody.setHead(bodyHead);
+
+        RevoluteJointDef revoluteJointDefAnchor = new RevoluteJointDef();
+        revoluteJointDefAnchor.initialize(bodyAnchor, bodies[0], bodyAnchor.getPosition());
+        revoluteJointDefAnchor.collideConnected = false;
+        revoluteJointDefAnchor.enableLimit = true;
+        revoluteJointDefAnchor.lowerAngle = -0.45f;
+        revoluteJointDefAnchor.upperAngle = 0.45f;
+        world.createJoint(revoluteJointDefAnchor);
+
+        for (int i=0;i<bodies.length-1;i++) {
+            RevoluteJointDef revoluteJointDef1 = new RevoluteJointDef();
+            revoluteJointDef1.initialize(bodies[i], bodies[i+1], bodies[i].getPosition());
+            revoluteJointDef1.collideConnected = false;
+            revoluteJointDef1.enableLimit = true;
+            revoluteJointDef1.lowerAngle = -0.2f;
+            revoluteJointDef1.upperAngle = 0.2f;
+            world.createJoint(revoluteJointDef1);
+        }
+
+        RevoluteJointDef revoluteJointDef5 = new RevoluteJointDef();
+        revoluteJointDef5.initialize(bodies[bodies.length-1], bodyFirst, bodies[bodies.length-1].getPosition());
+        revoluteJointDef5.collideConnected = false;
+        revoluteJointDef5.enableLimit = true;
+        revoluteJointDef5.lowerAngle = -0.2f;
+        revoluteJointDef5.upperAngle = 0.2f;
+        world.createJoint(revoluteJointDef5);
+
+        RevoluteJointDef revoluteJointDef6 = new RevoluteJointDef();
+        revoluteJointDef6.initialize(bodyFirst, bodyHeadAnchor, bodyFirst.getPosition());
+        revoluteJointDef6.collideConnected = false;
+        revoluteJointDef6.enableLimit = true;
+        revoluteJointDef6.lowerAngle = -0.2f;
+        revoluteJointDef6.upperAngle = 0.2f;
+        world.createJoint(revoluteJointDef6);
+
+        RevoluteJointDef revoluteJointDef7 = new RevoluteJointDef();
+        revoluteJointDef7.initialize(bodyHeadAnchor, bodyHead, bodyHeadAnchor.getPosition());
+        revoluteJointDef7.collideConnected = false;
+        revoluteJointDef7.enableLimit = true;
+        revoluteJointDef7.lowerAngle = -0.1f;
+        revoluteJointDef7.upperAngle = 0.1f;
+        revoluteJointDef7.maxMotorTorque = 10.0f;
+        revoluteJointDef7.motorSpeed = 0f;
+        revoluteJointDef7.enableMotor = true;
+        dragonBody.setHHAnchorJoin((RevoluteJoint) world.createJoint(revoluteJointDef7));
+
+        return dragonBody;
     }
 
     public static Body createRunnerShell(World world) {
@@ -300,4 +486,5 @@ public class WorldUtils {
         shape.dispose();
         return body;
     }
+
 }

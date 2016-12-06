@@ -1,7 +1,9 @@
 package net.uglukfearless.monk.stages;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,8 +18,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
+import net.uglukfearless.monk.actors.ParticleActor;
 import net.uglukfearless.monk.actors.menu.MenuBackground;
+import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.enums.ArmourType;
+import net.uglukfearless.monk.enums.WeaponType;
 import net.uglukfearless.monk.screens.GameScreen;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.PreferencesManager;
@@ -41,10 +46,13 @@ public class ShopStage extends Stage {
     private int mCash;
 
     private ArmourType mCurrentArmour;
+    private WeaponType mCurrentWeapon;
     private TextureRegion mTreasureRegion;
 
     private Window mAcceptWindow;
     private Label mAcceptCost;
+
+    ParticleActor mParticleActor;
 
     public ShopStage(GameScreen screen, float yViewportHeight) {
         super(new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
@@ -58,6 +66,7 @@ public class ShopStage extends Stage {
 
         mCash = PreferencesManager.getTreasures();
         mCurrentArmour = PreferencesManager.getArmour();
+        mCurrentWeapon = PreferencesManager.getWeapon();
 
         mTreasureRegion = AssetLoader.bonusesAtlas.findRegion("rupee");
 
@@ -67,6 +76,9 @@ public class ShopStage extends Stage {
         setupSelectItems();
         setupAcceptWindow();
         setupBackButton();
+
+        Gdx.input.setCatchBackKey(true);
+        Gdx.input.setCatchMenuKey(true);
     }
 
     private void setupAcceptWindow() {
@@ -103,6 +115,11 @@ public class ShopStage extends Stage {
                 } else {
                     PreferencesManager.clearArmour();
                 }
+                if (mCurrentWeapon != null) {
+                    PreferencesManager.setWeapon(mCurrentWeapon);
+                } else {
+                    PreferencesManager.clearWeapon();
+                }
                 mScreen.returnGame();
             }
         });
@@ -130,6 +147,21 @@ public class ShopStage extends Stage {
 
         mWeaponCell = new Table();
         mWeaponCell.background(new NinePatchDrawable(AssetLoader.broadbord));
+        if (mCurrentWeapon!=null) {
+            mWeaponCell.add(new Image(mCurrentWeapon.getImage()));
+        }
+        mWeaponCell.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                if (mCurrentWeapon != null) {
+                    mCash += mCurrentWeapon.getPrice();
+                }
+                mCurrentWeapon = null;
+                mBalanceLabel.setText("x".concat(String.valueOf(mCash)));
+                mWeaponCell.clearChildren();
+            }
+        });
         mainSelect.add(mWeaponCell).prefWidth(VIEWPORT_WIDTH * 0.25f).prefHeight(VIEWPORT_HEIGHT * 0.25f)
                 .padLeft(VIEWPORT_WIDTH * 0.1f);
 
@@ -162,7 +194,7 @@ public class ShopStage extends Stage {
                 if (mCurrentArmour != null) {
                     mCash += mCurrentArmour.getPrice();
                 }
-                mCurrentArmour=null;
+                mCurrentArmour = null;
                 mBalanceLabel.setText("x".concat(String.valueOf(mCash)));
                 mArmourCell.clearChildren();
             }
@@ -193,7 +225,7 @@ public class ShopStage extends Stage {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
-                    THIS.buy(armourType);
+                    THIS.buyArmour(armourType);
                 }
             });
             tableArmours.add(tableArmour);
@@ -205,7 +237,7 @@ public class ShopStage extends Stage {
         mainArmour.add(scrollArmour);
     }
 
-    private void buy(ArmourType armourType) {
+    private void buyArmour(ArmourType armourType) {
         if ((mCurrentArmour!=null&&(mCash+mCurrentArmour.getPrice()-armourType.getPrice()>=0))
                 ||(mCash-armourType.getPrice()>=0)) {
             if (mCurrentArmour!=null) {
@@ -226,6 +258,46 @@ public class ShopStage extends Stage {
         mainWeapon.setBounds(VIEWPORT_WIDTH * 0.15f, VIEWPORT_HEIGHT * 0.33f
                 , VIEWPORT_WIDTH * 0.3f, VIEWPORT_HEIGHT * 0.55f);
         addActor(mainWeapon);
+
+        Table tableWeapons = new Table();
+
+        for (final WeaponType weaponType : WeaponType.values()) {
+            Table tableWeapon = new Table();
+            Image imageWeapon = new Image(weaponType.getImage());
+            tableWeapon.add(imageWeapon);
+            Label labelWeapon = new Label(String.valueOf(weaponType.getPrice()), AssetLoader.sGuiSkin);
+            tableWeapon.add(labelWeapon);
+            Image imageTreasures = new Image(AssetLoader.bonusesAtlas.findRegion("rupee"));
+            tableWeapon.add(imageTreasures);
+            tableWeapon.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    THIS.buyWeapon(weaponType);
+                }
+            });
+            tableWeapons.add(tableWeapon);
+            tableWeapons.row();
+        }
+
+        ScrollPane scrollArmour = new ScrollPane(tableWeapons);
+
+        mainWeapon.add(scrollArmour);
+    }
+
+    private void buyWeapon(WeaponType weaponType) {
+
+        if ((mCurrentWeapon!=null&&(mCash+mCurrentWeapon.getPrice()-weaponType.getPrice()>=0))
+                ||(mCash-weaponType.getPrice()>=0)) {
+            if (mCurrentWeapon!=null) {
+                mCash +=mCurrentWeapon.getPrice();
+            }
+            mCash-=weaponType.getPrice();
+            mBalanceLabel.setText("x".concat(String.valueOf(mCash)));
+            mCurrentWeapon = weaponType;
+            mWeaponCell.clearChildren();
+            mWeaponCell.add(new Image(weaponType.getImage()));
+        }
     }
 
     private void setupBackButton() {
@@ -242,6 +314,14 @@ public class ShopStage extends Stage {
                     } else {
                         PreferencesManager.clearArmour();
                     }
+
+                    if (mCurrentWeapon != null) {
+                        PreferencesManager.setWeapon(mCurrentWeapon);
+                    } else {
+                        PreferencesManager.clearWeapon();
+                    }
+
+                    resetSnowParticles();
                     mScreen.returnGame();
                 } else {
                     if (PreferencesManager.getTreasures() - mCash>=0) {
@@ -257,6 +337,43 @@ public class ShopStage extends Stage {
     }
 
     private void setupBackground() {
-        addActor(new MenuBackground());
+        addActor(new MenuBackground(AssetLoader.menuBackgroundTexture1, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, VIEWPORT_HEIGHT, true));
+        setupParticles(AssetLoader.sSnowParticleBack);
+        addActor(new MenuBackground(AssetLoader.menuBackgroundTexture2, VIEWPORT_WIDTH
+                , Constants.APP_HEIGHT*(VIEWPORT_WIDTH/Constants.APP_WIDTH), VIEWPORT_HEIGHT, false));
+        setupParticles(AssetLoader.sSnowParticle);
+    }
+
+    private void setupParticles(ParticleEffect particleEffect) {
+        mParticleActor = new ParticleActor(particleEffect);
+        mParticleActor.setPosition(VIEWPORT_WIDTH/2, VIEWPORT_HEIGHT);
+        mParticleActor.setNewBounds(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+        addActor(mParticleActor);
+        mParticleActor.start();
+    }
+
+    private void resetSnowParticles() {
+        mParticleActor.setNewBounds(Constants.APP_WIDTH, Constants.APP_HEIGHT);
+    }
+
+    @Override
+    public boolean keyDown(int keyCode) {
+        if (keyCode== Input.Keys.ESCAPE||keyCode==Input.Keys.BACK) {
+            PreferencesManager.purchase(PreferencesManager.getTreasures() - mCash);
+            if (mCurrentArmour != null) {
+                PreferencesManager.setArmour(mCurrentArmour);
+            } else {
+                PreferencesManager.clearArmour();
+            }
+            if (mCurrentWeapon != null) {
+                PreferencesManager.setWeapon(mCurrentWeapon);
+            } else {
+                PreferencesManager.clearWeapon();
+            }
+            mScreen.returnGame();
+        } else if (keyCode==Input.Keys.MENU) {
+            mScreen.setMenu();
+        }
+        return super.keyDown(keyCode);
     }
 }

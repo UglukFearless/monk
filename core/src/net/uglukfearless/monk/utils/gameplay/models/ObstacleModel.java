@@ -27,6 +27,7 @@ public class ObstacleModel {
     public boolean armour;
     public boolean isTrap;
     public boolean isSphere;
+    public boolean isContainer;
 
     public float textureScaleX = 1;
     public float textureScaleY = 1;

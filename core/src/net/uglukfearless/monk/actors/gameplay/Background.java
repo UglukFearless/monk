@@ -9,9 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.utils.file.AssetLoader;
-import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.utils.gameplay.Movable;
-import net.uglukfearless.monk.utils.gameplay.WorldUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.WorldUtils;
 
 /**
  * Created by Ugluk on 21.05.2016.
@@ -22,7 +21,8 @@ public class Background extends Actor implements Movable {
     private float mSpeedCof = 0;
     private Body mBody1, mBody2;
 
-    private TextureRegion mRegion;
+    private TextureRegion mRegionOne;
+    private TextureRegion mRegionTwo;
 
     public Background(World world, int viewport_width, float viewport_height, float speedCof, boolean isFirst) {
 
@@ -31,10 +31,25 @@ public class Background extends Actor implements Movable {
         mBody1 = WorldUtils.createBackground(world,0 - viewport_width*0.05f/2, viewport_width*1.05f, viewport_height*1.05f);
         mBody2 = WorldUtils.createBackground(world,viewport_width + viewport_width*0.05f/2, viewport_width*1.05f, viewport_height*1.05f);
 
+        TextureRegion textureRegion;
+
         if (isFirst) {
-            mRegion = AssetLoader.environmentAtlas.findRegion("background1");
+            mRegionOne = AssetLoader.environmentAtlas.findRegion("background1");
+            textureRegion = AssetLoader.environmentAtlas.findRegion("background1", 2);
+            if (textureRegion!=null) {
+                mRegionTwo = textureRegion;
+            } else {
+                mRegionTwo = mRegionOne;
+            }
         } else {
-            mRegion = AssetLoader.environmentAtlas.findRegion("background2");
+            mRegionOne = AssetLoader.environmentAtlas.findRegion("background2");
+            textureRegion = AssetLoader.environmentAtlas.findRegion("background2", 2);
+
+            if (textureRegion!=null) {
+                mRegionTwo = textureRegion;
+            } else {
+                mRegionTwo = mRegionOne;
+            }
         }
 
     }
@@ -62,12 +77,12 @@ public class Background extends Actor implements Movable {
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
 
-        batch.draw(mRegion
+        batch.draw(mRegionOne
                 , mBody1.getPosition().x - ((UserData) mBody1.getUserData()).getWidth()/ 2f
                 , mBody1.getPosition().y - ((UserData) mBody1.getUserData()).getHeight() / 2f
                 , ((UserData) mBody1.getUserData()).getWidth()*1.01f
                 , ((UserData) mBody1.getUserData()).getHeight());
-        batch.draw(mRegion
+        batch.draw(mRegionTwo
                 , mBody2.getPosition().x - ((UserData)mBody2.getUserData()).getWidth()/2f
                 , mBody2.getPosition().y - ((UserData)mBody2.getUserData()).getHeight()/2f
                 , ((UserData)mBody2.getUserData()).getWidth()*1.01f

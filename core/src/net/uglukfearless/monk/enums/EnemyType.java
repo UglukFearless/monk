@@ -12,7 +12,6 @@ import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.gameplay.dangers.Danger;
 import net.uglukfearless.monk.constants.PlacingCategory;
 import net.uglukfearless.monk.utils.gameplay.models.EnemyModel;
-import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 
 import java.util.Random;
 
@@ -56,7 +55,8 @@ public enum EnemyType implements Danger {
     private Vector2 linearVelocity;
     private float jumpingImpulse;
     private int gravityScale;
-    private boolean armour;
+
+    private boolean demon;
     private boolean jumper;
     private boolean shouter;
     private boolean striker;
@@ -95,51 +95,8 @@ public enum EnemyType implements Danger {
 
     EnemyType() {
 
-//        this.name = name;
-//        this.ruName = ruName;
-//        this.enName = enName;
-//        this.KEY = PreferencesConstants.GENERAL_DANGER_KEY.concat(this.name);
-
-//        PreferencesManager.putDangerKey(KEY, this.enName, this.ruName);
-
         setupProhibitionMap();
         this.density = Constants.ENEMY_DENSITY;
-//        this.y = y;
-//        this.height = height;
-//        this.width = width;
-//        this.linearVelocity = new Vector2(Constants.WORLD_STATIC_VELOCITY_INIT.x +linearVelocity, 0);
-//        basicXVelocity = linearVelocity;
-//        this.gravityScale = gravityScale;
-//        if (gravityScale==0) {
-//            categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_FLYING);
-//        }  else {
-//            categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_OVERLAND);
-//        }
-//        this.armour = armour;
-//        if (armour) {
-//            categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR);
-//
-//            prohibitionsMap[0][1] = (short) (prohibitionsMap[0][1] | PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR
-//                    | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP);
-//            prohibitionsMap[1][1] = PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR
-//                    | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP;
-//            prohibitionsMap[1][0] = PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP
-//                    | PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR;
-//        }
-//
-//        this.jumper = jumper;
-//        this.shouter = shouter;
-//        this.striker = striker;
-//        this.jumpingImpulse = jumpingImpulse;
-//
-//        priority = prior;
-//
-//        this.textureScaleX = scaleX;
-//        this.textureScaleY = scaleY;
-//        this.textureOffsetX = offsetX;
-//        this.textureOffsetY = offsetY;
-//
-//        this.number = number;
     }
 
     public void init(EnemyModel enemyModel) {
@@ -164,17 +121,18 @@ public enum EnemyType implements Danger {
         }  else {
             categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_OVERLAND);
         }
-        armour = false;
-        if (armour) {
-            categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR);
 
-            prohibitionsMap[0][1] = (short) (prohibitionsMap[0][1] | PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR
-                    | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP);
-            prohibitionsMap[1][1] = PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR
-                    | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP;
-            prohibitionsMap[1][0] = PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP
-                    | PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR;
-        }
+        demon = enemyModel.demon;
+//        if (demon) {
+//            categoryBit = (short)(categoryBit|PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR);
+//
+//            prohibitionsMap[0][1] = (short) (prohibitionsMap[0][1] | PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR
+//                    | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP);
+//            prohibitionsMap[1][1] = PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR
+//                    | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP;
+//            prohibitionsMap[1][0] = PlacingCategory.CATEGORY_PLACING_OBSTACLE_TRAP
+//                    | PlacingCategory.CATEGORY_PLACING_ENEMY_ARMOUR | PlacingCategory.CATEGORY_PLACING_OBSTACLE_ARMOUR;
+//        }
 
         prohibitionsMap[0][1] = (short) (prohibitionsMap[0][1] | enemyModel.prohibitionsMap [0][1]);
         prohibitionsMap[1][1] = (short) (prohibitionsMap[1][1] | enemyModel.prohibitionsMap [1][1]);
@@ -244,6 +202,8 @@ public enum EnemyType implements Danger {
             mRunAnimation = mAnimations.get(1);
             mJumpAnimation = mAnimations.get(2);
             mStrikeAnimation = mAnimations.get(3);
+            mStrikeAnimation.setFrameDuration(0.2f);
+            mStrikeAnimation.setPlayMode(Animation.PlayMode.NORMAL);
             mDieAnimation = mAnimations.get(4);
 
             if (mStayAnimation!=null) {
@@ -319,8 +279,8 @@ public enum EnemyType implements Danger {
     }
 
 
-    public boolean isArmour() {
-        return armour;
+    public boolean isDemon() {
+        return demon;
     }
 
 

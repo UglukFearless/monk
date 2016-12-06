@@ -16,6 +16,7 @@ public class ObstacleUserData extends UserData {
     private int gravityScale;
 
     private boolean dead;
+    private boolean mTerribleDeath;
 
     private float scaleX;
     private float scaleY;
@@ -118,6 +119,9 @@ public class ObstacleUserData extends UserData {
         return obstacleType.isSphere();
     }
 
+    public boolean isConteiner() {
+        return obstacleType.isConteiner();
+    }
 
     public boolean isDead() {
         return dead;
@@ -174,5 +178,13 @@ public class ObstacleUserData extends UserData {
 
     public Animation getDieAnimation() {
         return obstacleType.getDieAnimation();
+    }
+
+    public boolean isTerribleDeath() {
+        return mTerribleDeath;
+    }
+
+    public void setTerribleDeath(boolean terribleDeath) {
+        mTerribleDeath = terribleDeath;
     }
 }

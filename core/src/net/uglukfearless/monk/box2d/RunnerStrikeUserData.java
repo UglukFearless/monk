@@ -2,6 +2,7 @@ package net.uglukfearless.monk.box2d;
 
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.enums.UserDataType;
+import net.uglukfearless.monk.enums.WeaponDistance;
 
 /**
  * Created by Ugluk on 01.06.2016.
@@ -13,7 +14,9 @@ public class RunnerStrikeUserData extends UserData {
     private boolean mPiercing1;
     private boolean mPiercing2;
 
-    public RunnerStrikeUserData() {
+    private WeaponDistance mWeaponDistance;
+
+    public RunnerStrikeUserData(WeaponDistance weaponDistance) {
         super();
         userDataType = UserDataType.RUNNER_STRIKE;
         width = Constants.RUNNER_WIDTH * 2.4f;
@@ -21,6 +24,8 @@ public class RunnerStrikeUserData extends UserData {
         mShell = false;
         mPiercing1 = true;
         mPiercing2 = false;
+
+        mWeaponDistance = weaponDistance;
     }
 
     public RunnerStrikeUserData(float width, float height, boolean shell) {
@@ -28,6 +33,14 @@ public class RunnerStrikeUserData extends UserData {
         userDataType = UserDataType.RUNNER_STRIKE;
         mShell = true;
         mPiercing1 = false;
+        mPiercing2 = false;
+    }
+
+    public RunnerStrikeUserData() {
+        super(Constants.RUNNER_WIDTH, Constants.RUNNER_HEIGHT);
+        userDataType = UserDataType.RUNNER_STRIKE;
+        mShell = false;
+        mPiercing1 = true;
         mPiercing2 = false;
     }
 
@@ -57,5 +70,9 @@ public class RunnerStrikeUserData extends UserData {
 
     public boolean isPiercing2() {
         return mPiercing2;
+    }
+
+    public WeaponDistance getWeaponDistance() {
+        return mWeaponDistance;
     }
 }

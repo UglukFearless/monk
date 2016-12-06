@@ -19,10 +19,12 @@ public class EnemyUserData extends UserData {
 
 
     private boolean dead;
+    private boolean mTerribleDeath;
     private boolean jumping;
     private boolean doll;
     private boolean mStrike;
     private boolean mShoot;
+    private boolean mStruck;
 
     private float scaleX;
     private float scaleY;
@@ -49,6 +51,7 @@ public class EnemyUserData extends UserData {
         doll = false;
         mStrike = false;
         mShoot = false;
+        mStruck = false;
 
         scaleX = type.getTextureScaleX();
         scaleY = type.getTextureScaleY();
@@ -102,8 +105,8 @@ public class EnemyUserData extends UserData {
         return enemyType.getY();
     }
 
-    public boolean isArmour() {
-        return enemyType.isArmour();
+    public boolean isDemon() {
+        return enemyType.isDemon();
     }
 
     public boolean isJumper() {
@@ -184,6 +187,13 @@ public class EnemyUserData extends UserData {
         return enemyType;
     }
 
+    public boolean isStruck() {
+        return mStruck;
+    }
+
+    public void setStruck(boolean struck) {
+        mStruck = struck;
+    }
 
     //геттеры по анимациям
     public TextureRegion getShellRegion() {
@@ -216,5 +226,13 @@ public class EnemyUserData extends UserData {
 
     public boolean isFly() {
         return enemyType.getGravityScale()==0;
+    }
+
+    public boolean isTerribleDeath() {
+        return mTerribleDeath;
+    }
+
+    public void setTerribleDeath(boolean terribleDeath) {
+        mTerribleDeath = terribleDeath;
     }
 }

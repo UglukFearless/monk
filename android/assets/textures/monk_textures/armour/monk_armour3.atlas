@@ -1,0 +1,124 @@
+
+monk_armour3.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+hit1
+  rotate: false
+  xy: 1, 285
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+jump1
+  rotate: false
+  xy: 1, 143
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+run1
+  rotate: false
+  xy: 148, 285
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+run2
+  rotate: false
+  xy: 1, 1
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+stay1
+  rotate: false
+  xy: 148, 143
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike1_frame1
+  rotate: false
+  xy: 295, 285
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike2_frame1
+  rotate: false
+  xy: 148, 1
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike3_frame1
+  rotate: false
+  xy: 295, 143
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike4_frame1
+  rotate: false
+  xy: 442, 285
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike5_frame1
+  rotate: false
+  xy: 295, 1
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike6_frame1
+  rotate: false
+  xy: 442, 143
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+weapon1_hit1
+  rotate: false
+  xy: 589, 285
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+weapon1_jump1
+  rotate: false
+  xy: 442, 1
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+weapon1_run1
+  rotate: false
+  xy: 589, 143
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+weapon1_run2
+  rotate: false
+  xy: 736, 285
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+weapon1_stay1
+  rotate: false
+  xy: 589, 1
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+weapon1_strike1_frame1
+  rotate: false
+  xy: 736, 143
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1

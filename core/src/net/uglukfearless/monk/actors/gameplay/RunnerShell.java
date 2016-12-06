@@ -8,11 +8,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Pool;
 
 import net.uglukfearless.monk.box2d.RunnerStrikeUserData;
-import net.uglukfearless.monk.box2d.UserData;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.utils.file.AssetLoader;
-import net.uglukfearless.monk.utils.gameplay.BodyUtils;
-import net.uglukfearless.monk.utils.gameplay.WorldUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.WorldUtils;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 /**
@@ -44,8 +43,8 @@ public class RunnerShell extends GameActor implements Pool.Poolable{
     }
 
     public void init(Stage stage, Vector2 position, int thunderFistLevel) {
-        body.setTransform(position.x, position.y + 0.5f, 0);
-        body.setLinearVelocity(25f, 0);
+        body.setTransform(position.x + 1f, position.y + 1f, 0);
+        body.setLinearVelocity(28f, 0);
         if (thunderFistLevel==1) {
             getUserData().setPiercing1(true);
         }

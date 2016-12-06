@@ -10,6 +10,14 @@ public class CircularList<T>  extends Array<T> {
     private int currentIndex;
 
 
+    public CircularList(Array<T> array) {
+        super(array);
+    }
+
+    public CircularList() {
+        super();
+    }
+
     public void resetIndex() {
         currentIndex = 0;
     }

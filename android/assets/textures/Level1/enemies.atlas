@@ -3,142 +3,191 @@ enemies.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
+enemy5_hit1
+  rotate: false
+  xy: 1, 776
+  size: 206, 242
+  orig: 206, 242
+  offset: 0, 0
+  index: -1
+enemy5_jump1
+  rotate: false
+  xy: 1, 532
+  size: 206, 242
+  orig: 206, 242
+  offset: 0, 0
+  index: -1
+enemy5_run1
+  rotate: false
+  xy: 209, 776
+  size: 206, 242
+  orig: 206, 242
+  offset: 0, 0
+  index: -1
+enemy5_run2
+  rotate: false
+  xy: 1, 288
+  size: 206, 242
+  orig: 206, 242
+  offset: 0, 0
+  index: -1
+enemy5_strike1
+  rotate: false
+  xy: 209, 532
+  size: 206, 242
+  orig: 206, 242
+  offset: 0, 0
+  index: -1
+enemy5_strike2
+  rotate: false
+  xy: 417, 776
+  size: 206, 242
+  orig: 206, 242
+  offset: 0, 0
+  index: -1
 enemy4_hit1
   rotate: false
-  xy: 1, 407
+  xy: 1, 188
   size: 200, 98
   orig: 200, 98
   offset: 0, 0
   index: -1
 enemy4_jump1
   rotate: false
-  xy: 1, 307
-  size: 200, 98
-  orig: 200, 98
-  offset: 0, 0
-  index: -1
-enemy4_run1
-  rotate: false
-  xy: 203, 407
-  size: 200, 98
-  orig: 200, 98
-  offset: 0, 0
-  index: -1
-enemy4_run2
-  rotate: false
-  xy: 1, 207
+  xy: 209, 432
   size: 200, 98
   orig: 200, 98
   offset: 0, 0
   index: -1
 enemy4_strike1
   rotate: false
-  xy: 203, 307
+  xy: 209, 432
+  size: 200, 98
+  orig: 200, 98
+  offset: 0, 0
+  index: -1
+enemy4_run1
+  rotate: false
+  xy: 417, 676
+  size: 200, 98
+  orig: 200, 98
+  offset: 0, 0
+  index: -1
+enemy4_run2
+  rotate: false
+  xy: 625, 920
   size: 200, 98
   orig: 200, 98
   offset: 0, 0
   index: -1
 enemy1_hit1
   rotate: false
-  xy: 405, 383
+  xy: 1, 64
   size: 98, 122
   orig: 98, 122
   offset: 0, 0
   index: -1
 enemy1_jump1
   rotate: false
-  xy: 1, 83
+  xy: 209, 308
   size: 98, 122
   orig: 98, 122
   offset: 0, 0
   index: -1
 enemy1_run1
   rotate: false
-  xy: 505, 383
+  xy: 417, 552
   size: 98, 122
   orig: 98, 122
   offset: 0, 0
   index: -1
 enemy1_run2
   rotate: false
-  xy: 101, 83
+  xy: 625, 796
   size: 98, 122
   orig: 98, 122
   offset: 0, 0
   index: -1
 enemy1_strike1
   rotate: false
-  xy: 605, 383
+  xy: 101, 64
   size: 98, 122
   orig: 98, 122
   offset: 0, 0
   index: -1
 enemy2_hit1
   rotate: false
-  xy: 705, 383
+  xy: 309, 308
   size: 85, 122
   orig: 85, 122
   offset: 0, 0
   index: -1
 enemy2_jump1
   rotate: false
-  xy: 792, 383
+  xy: 517, 552
   size: 85, 122
   orig: 85, 122
   offset: 0, 0
   index: -1
 enemy2_run1
   rotate: false
-  xy: 879, 383
+  xy: 725, 796
   size: 85, 122
   orig: 85, 122
   offset: 0, 0
   index: -1
 enemy2_run2
   rotate: false
-  xy: 203, 183
+  xy: 827, 896
   size: 85, 122
   orig: 85, 122
   offset: 0, 0
   index: -1
 enemy2_strike1
   rotate: false
-  xy: 290, 183
+  xy: 914, 896
   size: 85, 122
   orig: 85, 122
   offset: 0, 0
   index: -1
 enemy3_hit1
   rotate: false
-  xy: 1, 1
+  xy: 812, 814
   size: 74, 80
   orig: 74, 80
   offset: 0, 0
   index: -1
 enemy3_run1
   rotate: false
-  xy: 77, 1
+  xy: 888, 814
   size: 74, 80
   orig: 74, 80
   offset: 0, 0
   index: -1
+enemy5_shell1
+  rotate: false
+  xy: 1, 1
+  size: 52, 61
+  orig: 52, 61
+  offset: 0, 0
+  index: -1
 enemy3_run2
   rotate: false
-  xy: 201, 101
+  xy: 396, 350
   size: 74, 80
   orig: 74, 80
   offset: 0, 0
   index: -1
 enemy3_strike1
   rotate: false
-  xy: 277, 101
+  xy: 396, 268
   size: 74, 80
   orig: 74, 80
   offset: 0, 0
   index: -1
 enemy2_shell1
   rotate: false
-  xy: 405, 345
+  xy: 964, 858
   size: 32, 36
   orig: 32, 36
   offset: 0, 0

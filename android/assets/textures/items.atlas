@@ -1,25 +1,32 @@
 
-armours.png
+items.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
+weapon1
+  rotate: false
+  xy: 1, 163
+  size: 55, 81
+  orig: 55, 81
+  offset: 0, 0
+  index: -1
 armour1
   rotate: false
-  xy: 1, 1
+  xy: 1, 109
   size: 39, 52
   orig: 39, 52
   offset: 0, 0
   index: -1
 armour2
   rotate: false
-  xy: 42, 1
+  xy: 1, 55
   size: 39, 52
   orig: 39, 52
   offset: 0, 0
   index: -1
 armour3
   rotate: false
-  xy: 83, 1
+  xy: 1, 1
   size: 39, 52
   orig: 39, 52
   offset: 0, 0

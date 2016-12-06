@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Filter;
 
+import net.uglukfearless.monk.box2d.EnemyUserData;
 import net.uglukfearless.monk.box2d.RunnerUserData;
 import net.uglukfearless.monk.box2d.ShellUserData;
 import net.uglukfearless.monk.box2d.UserData;
@@ -18,10 +19,13 @@ import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.enums.ArmourType;
 import net.uglukfearless.monk.enums.RunnerState;
+import net.uglukfearless.monk.enums.WeaponType;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.SoundSystem;
-import net.uglukfearless.monk.utils.gameplay.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.bodies.BodyUtils;
+import net.uglukfearless.monk.utils.gameplay.CircularList;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
 import java.util.Random;
@@ -45,6 +49,8 @@ public class Runner extends GameActor {
     private Animation mAnimRun;
     private Animation mAnimJump;
     private Animation mAnimDie;
+
+    private CircularList<Animation> mCurrentStrikeList;
 
     private Animation mCurrentAnimation;
 
@@ -78,6 +84,8 @@ public class Runner extends GameActor {
     private int mWingsRevival;
     private boolean mWingsLanding;
 
+    private WeaponType mWeaponType;
+
 
     public Runner(Body body) {
         super(body);
@@ -106,6 +114,9 @@ public class Runner extends GameActor {
         mWingsRevival = 0;
         mWingsLanding = false;
 
+        mWeaponType = PreferencesManager.getWeapon();
+        changeClothes(PreferencesManager.getArmour());
+
         mRand = new Random();
     }
 
@@ -115,7 +126,6 @@ public class Runner extends GameActor {
 
         float x = body.getPosition().x - (data.getWidth()*0.1f) - data.getWidth()/2;
         float y = body.getPosition().y - data.getHeight()/2;
-        float width = data.getWidth()*1.2f;
 
         mColor = batch.getColor();
         batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
@@ -125,7 +135,7 @@ public class Runner extends GameActor {
                 x,
                 y,
                 getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
-                data.getWidth() *2.2f, data.getHeight() * 1.05f
+                data.getWidth() *3.2f, data.getHeight() * 1.84f
                 , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
 
         batch.setColor(mColor);
@@ -135,162 +145,174 @@ public class Runner extends GameActor {
     public void act(float delta) {
         super.act(delta);
 
-        if (!data.isDead()) {
-            body.setLinearVelocity(0, body.getLinearVelocity().y);
-            if (!body.getWorld().isLocked()) {
-                float x = body.getPosition().x - data.getWidth()/2;
-                if (x>mGround1.getBody().getPosition().x
-                        &&x<mGround1.getBody().getPosition().x + Constants.GROUND_WIDTH_INIT /2
-                        &&x>mGround2.getBody().getPosition().x - Constants.GROUND_WIDTH_INIT /2 - data.getWidth()*1.5f) {
-                    body.setTransform(Constants.RUNNER_X, body.getPosition().y, 0);
-                }
-            }
+        if (data.getState().equals(RunnerState.THE_DRAGON)) {
+            body.setTransform(Constants.RUNNER_X, ((GameStage) getStage()).getDragon().getDragonY(), 0);
+        } else {
 
-            if (body.getPosition().y>15) {
-                body.setLinearVelocity(body.getLinearVelocity().x, 0);
-            }
-
-            if (mBuddha) {
-                mBuddhaTimer +=delta;
-                if (mBuddhaTimer>mBuddhaThreshold&&!mUseBuddhaThreshold) {
-                    ((GameStage)getStage()).changingSpeed(((GameStage)getStage()).getCurrentVelocity().x/2f);
-                    mUseBuddhaThreshold = true;
-                }
-
-            }
-
-            if (BodyUtils.runnerIsFallDown(body)) {
-                if (mWings) {
-                    body.setTransform(Constants.RUNNER_X,Constants.RUNNER_Y, 0);
-                    ((GameStage)getStage()).StartRebutRunner();
-                } else if (mWingsLanding&&startGround()){
-                    body.setTransform(Constants.RUNNER_X,Constants.RUNNER_Y, 0);
-                    ((GameStage)getStage()).StartRebutRunner();
-                    mWingsLanding = false;
-                } else if (mWingsRevival>0&&!mWingsLanding) {
-                    mWingsRevival--;
-                    mWingsLanding = true;
-                    ((GameStage) getStage()).checkWingsRevival(mWingsRevival);
-                } else if (!mWingsLanding){
-                    hit(PreferencesConstants.STATS_CRASHED_DEATH_KEY);
-                    if (mArmour) {
-                        if (mArmourActor!=null) {
-                            mArmourActor.getUserData().destroyArmour();
-                        }
-                        unarmoured();
-                    }
-                }
-
-            } else if (BodyUtils.runnerIsBehind(body)) {
-                if (mWings) {
-                    body.setTransform(Constants.RUNNER_X,Constants.RUNNER_Y, 0);
-                    ((GameStage)getStage()).StartRebutRunner();
-                } else if (mWingsLanding&&startGround()){
-                    body.setTransform(Constants.RUNNER_X,Constants.RUNNER_Y, 0);
-                    ((GameStage)getStage()).StartRebutRunner();
-                    mWingsLanding = false;
-                } else if (mWingsRevival>0&&!mWingsLanding) {
-                    mWingsRevival--;
-                    mWingsLanding = true;
-                    ((GameStage) getStage()).checkWingsRevival(mWingsRevival);
-                } else if (!mWingsLanding) {
-                    hit(PreferencesConstants.STATS_CRASHED_DEATH_KEY);
-                    if (mArmour) {
-                        if (mArmourActor!=null) {
-                            mArmourActor.getUserData().destroyArmour();
-                        }
-                        unarmoured();
-                    }
-                }
-            }
-        }
-
-        switch (data.getState()) {
-            case JUMP:
-            case JUMP_DOUBLE:
-                if (comboTime<0.3) {
-                    comboTime +=delta;
-                } else {
-                    AssetLoader.playerStrikeList.resetIndex();
-                }
-                break;
-            case RUN:
+            if (!data.isDead()) {
+                body.setLinearVelocity(0, body.getLinearVelocity().y);
                 if (!body.getWorld().isLocked()) {
-                    float x = body.getPosition().x - data.getWidth()/2;
-                    if (x>mGround1.getBody().getPosition().x - Constants.GROUND_WIDTH_INIT /2
-                            &&x<mGround1.getBody().getPosition().x + Constants.GROUND_WIDTH_INIT /2) {
+                    float x = body.getPosition().x - data.getWidth() / 2;
+                    if (x > mGround1.getBody().getPosition().x
+                            && x < mGround1.getBody().getPosition().x + Constants.GROUND_WIDTH_INIT / 2
+                            && x > mGround2.getBody().getPosition().x - Constants.GROUND_WIDTH_INIT / 2 - data.getWidth() * 1.5f) {
                         body.setTransform(Constants.RUNNER_X, body.getPosition().y, 0);
                     }
                 }
-                if (comboTime<0.3) {
-                    comboTime +=delta;
-                } else {
-                    AssetLoader.playerStrikeList.resetIndex();
+
+                if (body.getPosition().y > 15) {
+                    body.setLinearVelocity(body.getLinearVelocity().x, 0);
                 }
-                break;
-            case RUN_STRIKE:
-                strikeTime +=delta;
-                if (strikeTime > 0.2f) {
-                    if (doubleStrike) {
-                        mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
-                        AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
-                        doubleStrike = false;
-                    } else {
-                        data.setState(RunnerState.RUN);
-                        mCurrentAnimation = mAnimRun;
-                        comboTime = 0;
+
+                if (mBuddha) {
+                    mBuddhaTimer += delta;
+                    if (mBuddhaTimer > mBuddhaThreshold && !mUseBuddhaThreshold) {
+                        ((GameStage) getStage()).changingSpeed(((GameStage) getStage()).getCurrentVelocity().x / 2f);
+                        mUseBuddhaThreshold = true;
                     }
-                    stateTime = 0;
-                    strikeTime = 0;
+
                 }
-                break;
-            case JUMP_STRIKE:
-                strikeTime +=delta;
-                if (strikeTime > 0.2f) {
-                    if (doubleStrike) {
-                        mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
-                        AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
-                        doubleStrike = false;
-                    } else {
-                        data.setState(RunnerState.JUMP);
-                        mCurrentAnimation = mAnimJump;
-                        comboTime = 0;
+
+                if (BodyUtils.runnerIsFallDown(body)) {
+                    if (mWings) {
+                        body.setTransform(Constants.RUNNER_X, Constants.RUNNER_Y, 0);
+                        ((GameStage) getStage()).StartRebutRunner();
+                    } else if (mWingsLanding && startGround()) {
+                        body.setTransform(Constants.RUNNER_X, Constants.RUNNER_Y, 0);
+                        ((GameStage) getStage()).StartRebutRunner();
+                        mWingsLanding = false;
+                    } else if (mWingsRevival > 0 && !mWingsLanding) {
+                        mWingsRevival--;
+                        mWingsLanding = true;
+                        ((GameStage) getStage()).checkWingsRevival(mWingsRevival);
+                    } else if (!mWingsLanding) {
+                        hit(PreferencesConstants.STATS_CRASHED_DEATH_KEY);
+                        if (mArmour) {
+                            if (mArmourActor != null) {
+                                mArmourActor.getUserData().destroyArmour();
+                            }
+                            unarmoured();
+                        }
                     }
-                    stateTime = 0;
-                    strikeTime = 0;
+
+                } else if (BodyUtils.runnerIsBehind(body)) {
+                    if (mWings) {
+                        body.setTransform(Constants.RUNNER_X, Constants.RUNNER_Y, 0);
+                        ((GameStage) getStage()).StartRebutRunner();
+                    } else if (mWingsLanding && startGround()) {
+                        body.setTransform(Constants.RUNNER_X, Constants.RUNNER_Y, 0);
+                        ((GameStage) getStage()).StartRebutRunner();
+                        mWingsLanding = false;
+                    } else if (mWingsRevival > 0 && !mWingsLanding) {
+                        mWingsRevival--;
+                        mWingsLanding = true;
+                        ((GameStage) getStage()).checkWingsRevival(mWingsRevival);
+                    } else if (!mWingsLanding) {
+                        hit(PreferencesConstants.STATS_CRASHED_DEATH_KEY);
+                        if (mArmour) {
+                            if (mArmourActor != null) {
+                                mArmourActor.getUserData().destroyArmour();
+                            }
+                            unarmoured();
+                        }
+                    }
                 }
-                break;
-            case JUMP_DOUBLE_STRIKE:
-                strikeTime +=delta;
-                if (strikeTime > 0.2f) {
-                    if (doubleStrike) {
-                        mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
-                        AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
-                        doubleStrike = false;
+            }
+
+            switch (data.getState()) {
+                case DIE:
+                    dead(delta);
+                    if (mBuddha) {
+                        ((GameStage) getStage()).changingSpeed(Constants.WORLD_STATIC_VELOCITY_INIT.x);
+                        mBuddha = false;
+                    }
+                    break;
+                case JUMP:
+                case JUMP_DOUBLE:
+                    if (comboTime < 0.3) {
+                        comboTime += delta;
                     } else {
+                        mCurrentStrikeList.resetIndex();
+                    }
+                    break;
+                case RUN:
+                    if (!body.getWorld().isLocked()) {
+                        float x = body.getPosition().x - data.getWidth() / 2;
+                        if (x > mGround1.getBody().getPosition().x - Constants.GROUND_WIDTH_INIT / 2
+                                && x < mGround1.getBody().getPosition().x + Constants.GROUND_WIDTH_INIT / 2) {
+                            body.setTransform(Constants.RUNNER_X, body.getPosition().y, 0);
+                        }
+                    }
+                    if (comboTime < 0.3) {
+                        comboTime += delta;
+                    } else {
+                        mCurrentStrikeList.resetIndex();
+                    }
+                    break;
+                case RUN_STRIKE:
+                    strikeTime += delta;
+                    if (strikeTime > 0.2f) {
+                        if (doubleStrike) {
+                            mCurrentAnimation = mCurrentStrikeList.getNext();
+                            playStrike();
+                            checkBonusStrike();
+                            doubleStrike = false;
+                            strikeTime = 0f;
+                        } else {
+                            data.setState(RunnerState.RUN);
+                            mCurrentAnimation = mAnimRun;
+                            comboTime = 0;
+                        }
+                        stateTime = 0;
+                        strikeTime = 0;
+                    }
+                    break;
+                case JUMP_STRIKE:
+                    strikeTime += delta;
+                    if (strikeTime > 0.2f) {
+                        if (doubleStrike) {
+                            mCurrentAnimation = mCurrentStrikeList.getNext();
+                            playStrike();
+                            checkBonusStrike();
+                            doubleStrike = false;
+                            strikeTime = 0f;
+                        } else {
+                            data.setState(RunnerState.JUMP);
+                            mCurrentAnimation = mAnimJump;
+                            comboTime = 0;
+                        }
+                        stateTime = 0;
+                        strikeTime = 0;
+                    }
+                    break;
+                case JUMP_DOUBLE_STRIKE:
+                    strikeTime += delta;
+                    if (strikeTime > 0.2f) {
+                        if (doubleStrike) {
+                            mCurrentAnimation = mCurrentStrikeList.getNext();
+                            playStrike();
+                            checkBonusStrike();
+                            doubleStrike = false;
+                            strikeTime = 0f;
+                        } else {
+                            data.setState(RunnerState.JUMP_DOUBLE);
+                            mCurrentAnimation = mAnimJump;
+                            comboTime = 0;
+                        }
                         data.setState(RunnerState.JUMP_DOUBLE);
                         mCurrentAnimation = mAnimJump;
-                        comboTime = 0;
+                        stateTime = 0;
+                        strikeTime = 0;
                     }
-                    data.setState(RunnerState.JUMP_DOUBLE);
-                    mCurrentAnimation = mAnimJump;
-                    stateTime = 0;
-                    strikeTime = 0;
-                }
-                break;
-            case DIE:
-                dead(delta);
-                if (mBuddha) {
-                    ((GameStage)getStage()).changingSpeed(Constants.WORLD_STATIC_VELOCITY_INIT.x);
-                    mBuddha = false;
-                }
-                break;
-        }
-
-        if(data!=null &&  data.isDestroy()){
-            if (!body.getWorld().isLocked()) {
-                body.getWorld().destroyBody(body);
+                    break;
             }
+
+            if (data != null && data.isDestroy()) {
+                if (!body.getWorld().isLocked()) {
+                    body.getWorld().destroyBody(body);
+                }
+            }
+
         }
     }
 
@@ -302,6 +324,7 @@ public class Runner extends GameActor {
     private void dead(float delta) {
         deadTime +=delta;
         if (deadTime>0.3f&&getStage()!=null) {
+            disarm();
 
             if (AssetLoader.sFreeParticleBlood.size>0) {
                 ParticleEffect effect = AssetLoader.sFreeParticleBlood.get(AssetLoader.sFreeParticleBlood.size -1);
@@ -319,6 +342,12 @@ public class Runner extends GameActor {
             ((GameStage) getStage()).gameOver(mCurrentKillerKey);
             this.remove();
         }
+    }
+
+    private void disarm() {
+        PreferencesManager.clearWeapon();
+        mWeaponType = null;
+        changeClothes(mArmourActor.getUserData().getType());
     }
 
     @Override
@@ -382,7 +411,6 @@ public class Runner extends GameActor {
 
 
     public void strike() {
-
         switch (data.getState()) {
             case DIE:
                 break;
@@ -391,53 +419,53 @@ public class Runner extends GameActor {
                 break;
             case RUN:
                 data.setState(RunnerState.RUN_STRIKE);
-                AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
+                playStrike();
                 if (comboTime>0.3) {
-                    AssetLoader.playerStrikeList.setIndex(mRand.nextInt(2)*3);
+                    mCurrentStrikeList.setIndex(mRand.nextInt(2)*3);
                 }
-                mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
+                mCurrentAnimation = mCurrentStrikeList.getNext();
                 strikeTime = 0f;
-                if (mRetribution) {
-                    ((GameStage)getStage()).retribution(mRetributionLevel);
-                } else if (mThunderFist) {
-                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition(), mThunderFistLevel);
-                }
+                checkBonusStrike();
                 break;
             case JUMP_STRIKE:
                 doubleStrike = true;
                 break;
             case JUMP:
                 data.setState(RunnerState.JUMP_STRIKE);
-                AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
+                playStrike();
                 if (comboTime>0.3) {
-                    AssetLoader.playerStrikeList.setIndex(mRand.nextInt(2)*3);
+                    mCurrentStrikeList.setIndex(mRand.nextInt(2)*3);
                 }
-                mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
+                mCurrentAnimation = mCurrentStrikeList.getNext();
                 strikeTime = 0f;
-                if (mRetribution) {
-                    ((GameStage)getStage()).retribution(mRetributionLevel);
-                } else if (mThunderFist) {
-                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition(), mThunderFistLevel);
-                }
+                checkBonusStrike();
                 break;
             case JUMP_DOUBLE_STRIKE:
                 doubleStrike = true;
                 break;
             case JUMP_DOUBLE:
                 data.setState(RunnerState.JUMP_DOUBLE_STRIKE);
-                AssetLoader.monkStrikeSound.play(SoundSystem.getSoundValue());
+                playStrike();
                 if (comboTime>0.3) {
-                    AssetLoader.playerStrikeList.setIndex(mRand.nextInt(2)*3);
+                    mCurrentStrikeList.setIndex(mRand.nextInt(2)*3);
                 }
-                mCurrentAnimation = AssetLoader.playerStrikeList.getNext();
+                mCurrentAnimation = mCurrentStrikeList.getNext();
                 strikeTime = 0f;
-                if (mRetribution) {
-                    ((GameStage)getStage()).retribution(mRetributionLevel);
-                } else if (mThunderFist) {
-                    PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition(), mThunderFistLevel);
-                }
+                checkBonusStrike();
                 break;
         }
+    }
+
+    private void checkBonusStrike() {
+        if (mRetribution) {
+            ((GameStage)getStage()).retribution(mRetributionLevel);
+        } else if (mThunderFist) {
+            PoolsHandler.sRunnerShellPool.obtain().init(getStage(), body.getPosition(), mThunderFistLevel);
+        }
+    }
+
+    private void playStrike() {
+        AssetLoader.monkStrikeSounds.get(mRand.nextInt(AssetLoader.monkStrikeSounds.size)).play(SoundSystem.getSoundValue());
     }
 
     public void hit(String key) {
@@ -456,6 +484,7 @@ public class Runner extends GameActor {
             System.out.println("isGhost " + isGhost());
             System.out.println("isBuddha " + isBuddha());
             System.out.println("isArmour " + isArmour());
+            System.out.println("isDragon " + isDragon());
         }
     }
 
@@ -550,13 +579,16 @@ public class Runner extends GameActor {
         mStrongBeat = strongBeat;
     }
 
-    public void beatBody(Body bBody, Contact contact) {
+    public void beatBody(Body bBody, Contact contact, boolean enemy, boolean obstacle, boolean shell, boolean close) {
 
         bBody.setFixedRotation(false);
         if (!mStrongBeat) {
             bBody.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_DEAD);
             if (bBody.getGravityScale()==0) {
                 bBody.setGravityScale(10);
+            }
+            if (enemy&&mWeaponType!=null&&close) {
+                ((EnemyUserData) bBody.getUserData()).setStruck(true);
             }
         } else if (bBody!=null&&((GameStage)getStage()).getRunnerStrike()!=null) {
 
@@ -573,8 +605,9 @@ public class Runner extends GameActor {
                 coff=1;
             }
 
-            if (bBody.getUserData() instanceof ShellUserData) {
+            if (shell) {
                 coff*=2;
+                ((ShellUserData) bBody.getUserData()).setStrong(true);
             }
 
             bBody.setLinearVelocity(coff*4f * impactVelocity.x, 2.5f * impactVelocity.y);
@@ -582,6 +615,10 @@ public class Runner extends GameActor {
             ((UserData)bBody.getUserData()).setLaunched(true);
             if (bBody.getGravityScale()==0) {
                 bBody.setGravityScale(3);
+            }
+
+            if (enemy) {
+                ((EnemyUserData) bBody.getUserData()).setStruck(true);
             }
 
             ((GameStage) getStage()).screenShake(0.1f, 0.15f);
@@ -609,24 +646,23 @@ public class Runner extends GameActor {
         changeClothes(armour.getUserData().getType());
     }
 
+    public void armouring(ArmourType armourType) {
+        mArmour = true;
+        mCustomFilter = FilterConstants.FILTER_RUNNER_GHOST;
+        mRevivalFilter = FilterConstants.FILTER_RUNNER_GHOST;
+        setCustomFilter();
+        mArmourActor.activate(armourType);
+        changeClothes(mArmourActor.getUserData().getType());
+        getStage().addActor(mArmourActor);
+        mArmourActor.setRunner(this);
+        if (!isGhost()&&!isBuddha()&&!isDragon()) {
+            mArmourActor.unhide();
+        }
+    }
+
     public void unarmoured() {
 
-        AssetLoader.loadMonkAnimations(null);
-
-        if (mCurrentAnimation==mAnimStay) {
-            mCurrentAnimation=AssetLoader.playerStay;
-        } else if (mCurrentAnimation==mAnimRun) {
-            mCurrentAnimation=AssetLoader.playerRun;
-        } else if (mCurrentAnimation==mAnimJump) {
-            mCurrentAnimation=AssetLoader.playerJump;
-        }else if (mCurrentAnimation==mAnimDie) {
-            mCurrentAnimation=AssetLoader.playerHit;
-        }
-
-        mAnimStay = AssetLoader.playerStay;
-        mAnimRun = AssetLoader.playerRun;
-        mAnimJump = AssetLoader.playerJump;
-        mAnimDie = AssetLoader.playerHit;
+        changeClothes(null);
 
         mArmour = false;
         mCustomFilter = FilterConstants.FILTER_RUNNER;
@@ -639,31 +675,44 @@ public class Runner extends GameActor {
 
     public void changeClothes(ArmourType armourType) {
 
-        AssetLoader.loadMonkAnimations(armourType);
-        if (mCurrentAnimation==mAnimStay) {
-            mCurrentAnimation=AssetLoader.playerStay;
-        } else if (mCurrentAnimation==mAnimRun) {
-            mCurrentAnimation=AssetLoader.playerRun;
-        } else if (mCurrentAnimation==mAnimJump) {
-            mCurrentAnimation=AssetLoader.playerJump;
-        }else if (mCurrentAnimation==mAnimDie) {
-            mCurrentAnimation=AssetLoader.playerHit;
-        }
+        AssetLoader.loadMonkAnimations(armourType, mWeaponType);
 
-        mAnimStay = AssetLoader.playerStay;
-        mAnimRun = AssetLoader.playerRun;
-        mAnimJump = AssetLoader.playerJump;
-        mAnimDie = AssetLoader.playerHit;
+            if (mCurrentAnimation==mAnimStay) {
+                mCurrentAnimation=AssetLoader.playerStay;
+            } else if (mCurrentAnimation==mAnimRun) {
+                mCurrentAnimation=AssetLoader.playerRun;
+            } else if (mCurrentAnimation==mAnimJump) {
+                mCurrentAnimation=AssetLoader.playerJump;
+            }else if (mCurrentAnimation==mAnimDie) {
+                mCurrentAnimation=AssetLoader.playerHit;
+            }
+
+            mAnimStay = AssetLoader.playerStay;
+            mAnimRun = AssetLoader.playerRun;
+            mAnimJump = AssetLoader.playerJump;
+            mAnimDie = AssetLoader.playerHit;
+
+            mCurrentStrikeList = AssetLoader.playerStrikeList;
     }
 
     public void setCustomFilter() {
-        if (mWings&&!mArmour) {
-            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS);
-        } else if (mWings&&mArmour) {
-            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS_GHOST);
-        } else if (body!=null) {
-            body.getFixtureList().get(0).setFilterData(mCustomFilter);
+        if (mArmour&&!isGhost()&&!isDragon()&&!isBuddha()&&mArmourActor!=null) {
+            if (mWings) {
+                body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS_GHOST);
+                mArmourActor.unhide();
+            } else {
+                mArmourActor.unhide();
+            }
+
+        } if (!isGhost()&&!isDragon()&&!isBuddha()) {
+            if (mWings&&!mArmour) {
+                body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS);
+
+            } else if (!getUserData().isDead()&&body!=null&&body.getFixtureList().size>0) {
+                body.getFixtureList().get(0).setFilterData(mCustomFilter);
+            }
         }
+
     }
 
     public void setRevivalFilter() {
@@ -688,5 +737,51 @@ public class Runner extends GameActor {
 
     public int getWingsRevival() {
         return mWingsRevival;
+    }
+
+    public WeaponType getWeaponType() {
+        return mWeaponType;
+    }
+
+    public void setWeaponType(WeaponType weaponType) {
+        mWeaponType = weaponType;
+        if (mArmour) {
+            changeClothes(mArmourActor.getUserData().getType());
+        } else {
+            changeClothes(null);
+        }
+
+    }
+
+    public void setArmour(Armour armour) {
+        mArmourActor = armour;
+    }
+
+    public boolean isDragon() {
+        return data.getState()==RunnerState.THE_DRAGON;
+    }
+
+    public void setDragon(boolean dragon) {
+        if (dragon) {
+            data.setState(RunnerState.THE_DRAGON);
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
+            body.setGravityScale(0);
+            if (mArmour) {
+                mArmourActor.hide();
+            }
+            setAlpha(0f);
+        } else {
+            if (!data.isDead()) {
+                data.setState(RunnerState.RUN);
+            }
+            mCurrentAnimation = mAnimRun;
+            body.setGravityScale(Constants.RUNNER_GRAVITY_SCALE);
+            body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS_GHOST);
+            ((GameStage) getStage()).setReturnFilter(true);
+//            if (mArmour) {
+//                mArmourActor.unhide();
+//            }
+            setAlpha(1f);
+        }
     }
 }
