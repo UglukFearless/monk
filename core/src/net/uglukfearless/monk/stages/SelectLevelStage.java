@@ -11,8 +11,10 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.ColorAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -132,27 +134,42 @@ public class SelectLevelStage extends Stage {
             mLevelName = new Label(AssetLoader.sBundle.format("MENU_SELECT_LEVEL_NAME"
                                                             , mLevelModels.get(i).getEN_NAME()
                                                             , mLevelModels.get(i).getRU_NAME()), AssetLoader.sGuiSkin);
-            mLevelImage.add(mLevelName).expand().align(Align.center).fill().align(Align.bottom);
+            Cell cell = mLevelImage.add(mLevelName).expand().align(Align.center).fill().align(Align.bottom);
             mLevelName.setAlignment(Align.bottom);
             mLevelImage.row();
 
-            mLevelRecord = new Label(String.valueOf(
-                    PreferencesManager.getLevelHighScore(mLevelModels.get(i).getLEVEL_NAME())), AssetLoader.sGuiSkin);
-            mLevelImage.add(mLevelRecord).expand().align(Align.center).fill();
-            mLevelRecord.setAlignment(Align.top);
-
             final LevelModel levelModel = mLevelModels.get(i);
 
-            mLevelImage.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    super.clicked(event, x, y);
-                    mScreen.newGame(levelModel);
-                }
-            });
+            Image lockImage = null;
+
+            if (levelModel.checkUnlock()) {
+                mLevelRecord = new Label(String.valueOf(
+                        PreferencesManager.getLevelHighScore(mLevelModels.get(i).getLEVEL_NAME())), AssetLoader.sGuiSkin);
+                mLevelImage.add(mLevelRecord).expand().align(Align.center).fill();
+                mLevelRecord.setAlignment(Align.top);
+
+
+
+                mLevelImage.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        super.clicked(event, x, y);
+                        mScreen.newGame(levelModel);
+                    }
+                });
+            } else {
+                mLevelImage.addAction(Actions.alpha(0.6f));
+                mLevelName.setAlignment(Align.center);
+
+                lockImage = new Image(AssetLoader.levelLock);
+            }
 
 
             mLevelsTable.add(mLevelImage).padTop(20).padBottom(20);
+
+            if (lockImage!=null) {
+                mLevelImage.add(lockImage).expand().align(Align.top);
+            }
 
             mLevelsTable.row();
         }

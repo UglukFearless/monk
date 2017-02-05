@@ -468,6 +468,11 @@ public class StatisticsMenuStage extends Stage {
         mKilledValue = new Label(String.valueOf(PreferencesManager.getKilled()), AssetLoader.sGuiSkin);
         mLabelValueArray.add(mKilledValue);
 
+        addLabelsToTable(0);
+
+        addKilledStats();
+        addLabelsToTable(20);
+
         mKillingRate = new Label(AssetLoader.sBundle.get("MENU_STATS_KILLING_RATE"), AssetLoader.sGuiSkin);
         mLabelArray.add(mKillingRate);
         mKillingRateValue = new Label(String.valueOf(PreferencesManager.getKillingRate()), AssetLoader.sGuiSkin);
@@ -483,30 +488,29 @@ public class StatisticsMenuStage extends Stage {
         mDestroyedValue = new Label(String.valueOf(PreferencesManager.getDestroyed()), AssetLoader.sGuiSkin);
         mLabelValueArray.add(mDestroyedValue);
 
+        addLabelsToTable(0);
+
+        addDestroyedStats();
+        addLabelsToTable(20);
+
         mDeaths = new Label(AssetLoader.sBundle.get("MENU_STATS_DEATHS"), AssetLoader.sGuiSkin);
         mLabelArray.add(mDeaths);
         mDeathsValue = new Label(String.valueOf(PreferencesManager.getDeaths()), AssetLoader.sGuiSkin);
         mLabelValueArray.add(mDeathsValue);
 
-        addLabelsToTable();
+        addLabelsToTable(0);
 
         addDeathStats();
-        addLabelsToTable();
+        addLabelsToTable(20);
 
         addBonusStats();
-
-
-        mTreasures = new Label(AssetLoader.sBundle.get("MENU_STATS_TREASURES"), AssetLoader.sGuiSkin);
-        mLabelArray.add(mTreasures);
-        mTreasuresValue = new Label(String.valueOf(PreferencesManager.getTreasuresTotal()), AssetLoader.sGuiSkin);
-        mLabelValueArray.add(mTreasuresValue);
 
         mEfficiency = new Label(AssetLoader.sBundle.get("MENU_STATS_EFFICIENCY"), AssetLoader.sGuiSkin);
         mLabelArray.add(mEfficiency);
         mEfficiencyValue = new Label(String.valueOf(PreferencesManager.getEfficiency()), AssetLoader.sGuiSkin);
         mLabelValueArray.add(mEfficiencyValue);
 
-        addLabelsToTable();
+        addLabelsToTable(0);
 
         mScrollPaneLoc = new ScrollPane(mContainerLoc);
 
@@ -527,6 +531,32 @@ public class StatisticsMenuStage extends Stage {
         });
 
         addActor(mMainTableLoc);
+    }
+
+    private void addKilledStats() {
+        for (String key : PreferencesManager.getKilledSets().keySet()) {
+            if (PreferencesManager.getKilledSets().get(key)>0) {
+                Label labelName = new Label(AssetLoader.sBundle.format("MENU_STATS_KILLED_NAME",
+                        PreferencesManager.getEnName(key), PreferencesManager.getRuName(key))
+                        , AssetLoader.sGuiSkin);
+                mLabelArray.add(labelName);
+                Label labelValue = new Label(String.valueOf(PreferencesManager.getKilledSets().get(key)), AssetLoader.sGuiSkin);
+                mLabelValueArray.add(labelValue);
+            }
+        }
+    }
+
+    private void addDestroyedStats() {
+        for (String key : PreferencesManager.getDestroyedSets().keySet()) {
+            if (PreferencesManager.getDestroyedSets().get(key)>0) {
+                Label labelName = new Label(AssetLoader.sBundle.format("MENU_STATS_DESTROYED_NAME",
+                        PreferencesManager.getEnName(key), PreferencesManager.getRuName(key))
+                        , AssetLoader.sGuiSkin);
+                mLabelArray.add(labelName);
+                Label labelValue = new Label(String.valueOf(PreferencesManager.getDestroyedSets().get(key)), AssetLoader.sGuiSkin);
+                mLabelValueArray.add(labelValue);
+            }
+        }
     }
 
     private void addDeathStats() {
@@ -566,7 +596,7 @@ public class StatisticsMenuStage extends Stage {
         }
     }
 
-    private void addLabelsToTable() {
+    private void addLabelsToTable(int leftPad) {
 
         for (int i = 0; i <mLabelArray.size; i++) {
             mLabel = mLabelArray.get(i);
@@ -574,6 +604,7 @@ public class StatisticsMenuStage extends Stage {
             mCell.align(Align.left);
             mCell.padBottom(5);
             mCell.padTop(5);
+            mCell.padLeft(leftPad);
 
 
             mLabel = mLabelValueArray.get(i);
@@ -658,6 +689,13 @@ public class StatisticsMenuStage extends Stage {
         mLabelArray.add(mDragon);
         mDragonValue = new Label(String.valueOf(PreferencesManager.getDragon()), AssetLoader.sGuiSkin);
         mLabelValueArray.add(mDragonValue);
+
+        mTreasures = new Label(AssetLoader.sBundle.get("MENU_STATS_TREASURES"), AssetLoader.sGuiSkin);
+        mLabelArray.add(mTreasures);
+        mTreasuresValue = new Label(String.valueOf(PreferencesManager.getTreasuresTotal()), AssetLoader.sGuiSkin);
+        mLabelValueArray.add(mTreasuresValue);
+
+        addLabelsToTable(20);
     }
 
     private String getTimeString() {

@@ -256,7 +256,7 @@ public class WorldUtils {
         bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(new Vector2(Constants.RUNNER_X, -10));
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(Constants.RUNNER_WIDTH*1.2f / 2f, Constants.RUNNER_HEIGHT *1.2f / 2f);
+        shape.setAsBox(Constants.RUNNER_WIDTH*1.3f / 2f, Constants.RUNNER_HEIGHT *1.3f / 2f);
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, Constants.RUNNER_DENSITY);
         body.setGravityScale(0);

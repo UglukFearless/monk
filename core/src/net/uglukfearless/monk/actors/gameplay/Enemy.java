@@ -20,6 +20,7 @@ import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
+import net.uglukfearless.monk.utils.file.SoundSystem;
 import net.uglukfearless.monk.utils.gameplay.bodies.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.Movable;
 import net.uglukfearless.monk.utils.gameplay.Retributable;
@@ -69,6 +70,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
     float mCurrentSpeed;
     float mBasicSpeed;
     float mCanonSpeed;
+    private boolean mCryed;
 
 
     public Enemy(World world, EnemyType enemyType) {
@@ -113,6 +115,8 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
     public void init(Stage stage, float x, float y) {
 
         mStage = (GameStage)stage;
+
+        mCryed = false;
 
         getUserData().setDead(false);
         getUserData().setStruck(false);
@@ -433,8 +437,8 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
     }
 
     public void dead(float delta) {
-
         deadTime +=delta;
+
         if (getUserData().isDemon()&&!getUserData().isStruck()) {
             body.setFixedRotation(true);
 
@@ -446,6 +450,9 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
                 body.setGravityScale(0);
             }
 
+        } else if (!mCryed){
+            playDeathSound();
+            mCryed = true;
         }
         body.applyForceToCenter(500, 50, false);
 
@@ -472,11 +479,11 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
                 stage.removeMovable(this);
                 stage.removeRetributable(this);
                 stage.createLump(body, 4, AssetLoader.lumpsAtlas.findRegion("lump1"));
-                this.remove();
                 PoolsHandler.sEnemiesPools.get(getUserData().getEnemyType().name()).free(this);
+                this.remove();
 
                 ScoreCounter.increaseScore(1);
-                ScoreCounter.increaseKilled();
+                ScoreCounter.increaseKilled(getUserData().getKEY());
             }
 
 
@@ -484,8 +491,13 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
 
     }
 
+    private void playDeathSound() {
+        AssetLoader.enemyDeathSounds.get(mRand.nextInt(AssetLoader.enemyDeathSounds.size)).play(SoundSystem.getSoundValue());
+    }
+
     @Override
     public void reset() {
+        mCryed = false;
         if (getStage()!=null) {
             ((GameStage)getStage()).removeMovable(this);
             ((GameStage)getStage()).removeRetributable(this);
@@ -532,6 +544,11 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
                 if (getBody().getPosition().x<Constants.GAME_WIDTH&&!getUserData().isDead()) {
                     getUserData().setDead(true);
                 }
+                break;
+            case 3:
+                getUserData().setDead(true);
+                getUserData().setStruck(true);
+                getUserData().setTerribleDeath(true);
                 break;
         }
     }

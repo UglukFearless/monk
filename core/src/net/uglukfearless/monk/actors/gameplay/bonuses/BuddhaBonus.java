@@ -26,7 +26,7 @@ public class BuddhaBonus extends GameBonus {
 
     @Override
     public void activation() {
-        mStage.getRunner().setBuddha(true, mWorkingTime, mSpeed*2f);
+        mStage.getRunner().setBuddha(true, mWorkingTime, mSpeed*Constants.BUDDHA_SPEED_SCALE);
         mStage.getRunner().getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_GHOST);
         ScoreCounter.increaseBuddha();
     }

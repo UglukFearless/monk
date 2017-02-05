@@ -7,8 +7,12 @@ import java.util.HashMap;
  */
 public class PreferencesConstants {
 
+    public static final String GENERAL_ENCRYPT_KEY = "ZalupaGames";
+    public static final String GENERAL_STATS_KEY = "1145783209";
+
     public static final String PREFERENCES_SETTING = "setting";
     public static final String PREFERENCES_STATISTICS = "statistics";
+    public static final String PREFERENCES_ENCRYPT_STATISTICS = "paiza1";
     public static final String PREFERENCES_DANGERS_KEYS = "dangers_keys";
     public static final String PREFERENCES_DANGERS_NAMES = "dangers_names";
 
@@ -61,6 +65,8 @@ public class PreferencesConstants {
     public static final String ACHIEVE_RUTHLESS_KEY = "STATS_RUTHLESS_ACH";
 
     public static final String GENERAL_DANGER_KEY = "KEY_BY_DANGER_";
+    public static final String GENERAL_KILLED_KEY = "KILLED_KEY_";
+    public static final String GENERAL_DESTROYED_KEY = "DESTROYED_KEY_";
 
     public static final String STATS_CRASHED_DEATH_KEY = "crashed_death";
     public static final String STATS_BEHIND_DEATH_KEY = "behind_death";
@@ -68,4 +74,7 @@ public class PreferencesConstants {
     public static final String ITEM_ARMOUR = "item_armour";
     public static final String ITEM_WEAPON = "item_weapon";
 
+    public static final String LEVEL_UNLOCK = "level_unlock";
+    public static final String LEVEL_UNLOCK_LEVEL = "Level";
+    public static final String LEVEL_MODEL_PATH = "levels/level";
 }

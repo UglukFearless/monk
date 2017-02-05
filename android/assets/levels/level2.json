@@ -7,16 +7,20 @@ mLevelConstants: {
 		x:-15
 		y:0
 	}
-  GROUND_WIDTH_INIT:46
+  GROUND_WIDTH_INIT:45
   COLUMNS_WIDTH_INIT:0.5
   COLUMNS_PIT_INIT:1.8
+  GROUND_HEIGHT_FIX_INIT:1.125
   COLUMNS_HEIGHT_INIT:8
   COLUMNS_QUANTITY_INIT:6
   GROUND_PIT_INIT:8
+	FOREVER_UNLOCK: false
+	GRADE:2
+	DURATION:200
 }
 mDifficultyHandler: {
-	mStepTime: 15, //Продолжительность одной иттерации сложности
-	mRuntime: 16, //для старта игры с 0шага должен быть больше mStepTime
+	mStepTime: 20, //Продолжительность одной иттерации сложности
+	mRuntime: 21, //для старта игры с 0шага должен быть больше mStepTime
 	currentStep: 0,
 	mSteps: [
 		{
@@ -26,7 +30,7 @@ mDifficultyHandler: {
 			priorityPit: 10
 			priorityColumns: 0
 			dangersProbability: 60
-			enemiesPriority: [ 10, 5, 10, 5, 10, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 10, 5, 10, 5, 5, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 20, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -36,7 +40,7 @@ mDifficultyHandler: {
 			priorityPit: 12
 			priorityColumns: 0
 			dangersProbability: 65
-			enemiesPriority: [ 20, 8, 20, 10, 15, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 20, 8, 20, 10, 10, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 25, 5, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -46,7 +50,7 @@ mDifficultyHandler: {
 			priorityPit: 5
 			priorityColumns: 0
 			dangersProbability: 70
-			enemiesPriority: [ 20, 10, 20, 15, 15, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 20, 10, 20, 15, 10, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 20, 10, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -56,7 +60,7 @@ mDifficultyHandler: {
 			priorityPit: 7
 			priorityColumns: 0
 			dangersProbability: 80
-			enemiesPriority: [ 10, 10, 10, 15, 20, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 10, 10, 10, 15, 15, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 30, 30, 0, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -66,7 +70,7 @@ mDifficultyHandler: {
 			priorityPit: 7
 			priorityColumns: 2
 			dangersProbability: 80
-			enemiesPriority: [ 0, 15, 10, 20, 20, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 0, 15, 10, 20, 15, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 30, 30, 10, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 		{
@@ -76,7 +80,7 @@ mDifficultyHandler: {
 			priorityPit: 7
 			priorityColumns: 5
 			dangersProbability: 90
-			enemiesPriority: [ 10, 30, 10, 20, 30, 0, 0, 0, 0, 0 ]
+			enemiesPriority: [ 10, 30, 10, 20, 20, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 20, 60, 10, 0, 0, 0, 0, 0, 0, 0 ]
 		}
 	]
@@ -159,7 +163,7 @@ mEnemiesModels:
     textureOffsetX:0.4
     textureOffsetY:-0.5
 
-    prohibitionsMap: [[0,4],[4,0]]
+    prohibitionsMap: [[0,4],[4,4]]
     priority:0
 		basicXVelocity:-10
 		block:false

@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -42,6 +43,9 @@ public class AssetLoader {
     public static TextureAtlas dragonAtlas;
 
     public static Texture playerShell;
+    public static Texture levelLock;
+
+    public static Texture finishDecoration;
 
     public static Animation playerStay;
     public static Animation playerRun;
@@ -66,7 +70,12 @@ public class AssetLoader {
     public static Sound monkStrikeSound3;
     public static Sound monkStrikeSound4;
     public static Sound monkStrikeSound5;
+
     public static Array<Sound> monkStrikeSounds;
+    public static Array<Sound> monkWeaponStrikeSounds;
+    public static Array<Sound> monkArmourHitSounds;
+
+    public static Array<Sound> enemyDeathSounds;
 
     public static Sound getBonusSound;
     public static Sound balanceBonusSound;
@@ -121,6 +130,8 @@ public class AssetLoader {
         menuBackgroundTexture1 = new Texture(Gdx.files.internal("textures/menu/menu_background1.png"));
         menuBackgroundTexture2 = new Texture(Gdx.files.internal("textures/menu/menu_background2.png"));
 
+        finishDecoration = new Texture(Gdx.files.internal("textures/decoration/besedka.png"));
+
         loadMonkAnimations(PreferencesManager.getArmour(), PreferencesManager.getWeapon());
 
         monkStrikeSounds = new Array<Sound>();
@@ -135,6 +146,36 @@ public class AssetLoader {
         monkStrikeSounds.add(monkStrikeSound4);
         monkStrikeSounds.add(monkStrikeSound5);
 
+        monkWeaponStrikeSounds = new Array<Sound>();
+
+        Sound weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon1.mp3"));
+        monkWeaponStrikeSounds.add(weaponStrikeSound);
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon2.mp3"));
+        monkWeaponStrikeSounds.add(weaponStrikeSound);
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon3.mp3"));
+        monkWeaponStrikeSounds.add(weaponStrikeSound);
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon4.mp3"));
+        monkWeaponStrikeSounds.add(weaponStrikeSound);
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon5.mp3"));
+        monkWeaponStrikeSounds.add(weaponStrikeSound);
+
+        monkArmourHitSounds = new Array<Sound>();
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/armour1.mp3"));
+        monkArmourHitSounds.add(weaponStrikeSound);
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/armour2.mp3"));
+        monkArmourHitSounds.add(weaponStrikeSound);
+
+        enemyDeathSounds = new Array<Sound>();
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/2.wav"));
+        enemyDeathSounds.add(weaponStrikeSound);
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/3.wav"));
+        enemyDeathSounds.add(weaponStrikeSound);
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/4.wav"));
+        enemyDeathSounds.add(weaponStrikeSound);
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/5.wav"));
+        enemyDeathSounds.add(weaponStrikeSound);
+        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/6.wav"));
+        enemyDeathSounds.add(weaponStrikeSound);
 
         getBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/coin.wav"));
         balanceBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beep.wav"));
@@ -243,7 +284,7 @@ public class AssetLoader {
 
                 stopSeek = false;
                 if (regions.size>0) {
-                    animations.add(new Animation(0.12f, regions));
+                    animations.add(new Animation(0.1f, regions));
                 } else {
                     animations.add(null);
                 }
@@ -294,7 +335,7 @@ public class AssetLoader {
 
                 stopSeek = false;
                 if (regions.size>0) {
-                    playerStrikeList.add(new Animation(0.10f, regions));
+                    playerStrikeList.add(new Animation(0.2f/regions.size, regions, Animation.PlayMode.NORMAL));
                 } else {
                     stopSeekStrike=true;
                 }
@@ -326,6 +367,7 @@ public class AssetLoader {
 
         menuBackgroundTexture1 = new Texture(Gdx.files.internal("textures/menu/menu_background1.png"));
         menuBackgroundTexture2 = new Texture(Gdx.files.internal("textures/menu/menu_background2.png"));
+        levelLock = new Texture(Gdx.files.internal("textures/menu/lock.png"));
         achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
         bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
 
@@ -358,6 +400,7 @@ public class AssetLoader {
         menuTestValueSound.dispose();
         menuBackgroundTexture1.dispose();
         menuBackgroundTexture2.dispose();
+        levelLock.dispose();
         achieveAtlas.dispose();
         bonusesAtlas.dispose();
         sGuiSkin.dispose();
@@ -375,6 +418,8 @@ public class AssetLoader {
         menuBackgroundTexture1.dispose();
         menuBackgroundTexture2.dispose();
 
+        finishDecoration.dispose();
+
         itemsAtlas.dispose();
 
         achieveAtlas.dispose();
@@ -388,6 +433,18 @@ public class AssetLoader {
         monkStrikeSound3.dispose();
         monkStrikeSound4.dispose();
         monkStrikeSound5.dispose();
+
+        for (Sound weaponSound : monkWeaponStrikeSounds){
+            weaponSound.dispose();
+        }
+
+        for (Sound armourSound : monkArmourHitSounds){
+            armourSound.dispose();
+        }
+
+        for (Sound deathSound : enemyDeathSounds){
+            deathSound.dispose();
+        }
 
         getBonusSound.dispose();
         balanceBonusSound.dispose();

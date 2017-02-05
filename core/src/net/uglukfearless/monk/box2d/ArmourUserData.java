@@ -1,8 +1,11 @@
 package net.uglukfearless.monk.box2d;
 
+import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.enums.ArmourType;
 import net.uglukfearless.monk.enums.UserDataType;
+import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.file.PreferencesManager;
+import net.uglukfearless.monk.utils.file.SoundSystem;
 
 /**
  * Created by Ugluk on 07.11.2016.
@@ -72,6 +75,7 @@ public class ArmourUserData extends UserData {
         if (isHit) {
             mHitted=true;
             deductStrength();
+            AssetLoader.monkArmourHitSounds.get(Constants.RANDOM.nextInt(AssetLoader.monkArmourHitSounds.size)).play(SoundSystem.getSoundValue());
         }
     }
 

@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -24,6 +25,7 @@ import net.uglukfearless.monk.actors.gameplay.Background;
 import net.uglukfearless.monk.actors.gameplay.BuddhasBody;
 import net.uglukfearless.monk.actors.gameplay.Columns;
 import net.uglukfearless.monk.actors.gameplay.Dragon;
+import net.uglukfearless.monk.actors.gameplay.GameDecoration;
 import net.uglukfearless.monk.actors.gameplay.Ground;
 import net.uglukfearless.monk.actors.gameplay.Lump;
 import net.uglukfearless.monk.actors.gameplay.Runner;
@@ -62,6 +64,7 @@ import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.gameplay.Movable;
 import net.uglukfearless.monk.utils.gameplay.ai.SpaceTable;
 import net.uglukfearless.monk.utils.gameplay.bodies.WorldUtils;
+import net.uglukfearless.monk.utils.gameplay.models.GameProgressModel;
 import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
@@ -157,7 +160,16 @@ public class GameStage extends Stage {
 
     private Dragon mDragon;
 
-    public GameStage(GameScreen screen, float yViewportHeight, LevelModel levelModel) {
+    private int mFinishCount;
+    private float startTime;
+    private boolean mInfinityGame;
+
+    private Group mDecorationGroup;
+    private GameDecoration mFinishDecoration;
+
+    private float deltaTime;
+
+    public GameStage(GameScreen screen, float yViewportHeight, LevelModel levelModel, int revival, int wingsRevival) {
 
         super(new FitViewport(VIEWPORT_WIDTH, yViewportHeight,
                 new OrthographicCamera(VIEWPORT_WIDTH, yViewportHeight)));
@@ -174,24 +186,35 @@ public class GameStage extends Stage {
 
         mCurrentVelocity = Constants.WORLD_STATIC_VELOCITY_INIT;
 
+        mStartRevival = revival;
+
         setUpLevel(levelModel);
         setUpWorld();
         setupCamera();
         setupTouchControlAreas();
+        setupTweenEffect();
+
         renderer = new Box2DDebugRenderer();
 
+        runner.setWingsRevival(wingsRevival);
+
         runTime = 0;
+        startTime = ScoreCounter.getTime();
+        mInfinityGame = false;
 
         Gdx.input.setCatchBackKey(true);
         Gdx.input.setCatchMenuKey(true);
 
+        mWaitThreshold = 50;
+
+    }
+
+    private void setupTweenEffect() {
         alpha = new Value();
         transitionColor = new Color();
         prepareTransition(255,255,255,.3f);
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setProjectionMatrix(getCamera().combined);
-
-        mWaitThreshold = 50;
     }
 
     private void setupTouchControlAreas() {
@@ -211,6 +234,7 @@ public class GameStage extends Stage {
         PoolsHandler.initPools(world);
 
         setUpBackground();
+        setUpDecoration();
         setUpGround();
         setUpColumns();
         setUpPits();
@@ -223,6 +247,11 @@ public class GameStage extends Stage {
 
         setUpShake();
 
+    }
+
+    private void setUpDecoration() {
+        mDecorationGroup = new Group();
+        addActor(mDecorationGroup);
     }
 
     private void setUpArmour() {
@@ -238,6 +267,8 @@ public class GameStage extends Stage {
     private void setUpLevel(LevelModel levelModel) {
         mLevelModel = levelModel;
         mLevelModel.setStage(this);
+
+        ScoreCounter.levelInit();
     }
 
     private void setUpBuddhaBody() {
@@ -315,6 +346,7 @@ public class GameStage extends Stage {
     private void setUpWings() {
         mWingsAvatar = new WingsAvatar(this, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
         addActor(mWingsAvatar);
+        checkWingsRevival(runner.getWingsRevival());
     }
 
     private void setUpPits() {
@@ -410,6 +442,7 @@ public class GameStage extends Stage {
 
 //        delta /=3.5f;
 
+        deltaTime = delta;
         float time = 1f / delta;
 
         if (time<50) {
@@ -429,6 +462,8 @@ public class GameStage extends Stage {
 
         if (mState!=PAUSE&&mState!=WAIT&&time>6) {
 
+            mLevelModel.act(delta, runTime, mInfinityGame);
+
             super.act(delta);
 
             checkRevivalRunner(delta);
@@ -441,7 +476,6 @@ public class GameStage extends Stage {
 
             SpaceTable.leaf();
 
-            mLevelModel.act(delta);
 
             particlesAct(delta);
 
@@ -544,7 +578,10 @@ public class GameStage extends Stage {
 
 
     public void repositionGround() {
-        dangersHandler.createDangers(ground1, ground2);
+        dangersHandler.createDangers(ground1, ground2, mState==SLOWDOWN);
+        if (mState==SLOWDOWN) {
+            mFinishCount++;
+        }
     }
 
 
@@ -619,12 +656,6 @@ public class GameStage extends Stage {
     }
 
 
-    @Override
-    public void dispose() {
-//        effect.dispose();
-        super.dispose();
-    }
-
     //для тестирования
     @Override
     public boolean keyDown(int keyCode) {
@@ -683,7 +714,7 @@ public class GameStage extends Stage {
     }
 
     public void saveTimePoint() {
-        ScoreCounter.setTime((int)runTime);
+        ScoreCounter.setTime((int)(runTime+startTime));
     }
 
     public void gameOver(String currentKillerKey) {
@@ -749,6 +780,20 @@ public class GameStage extends Stage {
         return runTime;
     }
 
+    public float getCollectTime() {
+        return runTime + startTime;
+    }
+
+    public float getTimeBalance() {
+        return mLevelModel.getTimeBalance(runTime);
+    }
+
+    public String getTimeString() {
+        return !mInfinityGame ?
+                String.valueOf((int) getTimeBalance()).concat("/").concat(String.valueOf((int) getCollectTime()))
+                : String.valueOf((int) getCollectTime());
+    }
+
     public RunnerStrike getRunnerStrike() {
 
         if (runner.getWeaponType()!=null) {
@@ -780,77 +825,26 @@ public class GameStage extends Stage {
 
         AssetLoader.retributionBonusSound.play(SoundSystem.getSoundValue());
         screenShake(0.1f, 0.15f);
-//        switch (retributionLevel) {
-//            case 0:
-//                for(Actor actor : getActors()) {
-//                    if (actor instanceof Enemy) {
-//                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-//                                &&!(((Enemy)actor).getUserData()).isDead()) {
-//                            (((Enemy)actor).getUserData()).setDead(true);
-////                            ScoreCounter.increaseScore(1);
-////                            ScoreCounter.increaseKilled();
-//                        }
-//                    } else if ((actor instanceof Obstacle)
-//                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-//                            &&!(((Obstacle)actor).getUserData()).isTrap()
-//                            &&!(((Obstacle)actor).getUserData()).isArmour()
-//                            &&!(((Obstacle)actor).getUserData()).isDead()) {
-//                        (((Obstacle)actor).getUserData()).setDead(true);
-//                        ScoreCounter.increaseScore(1);
-//                        ScoreCounter.increaseDestroyed();
-//                    } else if (actor instanceof Shell) {
-//                        ((Shell) actor).getUserData().setDead(true);
-//                    }
-//                }
-//                break;
-//            case 1:
-//                for(Actor actor : getActors()) {
-//                    if (actor instanceof Enemy) {
-//                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-//                                &&!(((Enemy)actor).getUserData()).isDead()) {
-//                            (((Enemy)actor).getUserData()).setDead(true);
-////                            ScoreCounter.increaseScore(1);
-////                            ScoreCounter.increaseKilled();
-//                        }
-//                    } else if ((actor instanceof Obstacle)
-//                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-//                            &&!(((Obstacle)actor).getUserData()).isTrap()
-//                            &&!(((Obstacle)actor).getUserData()).isDead()) {
-//                        (((Obstacle)actor).getUserData()).setDead(true);
-//                        ScoreCounter.increaseScore(1);
-//                        ScoreCounter.increaseDestroyed();
-//                    } else if (actor instanceof Shell) {
-//                        ((Shell) actor).getUserData().setDead(true);
-//                    }
-//                }
-//                break;
-//            case 2:
-//                for(Actor actor : getActors()) {
-//                    if (actor instanceof Enemy) {
-//                        if (((Enemy)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-//                                &&!(((Enemy)actor).getUserData()).isDead()) {
-//                            (((Enemy)actor).getUserData()).setDead(true);
-////                            ScoreCounter.increaseScore(1);
-////                            ScoreCounter.increaseKilled();
-//                        }
-//                    } else if ((actor instanceof Obstacle)
-//                            &&((Obstacle)actor).getBody().getPosition().x<Constants.GAME_WIDTH
-//                            &&!(((Obstacle)actor).getUserData()).isDead()) {
-//                        (((Obstacle)actor).getUserData()).setDead(true);
-//                        ScoreCounter.increaseScore(1);
-//                        ScoreCounter.increaseDestroyed();
-//                    } else if (actor instanceof Shell) {
-//                        ((Shell) actor).getUserData().setDead(true);
-//                    }
-//                }
-//                break;
-//        }
 
         for (Retributable retributable : mRetributableList) {
             retributable.punish(retributionLevel);
         }
         prepareTransition(255, 50, 0, .1f);
 
+    }
+
+    public void retributionSilence(int retributionLevel) {
+        screenShake(0.1f, 0.15f);
+        for (Retributable retributable : mRetributableList) {
+            retributable.punish(retributionLevel);
+        }
+        prepareTransition(255, 50, 0, .1f);
+    }
+
+    public void finishRetribution() {
+        for (Retributable retributable : mRetributableList) {
+            retributable.punish(3);
+        }
     }
 
     public void changingSpeed(float speedScale) {
@@ -863,9 +857,17 @@ public class GameStage extends Stage {
 
     public void changingSpeedHandler(float speedScale) {
         if (runner.isBuddha()&&!runner.isUseBuddhaThreshold()) {
-            speedScale*=2f;
+            speedScale*=Constants.BUDDHA_SPEED_SCALE;
         }
         changingSpeed(speedScale);
+
+        if (speedScale==0f) {
+            runner.stop();
+        }
+    }
+
+    public Vector2 getCurrentVelocity() {
+        return mCurrentVelocity;
     }
 
     public void addMovable(Movable movable) {
@@ -876,9 +878,7 @@ public class GameStage extends Stage {
         mMovableArray.removeValue(movable, false);
     }
 
-    public Vector2 getCurrentVelocity() {
-        return mCurrentVelocity;
-    }
+
 
     public void addRevival() {
         if (mRevival<mLimitRevival) {
@@ -1017,5 +1017,56 @@ public class GameStage extends Stage {
 
     public void setReturnFilter(boolean returnFilter) {
         mReturnFilter = returnFilter;
+    }
+
+    public boolean reachFinish() {
+
+        if (mFinishDecoration!=null) {
+            return mFinishDecoration.getX() + mFinishDecoration.getWidth()<Constants.GAME_WIDTH;
+        } else {
+            return false;
+        }
+    }
+
+    public int getFinishCount() {
+        return mFinishCount;
+    }
+
+    public boolean isInfinityGame() {
+        return mInfinityGame;
+    }
+
+    public void setInfinityGame(boolean infinityGame) {
+        mInfinityGame = infinityGame;
+    }
+
+    public void checkLevelScore() {
+        ScoreCounter.checkLevelScore(mLevelModel.getLEVEL_NAME());
+    }
+
+    public GameProgressModel getProgress() {
+        return new GameProgressModel(mRevival, runner.getWingsRevival(), mLevelModel.getGrade() + 1);
+    }
+
+    public void unlockNextLevel() {
+        PreferencesManager.unlockLevel(mLevelModel.getGrade() + 1);
+    }
+
+    public void secondStart() {
+        mInfinityGame = true;
+        mState = RUN;
+        mLevelModel.secondStart();
+    }
+
+    public void addDecoration(GameDecoration decoration, boolean isFinish) {
+        mDecorationGroup.addActor(decoration);
+
+        if (isFinish) {
+            mFinishDecoration = decoration;
+        }
+    }
+
+    public float getDeltaTime() {
+        return deltaTime;
     }
 }

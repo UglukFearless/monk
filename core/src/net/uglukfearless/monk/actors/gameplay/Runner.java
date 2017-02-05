@@ -18,6 +18,7 @@ import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.FilterConstants;
 import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.enums.ArmourType;
+import net.uglukfearless.monk.enums.GameState;
 import net.uglukfearless.monk.enums.RunnerState;
 import net.uglukfearless.monk.enums.WeaponType;
 import net.uglukfearless.monk.stages.GameStage;
@@ -36,6 +37,7 @@ import java.util.Random;
 public class Runner extends GameActor {
 
 
+    private static final float STRIKE_DURATION = 0.2f;
     private RunnerUserData data;
 
     private float stateTime;
@@ -97,7 +99,7 @@ public class Runner extends GameActor {
         mAnimJump = AssetLoader.playerJump;
         mAnimDie = AssetLoader.playerHit;
 
-        mCurrentAnimation = mAnimStay;
+        setCurrentAnimation(mAnimStay, true);
 
         mAlpha = 1f;
         mWings = false;
@@ -129,9 +131,11 @@ public class Runner extends GameActor {
 
         mColor = batch.getColor();
         batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
-        stateTime += Gdx.graphics.getDeltaTime();
 
-        batch.draw(mCurrentAnimation.getKeyFrame(stateTime, true),
+//        stateTime += Gdx.graphics.getDeltaTime();
+        stateTime += ((GameStage) getStage()).getDeltaTime();
+
+        batch.draw(mCurrentAnimation.getKeyFrame(stateTime),
                 x,
                 y,
                 getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
@@ -167,7 +171,10 @@ public class Runner extends GameActor {
                 if (mBuddha) {
                     mBuddhaTimer += delta;
                     if (mBuddhaTimer > mBuddhaThreshold && !mUseBuddhaThreshold) {
-                        ((GameStage) getStage()).changingSpeed(((GameStage) getStage()).getCurrentVelocity().x / 2f);
+                        System.out.println("runner stop buddha change speed " + ((GameStage) getStage()).getCurrentVelocity().x
+                                / Constants.BUDDHA_SPEED_SCALE);
+                        ((GameStage) getStage()).changingSpeed(((GameStage) getStage()).getCurrentVelocity().x
+                                / Constants.BUDDHA_SPEED_SCALE);
                         mUseBuddhaThreshold = true;
                     }
 
@@ -222,8 +229,9 @@ public class Runner extends GameActor {
             switch (data.getState()) {
                 case DIE:
                     dead(delta);
-                    if (mBuddha) {
-                        ((GameStage) getStage()).changingSpeed(Constants.WORLD_STATIC_VELOCITY_INIT.x);
+                    if (mBuddha&&!mUseBuddhaThreshold) {
+                        System.out.println("runner death change speed " + (Constants.WORLD_STATIC_VELOCITY_INIT.x));
+                        ((GameStage) getStage()).changingSpeed(((GameStage) getStage()).getCurrentVelocity().x/Constants.BUDDHA_SPEED_SCALE);
                         mBuddha = false;
                     }
                     break;
@@ -251,27 +259,27 @@ public class Runner extends GameActor {
                     break;
                 case RUN_STRIKE:
                     strikeTime += delta;
-                    if (strikeTime > 0.2f) {
+                    if (strikeTime > STRIKE_DURATION) {
                         if (doubleStrike) {
-                            mCurrentAnimation = mCurrentStrikeList.getNext();
+                            setCurrentAnimation(mCurrentStrikeList.getNext(), false);
                             playStrike();
                             checkBonusStrike();
                             doubleStrike = false;
                             strikeTime = 0f;
                         } else {
                             data.setState(RunnerState.RUN);
-                            mCurrentAnimation = mAnimRun;
+                            setCurrentAnimation(mAnimRun, true);
                             comboTime = 0;
                         }
-                        stateTime = 0;
+//                        stateTime = 0;
                         strikeTime = 0;
                     }
                     break;
                 case JUMP_STRIKE:
                     strikeTime += delta;
-                    if (strikeTime > 0.2f) {
+                    if (strikeTime > STRIKE_DURATION) {
                         if (doubleStrike) {
-                            mCurrentAnimation = mCurrentStrikeList.getNext();
+                            setCurrentAnimation(mCurrentStrikeList.getNext(), false);
                             playStrike();
                             checkBonusStrike();
                             doubleStrike = false;
@@ -281,15 +289,15 @@ public class Runner extends GameActor {
                             mCurrentAnimation = mAnimJump;
                             comboTime = 0;
                         }
-                        stateTime = 0;
+//                        stateTime = 0;
                         strikeTime = 0;
                     }
                     break;
                 case JUMP_DOUBLE_STRIKE:
                     strikeTime += delta;
-                    if (strikeTime > 0.2f) {
+                    if (strikeTime > STRIKE_DURATION) {
                         if (doubleStrike) {
-                            mCurrentAnimation = mCurrentStrikeList.getNext();
+                            setCurrentAnimation(mCurrentStrikeList.getNext(), false);
                             playStrike();
                             checkBonusStrike();
                             doubleStrike = false;
@@ -301,7 +309,7 @@ public class Runner extends GameActor {
                         }
                         data.setState(RunnerState.JUMP_DOUBLE);
                         mCurrentAnimation = mAnimJump;
-                        stateTime = 0;
+//                        stateTime = 0;
                         strikeTime = 0;
                     }
                     break;
@@ -371,7 +379,7 @@ public class Runner extends GameActor {
                 data.setState(RunnerState.JUMP);
                 body.applyLinearImpulse(data.getJumpingLinearImpulse()
                         , body.getWorldCenter(), true);
-                mCurrentAnimation = mAnimJump;
+                setCurrentAnimation(mAnimJump, false);
                 break;
             case RUN_STRIKE:
                 body.applyLinearImpulse(data.getJumpingLinearImpulse()
@@ -404,7 +412,7 @@ public class Runner extends GameActor {
             case JUMP:
             case JUMP_DOUBLE:
                 data.setState(RunnerState.RUN);
-                mCurrentAnimation = mAnimRun;
+                setCurrentAnimation(mAnimRun, true);
                 break;
         }
     }
@@ -421,9 +429,10 @@ public class Runner extends GameActor {
                 data.setState(RunnerState.RUN_STRIKE);
                 playStrike();
                 if (comboTime>0.3) {
-                    mCurrentStrikeList.setIndex(mRand.nextInt(2)*3);
+//                    mCurrentStrikeList.setIndex(mRand.nextInt(2)*3);
+                    mCurrentStrikeList.setIndex(mRand.nextInt(mCurrentStrikeList.size));
                 }
-                mCurrentAnimation = mCurrentStrikeList.getNext();
+                setCurrentAnimation(mCurrentStrikeList.getNext(), false);
                 strikeTime = 0f;
                 checkBonusStrike();
                 break;
@@ -434,9 +443,10 @@ public class Runner extends GameActor {
                 data.setState(RunnerState.JUMP_STRIKE);
                 playStrike();
                 if (comboTime>0.3) {
-                    mCurrentStrikeList.setIndex(mRand.nextInt(2)*3);
+//                    mCurrentStrikeList.setIndex(mRand.nextInt(2)*3);
+                    mCurrentStrikeList.setIndex(mRand.nextInt(mCurrentStrikeList.size));
                 }
-                mCurrentAnimation = mCurrentStrikeList.getNext();
+                setCurrentAnimation(mCurrentStrikeList.getNext(), false);
                 strikeTime = 0f;
                 checkBonusStrike();
                 break;
@@ -447,9 +457,10 @@ public class Runner extends GameActor {
                 data.setState(RunnerState.JUMP_DOUBLE_STRIKE);
                 playStrike();
                 if (comboTime>0.3) {
-                    mCurrentStrikeList.setIndex(mRand.nextInt(2)*3);
+//                    mCurrentStrikeList.setIndex(mRand.nextInt(2)*3);
+                    mCurrentStrikeList.setIndex(mRand.nextInt(mCurrentStrikeList.size));
                 }
-                mCurrentAnimation = mCurrentStrikeList.getNext();
+                setCurrentAnimation(mCurrentStrikeList.getNext(), false);
                 strikeTime = 0f;
                 checkBonusStrike();
                 break;
@@ -465,12 +476,17 @@ public class Runner extends GameActor {
     }
 
     private void playStrike() {
-        AssetLoader.monkStrikeSounds.get(mRand.nextInt(AssetLoader.monkStrikeSounds.size)).play(SoundSystem.getSoundValue());
+        if (mWeaponType==null) {
+            AssetLoader.monkStrikeSounds.get(mRand.nextInt(AssetLoader.monkStrikeSounds.size)).play(SoundSystem.getSoundValue());
+        } else {
+            AssetLoader.monkWeaponStrikeSounds.get(mRand.nextInt(AssetLoader.monkWeaponStrikeSounds.size)).play(SoundSystem.getSoundValue());
+        }
+
     }
 
     public void hit(String key) {
         mCurrentKillerKey = key;
-        mCurrentAnimation = mAnimDie;
+        setCurrentAnimation(mAnimDie, false);
         body.setFixedRotation(false);
         body.applyAngularImpulse(data.getHitAngularImpulse(), true);
         getUserData().setState(RunnerState.DIE);
@@ -490,7 +506,7 @@ public class Runner extends GameActor {
 
 
     public void start() {
-        mCurrentAnimation = mAnimRun;
+        setCurrentAnimation(mAnimRun, true);
         getUserData().setState(RunnerState.RUN);
     }
 
@@ -543,6 +559,7 @@ public class Runner extends GameActor {
         mBuddha = buddha;
         mUseBuddhaThreshold = false;
         mBuddhaThreshold = workingTime*0.8f;
+        System.out.println("runner set buddha change speed " + speed);
         ((GameStage) getStage()).changingSpeed(speed);
         if (!buddha) {
             mBuddhaTimer=0;
@@ -647,16 +664,28 @@ public class Runner extends GameActor {
     }
 
     public void armouring(ArmourType armourType) {
-        mArmour = true;
-        mCustomFilter = FilterConstants.FILTER_RUNNER_GHOST;
-        mRevivalFilter = FilterConstants.FILTER_RUNNER_GHOST;
-        setCustomFilter();
-        mArmourActor.activate(armourType);
-        changeClothes(mArmourActor.getUserData().getType());
-        getStage().addActor(mArmourActor);
-        mArmourActor.setRunner(this);
-        if (!isGhost()&&!isBuddha()&&!isDragon()) {
-            mArmourActor.unhide();
+        if (armourType!=null) {
+            mArmour = true;
+            mCustomFilter = FilterConstants.FILTER_RUNNER_GHOST;
+            mRevivalFilter = FilterConstants.FILTER_RUNNER_GHOST;
+            setCustomFilter();
+            mArmourActor.activate(armourType);
+            changeClothes(mArmourActor.getUserData().getType());
+            getStage().addActor(mArmourActor);
+            mArmourActor.setRunner(this);
+            if (!isGhost()&&!isBuddha()&&!isDragon()) {
+                mArmourActor.unhide();
+            }
+        } else {
+            changeClothes(null);
+
+            mArmour = false;
+            mCustomFilter = FilterConstants.FILTER_RUNNER;
+            mRevivalFilter = FilterConstants.FILTER_RUNNER_GHOST;
+
+            mArmourActor.hide();
+
+            setCustomFilter();
         }
     }
 
@@ -678,13 +707,13 @@ public class Runner extends GameActor {
         AssetLoader.loadMonkAnimations(armourType, mWeaponType);
 
             if (mCurrentAnimation==mAnimStay) {
-                mCurrentAnimation=AssetLoader.playerStay;
+                replaceAnimation(AssetLoader.playerStay, true);
             } else if (mCurrentAnimation==mAnimRun) {
-                mCurrentAnimation=AssetLoader.playerRun;
+                replaceAnimation(AssetLoader.playerRun, true);
             } else if (mCurrentAnimation==mAnimJump) {
-                mCurrentAnimation=AssetLoader.playerJump;
+                replaceAnimation(AssetLoader.playerJump, false);
             }else if (mCurrentAnimation==mAnimDie) {
-                mCurrentAnimation=AssetLoader.playerHit;
+                replaceAnimation(AssetLoader.playerHit, false);
             }
 
             mAnimStay = AssetLoader.playerStay;
@@ -731,6 +760,7 @@ public class Runner extends GameActor {
         ((GameStage) getStage()).checkWingsRevival(mWingsRevival);
     }
 
+
     public void setWingsRevival(int wingsRevival) {
         mWingsRevival = wingsRevival;
     }
@@ -763,6 +793,7 @@ public class Runner extends GameActor {
 
     public void setDragon(boolean dragon) {
         if (dragon) {
+            ((GameStage)getStage()).retributionSilence(2);
             data.setState(RunnerState.THE_DRAGON);
             body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_GHOST);
             body.setGravityScale(0);
@@ -771,17 +802,42 @@ public class Runner extends GameActor {
             }
             setAlpha(0f);
         } else {
-            if (!data.isDead()) {
+            if (!data.isDead()&&((GameStage)getStage()).getState()==GameState.RUN) {
                 data.setState(RunnerState.RUN);
+                ((GameStage)getStage()).retributionSilence(2);
             }
-            mCurrentAnimation = mAnimRun;
+            setCurrentAnimation(mAnimRun, true);
             body.setGravityScale(Constants.RUNNER_GRAVITY_SCALE);
             body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS_GHOST);
             ((GameStage) getStage()).setReturnFilter(true);
-//            if (mArmour) {
-//                mArmourActor.unhide();
-//            }
             setAlpha(1f);
+        }
+    }
+
+    public void stop() {
+        switch (data.getState()) {
+            case DIE:
+            case STAY:
+                break;
+            default:
+                data.setState(RunnerState.STAY);
+                setCurrentAnimation(mAnimStay, true);
+                stateTime = 0;
+                break;
+        }
+    }
+
+    public void setCurrentAnimation(Animation animation, boolean loop) {
+        replaceAnimation(animation, loop);
+        stateTime = 0;
+    }
+
+    public void replaceAnimation(Animation animation, boolean loop) {
+        mCurrentAnimation = animation;
+        if (loop) {
+            mCurrentAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        } else {
+            mCurrentAnimation.setPlayMode(Animation.PlayMode.NORMAL);
         }
     }
 }

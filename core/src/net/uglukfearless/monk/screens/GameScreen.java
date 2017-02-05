@@ -4,9 +4,11 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Json;
 
 import net.uglukfearless.monk.constants.Constants;
@@ -21,6 +23,7 @@ import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.ScoreCounter;
 import net.uglukfearless.monk.utils.file.SoundSystem;
 import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
+import net.uglukfearless.monk.utils.gameplay.models.GameProgressModel;
 import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 
 
@@ -38,6 +41,9 @@ public class GameScreen implements Screen {
 
     InputMultiplexer mMultiplexer;
 
+    private Json mJsonIn;
+    private FileHandle mFileLevel;
+
     public GameScreen(Game game, LevelModel levelModel) {
 
         mGame = game;
@@ -46,11 +52,14 @@ public class GameScreen implements Screen {
 
         mLevelModel = levelModel;
 
-        initGame();
+        initGame(true, null);
     }
 
-    private void initGame() {
+    private void initGame(boolean newGame, GameProgressModel progressModel) {
 
+        if (!newGame) {
+            AssetLoader.levelMusic.dispose();
+        }
         mLevelModel.init();
         AssetLoader.loadMonkAnimations(PreferencesManager.getArmour(), PreferencesManager.getWeapon());
 
@@ -72,9 +81,17 @@ public class GameScreen implements Screen {
         }
 
         mYViewportHeight = Constants.GAME_WIDTH / ((float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight());
-        ScoreCounter.resetStats();
+        if (newGame) {
+            ScoreCounter.resetStats();
+            mGameStage = new GameStage(this, mYViewportHeight, mLevelModel, 0, 0);
+        } else {
+            mGameStage = new GameStage(this, mYViewportHeight, mLevelModel, progressModel.getRevival(), progressModel.getWingsRevival());
 
-        mGameStage = new GameStage(this, mYViewportHeight, mLevelModel);
+            AssetLoader.levelMusic.setVolume(SoundSystem.getMusicValue());
+            SoundSystem.registrationMusic(AssetLoader.levelMusic);
+            AssetLoader.levelMusic.setLooping(true);
+            AssetLoader.levelMusic.play();
+        }
         mGuiStage = new GameGuiStage(this, mGameStage, mYViewportHeight);
 
         mGameStage.setGuiStage(mGuiStage);
@@ -117,7 +134,12 @@ public class GameScreen implements Screen {
 
     public void returnGame() {
         mShopStage.dispose();
-        initGame();
+        mMultiplexer = new InputMultiplexer();
+        mMultiplexer.addProcessor(mGuiStage);
+        mMultiplexer.addProcessor(mGameStage);
+        Gdx.input.setInputProcessor(mMultiplexer);
+        mGameStage.getRunner().setWeaponType(PreferencesManager.getWeapon());
+        mGameStage.getRunner().armouring(PreferencesManager.getArmour());
     }
 
     public void newGame() {
@@ -127,9 +149,8 @@ public class GameScreen implements Screen {
 
         mLevelModel.getDifficultyHandler().applyStep(0);
 
-        mGameStage = new GameStage(this, mYViewportHeight, mLevelModel);
+        mGameStage = new GameStage(this, mYViewportHeight, mLevelModel, 0, 0);
         mGameStage.setGuiStage(mGuiStage);
-        mMultiplexer.addProcessor(mGuiStage);
         mMultiplexer.addProcessor(mGameStage);
         Gdx.input.setInputProcessor(mMultiplexer);
         mGuiStage.setGameStage(mGameStage);
@@ -160,7 +181,12 @@ public class GameScreen implements Screen {
         AssetLoader.levelMusic.stop();
         SoundSystem.removeMusic(AssetLoader.levelMusic);
         AssetLoader.disposeGame();
-        if (mGameStage.getState()== GameState.RUN) {
+        if (mGameStage.getState() == GameState.RUN
+                ||mGameStage.getState() == GameState.PAUSE
+                ||mGameStage.getState() == GameState.FINISH
+                ||mGameStage.getState() == GameState.SLOWDOWN
+                ||(mGameStage.getState() == GameState.START&&ScoreCounter.getScore()!=0)) {
+
             mGameStage.saveTimePoint();
             ScoreCounter.saveCalcStats(mGameStage.getLevelModel().getLEVEL_NAME());
 
@@ -181,9 +207,33 @@ public class GameScreen implements Screen {
     public void setShop() {
         mMultiplexer.removeProcessor(mGameStage);
         mMultiplexer.removeProcessor(mGuiStage);
-        mGameStage.dispose();
-        mGuiStage.dispose();
+//        mGameStage.dispose();
+//        mGuiStage.dispose();
         mShopStage = new ShopStage(this, mYViewportHeight);
         mMultiplexer.addProcessor(mShopStage);
+    }
+
+    public void loadNextLevel(GameProgressModel progress) {
+        mJsonIn = new Json();
+        try {
+            mFileLevel = Gdx.files.internal("levels/level".concat(String.valueOf(progress.getCurrentGrade())).concat(".json"));
+            mLevelModel = mJsonIn.fromJson(LevelModel.class, mFileLevel);
+        } catch (Exception e) {
+            mFileLevel = Gdx.files.internal("levels/level1.json");
+            mLevelModel = mJsonIn.fromJson(LevelModel.class, mFileLevel);
+        }
+
+        initGame(false, progress);
+        mMultiplexer.removeProcessor(mGameStage);
+        mGameStage.dispose();
+
+        mLevelModel.getDifficultyHandler().applyStep(0);
+
+        mGameStage = new GameStage(this, mYViewportHeight, mLevelModel, progress.getRevival(), progress.getWingsRevival());
+        mGameStage.setGuiStage(mGuiStage);
+//        mMultiplexer.addProcessor(mGuiStage);
+        mMultiplexer.addProcessor(mGameStage);
+        Gdx.input.setInputProcessor(mMultiplexer);
+        mGuiStage.setGameStage(mGameStage);
     }
 }

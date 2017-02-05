@@ -143,8 +143,8 @@ public class GameContactListener implements ContactListener {
                         &&((RunnerStrikeUserData)a.getUserData()).isPiercing1())
                         ||((RunnerStrikeUserData)a.getUserData()).isPiercing2()
                         ||!((ObstacleUserData)b.getUserData()).isArmour())) {
-                    ScoreCounter.increaseScore(1);
-                    ScoreCounter.increaseDestroyed();
+//                    ScoreCounter.increaseScore(1);
+//                    ScoreCounter.increaseDestroyed();
                     ((ObstacleUserData)b.getUserData()).setDead(true);
                     stage.getRunner().beatBody(b, contact, false, true, false, !((RunnerStrikeUserData)a.getUserData()).isShell());
                 }
@@ -164,8 +164,8 @@ public class GameContactListener implements ContactListener {
                     &&((RunnerStrikeUserData)b.getUserData()).isPiercing1())
                     ||((RunnerStrikeUserData)b.getUserData()).isPiercing2())
                     ||!((ObstacleUserData)a.getUserData()).isArmour())) {
-                ScoreCounter.increaseScore(1);
-                ScoreCounter.increaseDestroyed();
+//                ScoreCounter.increaseScore(1);
+//                ScoreCounter.increaseDestroyed();
                 ((ObstacleUserData)a.getUserData()).setDead(true);
                 stage.getRunner().beatBody(a, contact, false, true, false, !((RunnerStrikeUserData)b.getUserData()).isShell());
             }
@@ -189,8 +189,8 @@ public class GameContactListener implements ContactListener {
             } else if (((UserData)a.getUserData()).isLaunched()
                     &&!((ObstacleUserData)b.getUserData()).isDead()
                     &&!((ObstacleUserData)b.getUserData()).isArmour()) {
-                ScoreCounter.increaseScore(1);
-                ScoreCounter.increaseDestroyed();
+//                ScoreCounter.increaseScore(1);
+//                ScoreCounter.increaseDestroyed();
                 ((ObstacleUserData)b.getUserData()).setDead(true);
             } else if (((UserData)b.getUserData()).isLaunched()
                     &&!((EnemyUserData)a.getUserData()).isDead()) {
@@ -210,8 +210,8 @@ public class GameContactListener implements ContactListener {
             } else if (((UserData)b.getUserData()).isLaunched()
                     &&!((ObstacleUserData)a.getUserData()).isDead()
                     &&!((ObstacleUserData)a.getUserData()).isArmour()) {
-                ScoreCounter.increaseScore(1);
-                ScoreCounter.increaseDestroyed();
+//                ScoreCounter.increaseScore(1);
+//                ScoreCounter.increaseDestroyed();
                 ((ObstacleUserData)a.getUserData()).setDead(true);
             } else if (((UserData)a.getUserData()).isLaunched()
                     &&!((EnemyUserData)b.getUserData()).isDead()) {
@@ -240,15 +240,15 @@ public class GameContactListener implements ContactListener {
                     &&!((ObstacleUserData)b.getUserData()).isTrap()
 //                    &&!((ObstacleUserData)b.getUserData()).isDemon()
                     &&!((ObstacleUserData)b.getUserData()).isDead()) {
-                ScoreCounter.increaseScore(1);
-                ScoreCounter.increaseDestroyed();
+//                ScoreCounter.increaseScore(1);
+//                ScoreCounter.increaseDestroyed();
                 ((ObstacleUserData)b.getUserData()).setDead(true);
             } else if (((UserData)b.getUserData()).isLaunched()
                     &&!((ObstacleUserData)a.getUserData()).isTrap()
 //                    &&!((ObstacleUserData)a.getUserData()).isDemon()
                     &&!((ObstacleUserData)a.getUserData()).isDead()) {
-                ScoreCounter.increaseScore(1);
-                ScoreCounter.increaseDestroyed();
+//                ScoreCounter.increaseScore(1);
+//                ScoreCounter.increaseDestroyed();
                 ((ObstacleUserData)a.getUserData()).setDead(true);
             }
         } else if (BodyUtils.bodyIsArmour(a)){
@@ -287,8 +287,8 @@ public class GameContactListener implements ContactListener {
                     stage.getRunner().getBody().setLinearVelocity(0,6f);
                 } else {
                     if (!((ObstacleUserData)another.getUserData()).isDead()&&!((ArmourUserData)armour.getUserData()).isHit()) {
-                        ScoreCounter.increaseScore(1);
-                        ScoreCounter.increaseDestroyed();
+//                        ScoreCounter.increaseScore(1);
+//                        ScoreCounter.increaseDestroyed();
                         ((ObstacleUserData)another.getUserData()).setDead(true);
                         another.setLinearVelocity(another.getLinearVelocity().add(mRandom.nextInt(10) + 20
                                 , mRandom.nextInt(10)));
@@ -340,8 +340,8 @@ public class GameContactListener implements ContactListener {
                 break;
             case OBSTACLE:
                 if (!((ObstacleUserData)another.getUserData()).isDead()) {
-                    ScoreCounter.increaseScore(1);
-                    ScoreCounter.increaseDestroyed();
+//                    ScoreCounter.increaseScore(1);
+//                    ScoreCounter.increaseDestroyed();
                     ((ObstacleUserData)another.getUserData()).setDead(true);
                     another.setLinearVelocity(another.getLinearVelocity().add(mRandom.nextInt(10) + 20
                             , mRandom.nextInt(10)));

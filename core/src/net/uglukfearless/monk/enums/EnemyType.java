@@ -90,6 +90,7 @@ public enum EnemyType implements Danger {
     private Animation mStrikeAnimation;
     private Animation mDieAnimation;
     private Animation mAnimation;
+
     private boolean mBlock;
 
 

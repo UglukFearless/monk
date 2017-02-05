@@ -4,17 +4,22 @@ import com.badlogic.gdx.math.Vector2;
 
 import net.uglukfearless.monk.utils.gameplay.models.LevelConstants;
 
+import java.util.Random;
+
 /**
  * Created by Ugluk on 17.05.2016.
  */
 public class Constants {
+
+    public static final Random RANDOM = new Random();
+
     public static final int APP_WIDTH = 800;
     public static final int APP_HEIGHT = 480;
     public static final int GAME_WIDTH = 25;
     public static final int GAME_HEIGHT = APP_HEIGHT/(APP_WIDTH/GAME_WIDTH);
 
 
-    public static final int BUTTON_MENU_WIDTH = 160;
+    public static final int BUTTON_MENU_WIDTH = 190;
     public static final int BUTTON_MENU_HEIGHT = 90;
 
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
@@ -30,6 +35,7 @@ public class Constants {
     public static final float GROUND_Y = 0;
     public static float GROUND_WIDTH_INIT = 44f;
     public static final float GROUND_HEIGHT = 6f;
+    public static float GROUND_HEIGHT_FIX_INIT = 1f;
     public static final float GROUND_DENSITY = 10f;
     public static final Vector2 GROUND_LINEAR_VELOCITY = WORLD_STATIC_VELOCITY_INIT;
 
@@ -54,7 +60,7 @@ public class Constants {
     public static final float LAYOUT_Y_STEP = 4;
     public static final float LAYOUT_Y_ONE = GROUND_Y + GROUND_HEIGHT/2;
     public static final float LAYOUT_Y_TWO = LAYOUT_Y_ONE + LAYOUT_Y_STEP;
-    public static final float DANGERS_START_OFFSET = 12;
+    public static final float DANGERS_START_OFFSET = 13;
     public static float STEP_OF_DANGERS = (GROUND_WIDTH_INIT - DANGERS_START_OFFSET)/2f;
 
     public static final float RUNNER_X = 4;
@@ -67,6 +73,7 @@ public class Constants {
     public static final Vector2 RUNNER_JUMPING_LINEAR_IMPULSE_ONE = new Vector2(0, 65f);
     public static final float RUNNER_HIT_ANGULAR_IMPULSE = 20f;
     public static final float DRAGON_X = -4f;
+    public static final float BUDDHA_SPEED_SCALE = 1.8f;
 
     public static final int DANGERS_PRIORITY_NEVER = 0;
     public static final int DANGERS_PRIORITY_VERY_SELDOM = 3;
@@ -153,5 +160,7 @@ public class Constants {
 
         STEP_OF_DANGERS = (GROUND_WIDTH_INIT - GROUND_PIT_INIT)/2f;
         STEP_OF_DANGERS = (GROUND_WIDTH_INIT - DANGERS_START_OFFSET)/2f;
+
+        GROUND_HEIGHT_FIX_INIT = levelConstants.GROUND_HEIGHT_FIX_INIT;
     }
 }

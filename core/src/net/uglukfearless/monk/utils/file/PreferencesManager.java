@@ -6,7 +6,10 @@ import com.badlogic.gdx.Preferences;
 import net.uglukfearless.monk.constants.PreferencesConstants;
 import net.uglukfearless.monk.enums.ArmourType;
 import net.uglukfearless.monk.enums.WeaponType;
+import net.uglukfearless.monk.utils.EncryptHandler;
+import net.uglukfearless.monk.utils.StringGenerator;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,6 +18,7 @@ import java.util.Map;
 public class PreferencesManager {
 
     private static Preferences sStatistics = Gdx.app.getPreferences(PreferencesConstants.PREFERENCES_STATISTICS);
+    private static Preferences sEncryptStatistics = Gdx.app.getPreferences(PreferencesConstants.PREFERENCES_ENCRYPT_STATISTICS);
     private static Preferences sSetting = Gdx.app.getPreferences(PreferencesConstants.PREFERENCES_SETTING);
 
     private static Preferences sDangersKeys = Gdx.app.getPreferences(PreferencesConstants.PREFERENCES_DANGERS_KEYS);
@@ -79,6 +83,22 @@ public class PreferencesManager {
     public static void setLanguage(String language) {
         sSetting.putString(PreferencesConstants.SET_LANGUAGE, language);
         sSetting.flush();
+    }
+
+    //ШИФР СТАТИСТИКА*******************************************
+    public static void encryptKeyInit() {
+
+        String newKey = StringGenerator.generateRandString(10);
+        byte[] result = EncryptHandler.encode(newKey, PreferencesConstants.GENERAL_ENCRYPT_KEY);
+        System.out.println(newKey);
+        System.out.println(new String(result));
+        sEncryptStatistics.putString(PreferencesConstants.GENERAL_STATS_KEY, new String(result));
+        sEncryptStatistics.flush();
+
+        String oldKey = sEncryptStatistics.getString(PreferencesConstants.GENERAL_STATS_KEY, "хуй");
+        System.out.println(oldKey);
+        String res = EncryptHandler.decode(oldKey.getBytes(), PreferencesConstants.GENERAL_ENCRYPT_KEY);
+        System.out.println(res);
     }
 
     //СТАТИСТИКА*******************************************
@@ -157,14 +177,15 @@ public class PreferencesManager {
     }
 
     //МЕТРИКИ ЗАБЕГОВ ******************************************************************************
-    public static void setScore(int score, String levelName) {
+    public static void setScore(int score, int levelScore, String levelName) {
         if (score>getHighScore()) {
             sStatistics.putInteger(PreferencesConstants.STATS_HIGHSCORE_KEY, score);
             sStatistics.flush();
         }
 
-        if (score>getLevelHighScore(levelName)) {
-            sStatistics.putInteger(PreferencesConstants.STATS_HIGHSCORE_KEY.concat(levelName), score);
+        if (levelScore>getLevelHighScore(levelName)) {
+            sStatistics.putInteger(PreferencesConstants.STATS_HIGHSCORE_KEY.concat(levelName), levelScore);
+            sStatistics.flush();
         }
     }
 
@@ -398,4 +419,55 @@ public class PreferencesManager {
         sStatistics.flush();
     }
 
+    //статистика по разрушениям и убийствам
+    public static void setKilledAndDestroyed(HashMap<String,Integer> killed, HashMap<String,Integer> destroyed) {
+
+        for (String kill : killed.keySet()) {
+            addKillOrDest(PreferencesConstants.GENERAL_KILLED_KEY.concat(kill), killed.get(kill));
+        }
+
+        for (String destroy : destroyed.keySet()) {
+            addKillOrDest(PreferencesConstants.GENERAL_DESTROYED_KEY.concat(destroy), destroyed.get(destroy));
+        }
+        sStatistics.flush();
+    }
+
+    public static void addKillOrDest(String key, int quantity) {
+        sStatistics.putInteger(key, getKillOrDestKey(key) + quantity);
+    }
+
+    private static int getKillOrDestKey(String key) {
+        return sStatistics.getInteger(key, 0);
+    }
+
+    public static HashMap<String, Integer> getKilledSets() {
+        HashMap<String, Integer> resultSet = new HashMap<String, Integer>();
+        for(String key: sStatistics.get().keySet()) {
+            if (key.length()>11&&key.substring(0, 11).equals(PreferencesConstants.GENERAL_KILLED_KEY)) {
+                resultSet.put(key.substring(11), sStatistics.getInteger(key));
+            }
+         }
+        return resultSet;
+    }
+
+    public static HashMap<String, Integer> getDestroyedSets() {
+        HashMap<String, Integer> resultSet = new HashMap<String, Integer>();
+        for(String key: sStatistics.get().keySet()) {
+            if (key.length()>14&&key.substring(0, 14).equals(PreferencesConstants.GENERAL_DESTROYED_KEY)) {
+                resultSet.put(key.substring(14), sStatistics.getInteger(key));
+            }
+        }
+        return resultSet;
+    }
+
+
+    //Разблокировка и проверка блокировки уровней
+    public static boolean checkUnlockLevel(String level_name) {
+        return sStatistics.getBoolean(PreferencesConstants.LEVEL_UNLOCK.concat(level_name), false);
+    }
+
+    public static void unlockLevel(int level_num) {
+        sStatistics.putBoolean(PreferencesConstants.LEVEL_UNLOCK.concat(PreferencesConstants.LEVEL_UNLOCK_LEVEL) + level_num, true);
+        sStatistics.flush();
+    }
 }

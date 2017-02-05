@@ -3,6 +3,7 @@ package net.uglukfearless.monk.actors.gameplay.bonuses;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.ScoreCounter;
 
 /**
  * Created by Ugluk on 02.12.2016.
@@ -24,6 +25,7 @@ public class DragonFormBonus extends GameBonus {
     public void activation() {
         mStage.getDragon().takeShape();
         mStage.getRunner().setDragon(true);
+        ScoreCounter.increaseDragon();
     }
 
     @Override

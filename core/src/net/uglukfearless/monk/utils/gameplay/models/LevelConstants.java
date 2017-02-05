@@ -14,4 +14,9 @@ public class LevelConstants {
     public float COLUMNS_HEIGHT_INIT;
     public int COLUMNS_QUANTITY_INIT;
     public float GROUND_PIT_INIT;
+    public  float GROUND_HEIGHT_FIX_INIT;
+
+    public boolean FOREVER_UNLOCK;
+    public int GRADE;
+    public int DURATION;
 }

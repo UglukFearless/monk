@@ -51,6 +51,7 @@ public class DifficultyHandler {
     public void applyStep(int stepNumber) {
 
         StepModel step = mSteps.get(stepNumber);
+        System.out.println("step change speed " + step.worldSpeed);
         mStage.changingSpeedHandler(step.worldSpeed);
         mLevelModel.mPriorityGround = step.priorityGround;
         mLevelModel.mPriorityPit = step.priorityPit;
@@ -74,6 +75,7 @@ public class DifficultyHandler {
 
         if (currentStep<(mSteps.size)) {
             StepModel step = mSteps.get(currentStep);
+            System.out.println("new step change speed " + step.worldSpeed);
             mStage.changingSpeedHandler(step.worldSpeed);
             mLevelModel.mPriorityGround = step.priorityGround;
             mLevelModel.mPriorityPit = step.priorityPit;
@@ -91,6 +93,28 @@ public class DifficultyHandler {
             mLevelModel.mDangersProbability = step.dangersProbability;
             currentStep++;
         }
+    }
+
+    public void applyLastStep() {
+        currentStep--;
+        StepModel step = mSteps.get(currentStep);
+        System.out.println("last step change speed " + step.worldSpeed);
+        mStage.changingSpeedHandler(step.worldSpeed);
+        mLevelModel.mPriorityGround = step.priorityGround;
+        mLevelModel.mPriorityPit = step.priorityPit;
+        mLevelModel.mPriorityColumns = step.priorityColumns;
+
+        for (int i=0;i<10;i++) {
+            EnemyType.values()[i].setPriority(step.enemiesPriority[i]);
+        }
+        for (int i=0;i<3;i++) {
+            ObstacleType.values()[i].setPriority(step.obstaclesPriority[i]);
+        }
+
+        mStage.getDangersHandler().init();
+
+        mLevelModel.mDangersProbability = step.dangersProbability;
+        currentStep++;
     }
 
     public void reset() {

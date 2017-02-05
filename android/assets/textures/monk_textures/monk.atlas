@@ -5,119 +5,217 @@ filter: Linear,Linear
 repeat: none
 hit1
   rotate: false
-  xy: 1, 285
+  xy: 1, 853
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 jump1
   rotate: false
-  xy: 1, 143
+  xy: 1, 711
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 run1
   rotate: false
-  xy: 148, 285
+  xy: 148, 853
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 run2
   rotate: false
-  xy: 1, 1
+  xy: 1, 569
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+run3
+  rotate: false
+  xy: 148, 711
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 stay1
   rotate: false
-  xy: 148, 143
+  xy: 295, 853
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 strike1_frame1
   rotate: false
-  xy: 295, 285
+  xy: 1, 427
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike1_frame2
+  rotate: false
+  xy: 148, 569
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike1_frame3
+  rotate: false
+  xy: 295, 711
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 strike2_frame1
   rotate: false
-  xy: 148, 1
+  xy: 442, 853
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike2_frame2
+  rotate: false
+  xy: 1, 285
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike2_frame3
+  rotate: false
+  xy: 148, 427
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 strike3_frame1
   rotate: false
-  xy: 295, 143
+  xy: 295, 569
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike3_frame2
+  rotate: false
+  xy: 442, 711
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike3_frame3
+  rotate: false
+  xy: 589, 853
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 strike4_frame1
   rotate: false
-  xy: 442, 285
+  xy: 1, 143
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike4_frame2
+  rotate: false
+  xy: 148, 285
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike4_frame3
+  rotate: false
+  xy: 295, 427
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 strike5_frame1
   rotate: false
-  xy: 295, 1
+  xy: 442, 569
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike5_frame2
+  rotate: false
+  xy: 589, 711
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 strike6_frame1
   rotate: false
-  xy: 442, 143
+  xy: 736, 853
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike6_frame2
+  rotate: false
+  xy: 1, 1
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike6_frame3
+  rotate: false
+  xy: 148, 143
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike6_frame4
+  rotate: false
+  xy: 295, 285
+  size: 145, 140
+  orig: 145, 140
+  offset: 0, 0
+  index: -1
+strike6_frame5
+  rotate: false
+  xy: 442, 427
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 weapon1_hit1
   rotate: false
-  xy: 589, 285
+  xy: 589, 569
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 weapon1_jump1
   rotate: false
-  xy: 442, 1
+  xy: 736, 711
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 weapon1_run1
   rotate: false
-  xy: 589, 143
+  xy: 148, 1
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 weapon1_run2
   rotate: false
-  xy: 736, 285
+  xy: 295, 143
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 weapon1_stay1
   rotate: false
-  xy: 589, 1
+  xy: 442, 285
   size: 145, 140
   orig: 145, 140
   offset: 0, 0
   index: -1
 weapon1_strike1_frame1
   rotate: false
-  xy: 736, 143
+  xy: 589, 427
   size: 145, 140
   orig: 145, 140
   offset: 0, 0

@@ -8,5 +8,7 @@ public enum GameState {
     RUN,
     PAUSE,
     WAIT,
-    GAME_OVER
+    GAME_OVER,
+    SLOWDOWN,
+    FINISH
 }

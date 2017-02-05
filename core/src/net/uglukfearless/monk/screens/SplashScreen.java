@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import net.uglukfearless.monk.RunningMonk;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.file.SoundSystem;
 import net.uglukfearless.monk.utils.fortween.SpriteAccessor;
 
@@ -43,17 +44,16 @@ public class SplashScreen implements Screen {
         mStartSound.setLooping(false);
         mStartSound.setVolume(SoundSystem.getSoundValue());
 
+        PreferencesManager.encryptKeyInit();
     }
 
 
     @Override
     public void show() {
 
-//        AssetLoader.logoSound.play(SoundSystem.getSoundValue());
         AssetLoader.logoSound.setLooping(false);
         AssetLoader.logoSound.setVolume(SoundSystem.getSoundValue());
         AssetLoader.logoSound.play();
-//        mStartSound.play();
 
         mSprite = new Sprite(AssetLoader.logoPicture);
         mSprite.setColor(1,1,1,0);

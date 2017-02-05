@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import net.uglukfearless.monk.actors.ParticleActor;
+import net.uglukfearless.monk.actors.gameplay.GameDecoration;
 import net.uglukfearless.monk.actors.menu.MenuBackground;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.listeners.baction.MenuOptionAction;
@@ -81,6 +82,8 @@ public class MainMenuStage extends Stage {
         Gdx.input.setCatchMenuKey(true);
 
     }
+
+
 
     private void setupParticles(ParticleEffect particleEffect, float x, float y) {
         ParticleActor particleActor = new ParticleActor(particleEffect);

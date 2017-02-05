@@ -8,7 +8,7 @@ import net.uglukfearless.monk.utils.file.AssetLoader;
  * Created by Ugluk on 26.11.2016.
  */
 public enum WeaponType {
-    WEAPON_TYPE1("Sword", "Мечь", WeaponDistance.MIDDLE, 1, 1, 0.5f, 1.5f);
+    WEAPON_TYPE1("Sword", "Меч", WeaponDistance.MIDDLE, 1, 1, 0.5f, 1.5f);
 //    WEAPON_TYPE2("Spear", "Копье", WeaponDistance.LONG, 2, 2);
 
     private final String sEnName;

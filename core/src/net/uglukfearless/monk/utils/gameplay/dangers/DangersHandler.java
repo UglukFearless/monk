@@ -1,21 +1,25 @@
 package net.uglukfearless.monk.utils.gameplay.dangers;
 
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
 import net.uglukfearless.monk.actors.gameplay.Columns;
 import net.uglukfearless.monk.actors.gameplay.Enemy;
+import net.uglukfearless.monk.actors.gameplay.GameDecoration;
 import net.uglukfearless.monk.actors.gameplay.Ground;
 import net.uglukfearless.monk.actors.gameplay.Obstacle;
 import net.uglukfearless.monk.actors.gameplay.Pit;
 import net.uglukfearless.monk.actors.gameplay.bonuses.GameBonus;
 import net.uglukfearless.monk.actors.gameplay.bonuses.RevivalBonus;
+import net.uglukfearless.monk.actors.gameplay.bonuses.WingsBonus;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PlacingCategory;
 import net.uglukfearless.monk.enums.EnemyType;
 import net.uglukfearless.monk.enums.ObstacleType;
 import net.uglukfearless.monk.stages.GameStage;
+import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
@@ -40,6 +44,7 @@ public class DangersHandler {
     private ObstacleType [] obstacleTypes;
 
     private List<EnemyType> allEnemies;
+    private List<EnemyType> allColumnsEnemies;
 
     private List<ObstacleType> allObstacles;
 
@@ -60,6 +65,7 @@ public class DangersHandler {
     private Array<Columns> mColumns2;
     private Pit mPit;
     private Array<GameBonus> mBonuses;
+    private float finishOffset;
 
     public DangersHandler(GameStage stage, Array<GameBonus> bonuses, LevelModel levelModel) {
         this.stage = stage;
@@ -68,6 +74,7 @@ public class DangersHandler {
         enemyTypes = EnemyType.values();
         obstacleTypes = ObstacleType.values();
         allEnemies = new ArrayList<EnemyType>();
+        allColumnsEnemies = new ArrayList<EnemyType>();
 
         allObstacles = new ArrayList<ObstacleType>();
 
@@ -85,12 +92,17 @@ public class DangersHandler {
     public void init() {
 
         allEnemies.clear();
+        allColumnsEnemies.clear();
         allObstacles.clear();
         allDangers.clear();
 
         for (EnemyType enemyType: enemyTypes) {
             if (enemyType.getPriority()>0) {
                     allEnemies.add(enemyType);
+
+                if (enemyType.getBasicXVelocity()==0||enemyType.getGravityScale()==0) {
+                    allColumnsEnemies.add(enemyType);
+                }
             }
         }
 
@@ -104,26 +116,42 @@ public class DangersHandler {
         allDangers.addAll(allObstacles);
     }
 
-    public void createDangers(Ground ground1, Ground ground2) {
+    public void createDangers(Ground ground1, Ground ground2, boolean finish) {
 
         selectLandscape();
 
         if (ground1.getBody().getPosition().x < ground2.getBody().getPosition().x) {
-            repositionGround(ground1, ground2);
+            repositionGround(ground1, ground2, finish);
         } else {
-            repositionGround(ground2, ground1);
+            repositionGround(ground2, ground1, finish);
         }
 
-        if(pit==true) {
-            fillPit();
-        } else {
-            startX += Constants.GROUND_PIT_INIT *1.8f;
-        }
+        if (!finish) {
 
-        fillGround();
+            if(pit==true) {
+                fillPit();
+            } else {
+                startX += Constants.DANGERS_START_OFFSET;
+            }
+
+            fillGround();
+        } else
+        if (stage.getFinishCount()==0)
+        {
+
+            GameDecoration gameDecoration = new GameDecoration(stage, AssetLoader.finishDecoration, 10f, 10f);
+            gameDecoration.init(stage.getCurrentVelocity().x, Constants.GROUND_WIDTH_INIT + finishOffset + Constants.GAME_WIDTH
+                    , Constants.LAYOUT_Y_ONE - 1.3f);
+            stage.addDecoration(gameDecoration, true);
+        }
     }
 
     private void fillGround() {
+
+//        GameDecoration gameDecoration = new GameDecoration(stage, AssetLoader.finishDecoration, 12f, 12f);
+//        gameDecoration.init(stage.getCurrentVelocity().x, startX
+//                , Constants.LAYOUT_Y_ONE - 1.5f);
+//        stage.addDecoration(gameDecoration, false);
 
         for (int i = 0;i<prohibitionsMap.length-1;i++) {
             for (int j = 0; j < prohibitionsMap[0].length-1; j++) {
@@ -208,7 +236,9 @@ public class DangersHandler {
 
                 GameBonus gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
 
-                while ((gameBonus instanceof RevivalBonus)&&(mBonuses.size>1)&&stage.getRevival()==stage.getLimitRevival()) {
+                //// TODO: 16.12.2016 это нужно переписать исключив оператор instanceof
+                while (((gameBonus instanceof RevivalBonus)&&(mBonuses.size>1)&&stage.getRevival()==stage.getLimitRevival())
+                        ||((gameBonus instanceof WingsBonus)&&(mBonuses.size>1)&&stage.getWingsRevival()==5)) {
                     gameBonus = mBonuses.get(rand.nextInt(mBonuses.size));
                 }
 
@@ -275,7 +305,6 @@ public class DangersHandler {
 
         }
 
-//        startX += Constants.GROUND_PIT_INIT *1.8f;
         startX += Constants.DANGERS_START_OFFSET;
         prohibitionsMap[0][0] = prohibitionsMap[1][0];
         prohibitionsMap[0][1] = prohibitionsMap[1][1];
@@ -348,28 +377,32 @@ public class DangersHandler {
         stage.addActor(enemy);
     }
 
-    private void repositionGround(Ground firstGround, Ground secondGround) {
+    private void repositionGround(Ground firstGround, Ground secondGround, boolean finish) {
 
         stage.getRunner().setGrounds(secondGround, firstGround);
 
-        if (columns==true) {
+        if (!finish) {
+            if (columns==true) {
 
-            mPit = stage.getColumnsPit();
-            mPit.setPosition(secondGround.getBody().getPosition().x +
-                    Constants.GROUND_WIDTH_INIT /2);
-            stage.addActor(mPit);
+                mPit = stage.getColumnsPit();
+                mPit.setPosition(secondGround.getBody().getPosition().x +
+                        Constants.GROUND_WIDTH_INIT /2);
+                stage.addActor(mPit);
 
-            if (!mColumns1.get(Constants.COLUMNS_QUANTITY_INIT -1).getBody().isActive()) {
-                placingColumns(mColumns1, secondGround);
-            } else {
-                placingColumns(mColumns2, secondGround);
+                if (!mColumns1.get(Constants.COLUMNS_QUANTITY_INIT -1).getBody().isActive()) {
+                    placingColumns(mColumns1, secondGround);
+                } else {
+                    placingColumns(mColumns2, secondGround);
+                }
+            } else if (pit==true) {
+
+                mPit = stage.getSimplePit();
+                mPit.setPosition(secondGround.getBody().getPosition().x +
+                                Constants.GROUND_WIDTH_INIT /2);
+                stage.addActor(mPit);
             }
-        } else if (pit==true) {
-
-            mPit = stage.getSimplePit();
-            mPit.setPosition(secondGround.getBody().getPosition().x +
-                            Constants.GROUND_WIDTH_INIT /2);
-            stage.addActor(mPit);
+        } else {
+            pitLength = 0;
         }
 
 
@@ -387,6 +420,17 @@ public class DangersHandler {
             columns.get(i).getBody().setTransform(x + Constants.COLUMNS_WIDTH_INIT / 2, Constants.COLUMNS_Y, 0);
             columns.get(i).getBody().setActive(true);
             stage.addActor(columns.get(i));
+
+            //добавить врага, если колона достаточно толстая
+            if (Constants.COLUMNS_WIDTH_INIT>=2&&(rand.nextInt(100)>Constants.DANGERS_PROBABILITY)) {
+                if (allColumnsEnemies.size()>0) {
+                    Enemy enemy;
+                    EnemyType enemyType = allColumnsEnemies.get(rand.nextInt(allColumnsEnemies.size()));
+                    enemy = PoolsHandler.sEnemiesPools.get(enemyType.name()).obtain();
+                    enemy.init(stage, x + Constants.COLUMNS_WIDTH_INIT / 2, Constants.COLUMNS_HEIGHT_INIT/2 + 1);
+                    stage.addActor(enemy);
+                }
+            }
         }
     }
 
@@ -403,20 +447,28 @@ public class DangersHandler {
             columns = false;
             pitLength = 0;
         } else if (priorityColumns>priorityPit&&priorityColumns>priorityGround) {
-            columns = true;
-            pit = false;
-            pitLength = Constants.COLUMNS_QUANTITY_INIT
-                    *(Constants.COLUMNS_WIDTH_INIT + Constants.COLUMNS_PIT_INIT) + Constants.COLUMNS_PIT_INIT;
+            if (stage.getTimeBalance()>8||stage.getTimeBalance()==0) {
+                columns = true;
+                pit = false;
+                pitLength = Constants.COLUMNS_QUANTITY_INIT
+                        *(Constants.COLUMNS_WIDTH_INIT + Constants.COLUMNS_PIT_INIT) + Constants.COLUMNS_PIT_INIT;
+            } else {
+                pit = false;
+                columns = false;
+                pitLength = 0;
+            }
+
         } else {
             pit = true;
             columns = false;
             pitLength = Constants.GROUND_PIT_INIT;
         }
+
+        finishOffset = pitLength;
     }
 
     public void setColumns(Array<Columns> columns1, Array<Columns> columns2) {
         mColumns1 = columns1;
         mColumns2 = columns2;
     }
-
 }

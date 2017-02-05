@@ -94,6 +94,8 @@ public class GameGuiStage extends Stage {
 
     private TextButton mShopButton;
 
+    private TextButton mNewLevelButton, mContinueButton;
+
 
     public GameGuiStage(GameScreen screen, GameStage gameStage, float yViewportHeight) {
 
@@ -113,9 +115,48 @@ public class GameGuiStage extends Stage {
         setupAchieveWindow(ScoreCounter.getAchieveList().get(6));
         setupWaitMenu();
         setupShopButton();
+        setupFinishButtons();
 
         mLabelStateTime = 0;
 
+    }
+
+    private void setupFinishButtons() {
+        mNewLevelButton = new TextButton(AssetLoader.sBundle.get("MENU_GAME_BUTTON_NEW_LEVEL"), AssetLoader.sGuiSkin, "help");
+        mContinueButton = new TextButton(AssetLoader.sBundle.get("MENU_GAME_BUTTON_CONTINUE"), AssetLoader.sGuiSkin, "help");
+
+        if (mNewLevelButton.getWidth()>mContinueButton.getWidth()) {
+            mContinueButton.setWidth(mNewLevelButton.getWidth());
+        } else {
+            mNewLevelButton.setWidth(mContinueButton.getWidth());
+        }
+
+        mNewLevelButton.setPosition(VIEWPORT_WIDTH/4f - mNewLevelButton.getWidth()/2f, mStartLabel.getY() - mNewLevelButton.getHeight());
+        mNewLevelButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                mGameStage.checkLevelScore();
+                mGameStage.saveTimePoint();
+                mGameScreen.loadNextLevel(mGameStage.getProgress());
+            }
+        });
+        addActor(mNewLevelButton);
+        mNewLevelButton.setVisible(false);
+
+        mContinueButton.setPosition(VIEWPORT_WIDTH*3f/4f - mContinueButton.getWidth()/2f, mStartLabel.getY() - mContinueButton.getHeight());
+        mContinueButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                mGameStage.secondStart();
+                mGameStage.getRunner().start();
+            }
+        });
+        addActor(mContinueButton);
+        mContinueButton.setVisible(false);
+
+        mShopButton.setPosition(VIEWPORT_WIDTH/2f - mShopButton.getWidth()/2f, 0);
     }
 
     private void setupShopButton() {
@@ -218,7 +259,7 @@ public class GameGuiStage extends Stage {
         mMainTableAchieve = new Table();
         mMainTableAchieve.background(new NinePatchDrawable(AssetLoader.broadbord));
         mMainTableAchieve.pad(15);
-        mMainTableAchieve.setBounds(100, VIEWPORT_HEIGHT / 5f, VIEWPORT_WIDTH * 0.75f
+        mMainTableAchieve.setBounds(VIEWPORT_WIDTH * 0.125f, VIEWPORT_HEIGHT / 5f, VIEWPORT_WIDTH * 0.75f
                 , VIEWPORT_HEIGHT - VIEWPORT_HEIGHT / 4f);
         mMainTableAchieve.add(mAchieveScroll).fill().expand();
         mMainTableAchieve.setVisible(false);
@@ -514,10 +555,11 @@ public class GameGuiStage extends Stage {
     public void act(float delta) {
         super.act(delta);
 
-        mTimeString = String.valueOf((int) mGameStage.getRunTime());
-
+        mTimeString = (mGameStage.getTimeString());
         mCurrentScore.setText(String.valueOf(ScoreCounter.getScore()));
+
         mCurrentTime.setText(mTimeString);
+        mCurrentTime.setSize(mCurrentTime.getPrefWidth(), mCurrentTime.getPrefHeight());
         mCurrentTime.setPosition(VIEWPORT_WIDTH / 2 - mCurrentTime.getWidth() / 2, VIEWPORT_HEIGHT - mCurrentTime.getHeight());
 
         if(mGameState!=mGameStage.getState()) {
@@ -532,6 +574,9 @@ public class GameGuiStage extends Stage {
                     mReplayButton.setVisible(false);
                     mPauseLabel.setVisible(false);
                     mMainTableAchieve.setVisible(false);
+
+                    mNewLevelButton.setVisible(false);
+                    mContinueButton.setVisible(false);
 
                     if (mJumpButton!=null) {
                         mJumpButton.setVisible(true);
@@ -561,6 +606,9 @@ public class GameGuiStage extends Stage {
 
                     mMainTableAchieve.setVisible(false);
 
+                    mNewLevelButton.setVisible(false);
+                    mContinueButton.setVisible(false);
+
                     if (mJumpButton!=null) {
                         mJumpButton.setVisible(true);
                     }
@@ -575,6 +623,14 @@ public class GameGuiStage extends Stage {
                         actor.remove();
                     }
                     mNewAchieveListObj.clear();
+
+                    if (mGameStage.getRevival()>0) {
+                        mRevivalLabel.setVisible(true);
+                    }
+
+                    if (mGameStage.getWingsRevival()>0) {
+                        mWingsLabel.setVisible(true);
+                    }
 
                     break;
                 case WAIT:
@@ -633,10 +689,23 @@ public class GameGuiStage extends Stage {
                         mStrikeButton.setVisible(false);
                     }
                     break;
+                case FINISH:
+                    mStartLabel.setText(AssetLoader.sBundle.get("PLAY_FINISH_LABEL"));
+                    mStartLabel.setSize(mStartLabel.getPrefWidth(), mStartLabel.getPrefHeight());
+                    mStartLabel.setPosition(VIEWPORT_WIDTH / 2f - mStartLabel.getWidth() / 2f,
+                            VIEWPORT_HEIGHT * 0.65f);
+                    mLabelStateTime = 0;
+                    mStartLabel.setVisible(true);
+
+                    mNewLevelButton.setVisible(true);
+                    mContinueButton.setVisible(true);
+
+                    mShopButton.setVisible(true);
+                    break;
             }
         }
 
-        if (mStartLabel.isVisible()&&mGameStage.getState()!=GameState.START) {
+        if (mStartLabel.isVisible()&&mGameStage.getState()!=GameState.START&&mGameStage.getState()!=GameState.FINISH) {
             mLabelStateTime +=delta;
             if (mLabelStateTime>mLabelDuration) {
                 mStartLabel.setVisible(false);

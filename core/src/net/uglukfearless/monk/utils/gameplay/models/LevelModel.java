@@ -2,8 +2,10 @@ package net.uglukfearless.monk.utils.gameplay.models;
 
 
 import net.uglukfearless.monk.constants.Constants;
+import net.uglukfearless.monk.enums.GameState;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.PreferencesManager;
 import net.uglukfearless.monk.utils.gameplay.DifficultyHandler;
 
 /**
@@ -46,14 +48,36 @@ public class LevelModel {
     }
 
     public void setStage(GameStage stage) {
-
         mStage = stage;
         mDifficultyHandler.init(mStage, this);
     }
 
-    public void act(float delta) {
+    public void act(float delta, float runTime, boolean infinity) {
+        if (!infinity) {
+            if (mStage.getState() == GameState.RUN&&checkEndTime(runTime)) {
+                mStage.setState(GameState.SLOWDOWN);
+                mStage.finishRetribution();
+            } else if (mStage.getState()== GameState.SLOWDOWN) {
+                float velocity = mStage.getCurrentVelocity().x;
+                if (velocity<-12) {
+                    float changeVelocity = 0.13f*delta;
+                    mStage.changingSpeed(velocity - velocity*changeVelocity);
+                }
 
-        mDifficultyHandler.act(delta);
+                if (mStage.reachFinish()) {
+                    mStage.setState(GameState.FINISH);
+                    mStage.deactivationBonuses();
+                    mStage.changingSpeedHandler(0f);
+                    mStage.unlockNextLevel();
+                }
+            } else if (mStage.getState()== GameState.RUN) {
+                mDifficultyHandler.act(delta);
+            }
+        } else {
+            if (mStage.getState()== GameState.RUN){
+                mDifficultyHandler.act(delta);
+            }
+        }
     }
 
     public EnemyModel[] getEnemiesModels() {
@@ -78,5 +102,33 @@ public class LevelModel {
 
     public String getEN_NAME() {
         return EN_NAME;
+    }
+
+    public boolean checkUnlock() {
+        if (mLevelConstants.FOREVER_UNLOCK) {
+            return true;
+        } else {
+            return PreferencesManager.checkUnlockLevel(LEVEL_NAME);
+        }
+    }
+
+    public float getDuration() {
+        return mLevelConstants.DURATION;
+    }
+
+    public float getTimeBalance(float runTime) {
+        return (getDuration() - runTime>0) ? (getDuration() - runTime) : 0;
+    }
+
+    private boolean checkEndTime(float runTime) {
+        return (getTimeBalance(runTime)==0);
+    }
+
+    public int getGrade() {
+        return mLevelConstants.GRADE;
+    }
+
+    public void secondStart() {
+        mDifficultyHandler.applyLastStep();
     }
 }

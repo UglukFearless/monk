@@ -155,6 +155,9 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable, Retri
             stage.removeRetributable(this);
             this.remove();
             PoolsHandler.sObstaclePools.get(getUserData().getObstacleType().name()).free(this);
+
+            ScoreCounter.increaseScore(1);
+            ScoreCounter.increaseDestroyed(getUserData().getKEY());
         }
     }
 
@@ -198,8 +201,8 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable, Retri
                             &&!getUserData().isDead()) {
 
                         getUserData().setDead(true);
-                        ScoreCounter.increaseScore(1);
-                        ScoreCounter.increaseDestroyed();
+//                        ScoreCounter.increaseScore(1);
+//                        ScoreCounter.increaseDestroyed();
                     }
                 break;
             case 1:
@@ -208,8 +211,8 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable, Retri
                             &&!getUserData().isDead()) {
 
                         getUserData().setDead(true);
-                        ScoreCounter.increaseScore(1);
-                        ScoreCounter.increaseDestroyed();
+//                        ScoreCounter.increaseScore(1);
+//                        ScoreCounter.increaseDestroyed();
                     }
                 break;
             case 2:
@@ -217,9 +220,12 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable, Retri
                             &&!getUserData().isDead()) {
 
                         getUserData().setDead(true);
-                        ScoreCounter.increaseScore(1);
-                        ScoreCounter.increaseDestroyed();
+//                        ScoreCounter.increaseScore(1);
+//                        ScoreCounter.increaseDestroyed();
                     }
+                break;
+            case 3:
+                getUserData().setDead(true);
                 break;
         }
     }
