@@ -15,8 +15,18 @@ public class LevelConstants {
     public int COLUMNS_QUANTITY_INIT;
     public float GROUND_PIT_INIT;
     public  float GROUND_HEIGHT_FIX_INIT;
+    public float DECORATION_ONE_OFFSET_INIT;
+    public float DECORATION_TWO_OFFSET_INIT;
+    public float DECORATION_NEAR_SPEED_INIT;
+    public float DECORATION_FURTHER_SPEED_INIT;
+
+    public float DECORATION_NEAR_STEP_INIT;
+    public float DECORATION_NEAR_STEP_MIN_INIT;
+    public float DECORATION_FURTHER_STEP_INIT;
+    public float DECORATION_FURTHER_STEP_MIN_INIT;
 
     public boolean FOREVER_UNLOCK;
     public int GRADE;
     public int DURATION;
+
 }

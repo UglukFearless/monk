@@ -16,7 +16,7 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '0.663'
+    version = '0.667'
     ext {
         appName = "the-running-monk"
         gdxVersion = '1.9.2'

@@ -55,7 +55,9 @@ public class WeaponItem extends GameBonus {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         //todo: Нужно бы подправить вычисление координат
-        batch.draw(mRegion, getX()+0.5f, getY()+0.5f, getWidth()-1.2f, getHeight()-0.7f);
+        if (inBounds()) {
+            batch.draw(mRegion, getX() + 0.5f, getY() + 0.5f, getWidth() - 1.2f, getHeight() - 0.7f);
+        }
     }
 
     @Override

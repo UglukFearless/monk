@@ -1,12 +1,12 @@
 package net.uglukfearless.monk.utils.file;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -32,6 +32,8 @@ public class AssetLoader {
     public static TextureAtlas environmentAtlas;
     public static TextureAtlas enemiesAtlas;
     public static TextureAtlas obstaclesAtlas;
+    public static TextureAtlas decorationsAtlas;
+
     public static TextureAtlas monkAtlas;
     public static TextureAtlas monkArmour1Atlas;
     public static TextureAtlas monkArmour2Atlas;
@@ -46,6 +48,7 @@ public class AssetLoader {
     public static Texture levelLock;
 
     public static Texture finishDecoration;
+    public static Texture deadPointDecoration;
 
     public static Animation playerStay;
     public static Animation playerRun;
@@ -98,6 +101,9 @@ public class AssetLoader {
     public static ParticleEffect sSnowParticleBack;
     public static ParticleEffect sCandleParticle;
 
+    public static AssetManager sAssetManager;
+    public static Texture sLoadingImage;
+
     public static void initBundle() {
         FileHandle baseFileHandle = Gdx.files.internal("i18n/Bundle");
         if (PreferencesManager.getLanguage()=="") {
@@ -113,33 +119,162 @@ public class AssetLoader {
         sBundle = I18NBundle.createBundle(baseFileHandle, new Locale(PreferencesManager.getLanguage()));
     }
 
+    public static void initLoaderAssets() {
+        //костылёк
+        sAssetManager = new AssetManager();
+
+        System.out.println(sAssetManager);
+        sAssetManager.load("loading.jpg", Texture.class);
+        sAssetManager.finishLoading();
+        sLoadingImage = sAssetManager.get("loading.jpg", Texture.class);
+    }
+
+    public static void initGameManager() {
+        sAssetManager.load("textures/monk_textures/monk.atlas", TextureAtlas.class);
+        sAssetManager.load("textures/monk_textures/armour/monk_armour1.atlas", TextureAtlas.class);
+        sAssetManager.load("textures/monk_textures/armour/monk_armour2.atlas", TextureAtlas.class);
+        sAssetManager.load("textures/monk_textures/armour/monk_armour3.atlas", TextureAtlas.class);
+        sAssetManager.load("achieve/achieve.atlas", TextureAtlas.class);
+        sAssetManager.load("bonuses/bonuses.atlas", TextureAtlas.class);
+        sAssetManager.load("lumps.atlas", TextureAtlas.class);
+        sAssetManager.load("textures/dragon.atlas", TextureAtlas.class);
+
+        sAssetManager.load("textures/items.atlas", TextureAtlas.class);
+
+        sAssetManager.load("monkShell.png", Texture.class);
+        sAssetManager.load("textures/menu/menu_background1.png", Texture.class);
+        sAssetManager.load("textures/menu/menu_background2.png", Texture.class);
+
+        sAssetManager.load("textures/decoration/besedka.png", Texture.class);
+        sAssetManager.load("textures/decoration/deadPoint.png", Texture.class);
+
+        sAssetManager.load("sound/kiya2.wav", Sound.class);
+        sAssetManager.load("sound/kiya3.wav", Sound.class);
+        sAssetManager.load("sound/kiya4.wav", Sound.class);
+        sAssetManager.load("sound/kiya5.wav", Sound.class);
+
+        sAssetManager.load("sound/monksounds/weapon1.mp3", Sound.class);
+        sAssetManager.load("sound/monksounds/weapon2.mp3", Sound.class);
+        sAssetManager.load("sound/monksounds/weapon3.mp3", Sound.class);
+        sAssetManager.load("sound/monksounds/weapon4.mp3", Sound.class);
+        sAssetManager.load("sound/monksounds/weapon5.mp3", Sound.class);
+
+        sAssetManager.load("sound/monksounds/armour1.mp3", Sound.class);
+        sAssetManager.load("sound/monksounds/armour2.mp3", Sound.class);
+
+        sAssetManager.load("sound/enemy/2.wav", Sound.class);
+        sAssetManager.load("sound/enemy/3.wav", Sound.class);
+        sAssetManager.load("sound/enemy/4.wav", Sound.class);
+        sAssetManager.load("sound/enemy/5.wav", Sound.class);
+        sAssetManager.load("sound/enemy/6.wav", Sound.class);
+
+        sAssetManager.load("sound/coin.wav", Sound.class);
+        sAssetManager.load("sound/beep.wav", Sound.class);
+        sAssetManager.load("sound/beat.wav", Sound.class);
+        sAssetManager.load("sound/death.mp3", Sound.class);
+
+        sAssetManager.load("gui/forskin/exp/gui_exp.json", Skin.class);
+
+    }
+
     public static void initGame() {
 
-        monkAtlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/monk.atlas"));
-        monkArmour1Atlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/armour/monk_armour1.atlas"));
-        monkArmour2Atlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/armour/monk_armour2.atlas"));
-        monkArmour3Atlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/armour/monk_armour3.atlas"));
-        achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
-        bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
-        lumpsAtlas = new TextureAtlas(Gdx.files.internal("lumps.atlas"));
-        dragonAtlas = new TextureAtlas(Gdx.files.internal("textures/dragon.atlas"));
+//        monkAtlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/monk.atlas"));
+//        monkArmour1Atlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/armour/monk_armour1.atlas"));
+//        monkArmour2Atlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/armour/monk_armour2.atlas"));
+//        monkArmour3Atlas = new TextureAtlas(Gdx.files.internal("textures/monk_textures/armour/monk_armour3.atlas"));
+//        achieveAtlas = new TextureAtlas(Gdx.files.internal("achieve/achieve.atlas"));
+//        bonusesAtlas = new TextureAtlas(Gdx.files.internal("bonuses/bonuses.atlas"));
+//        lumpsAtlas = new TextureAtlas(Gdx.files.internal("lumps.atlas"));
+//        dragonAtlas = new TextureAtlas(Gdx.files.internal("textures/dragon.atlas"));
 
-        itemsAtlas = new TextureAtlas(Gdx.files.internal("textures/items.atlas"));
+//        itemsAtlas = new TextureAtlas(Gdx.files.internal("textures/items.atlas"));
 
-        playerShell = new Texture(Gdx.files.internal("monkShell.png"));
-        menuBackgroundTexture1 = new Texture(Gdx.files.internal("textures/menu/menu_background1.png"));
-        menuBackgroundTexture2 = new Texture(Gdx.files.internal("textures/menu/menu_background2.png"));
+//        playerShell = new Texture(Gdx.files.internal("monkShell.png"));
+//        menuBackgroundTexture1 = new Texture(Gdx.files.internal("textures/menu/menu_background1.png"));
+//        menuBackgroundTexture2 = new Texture(Gdx.files.internal("textures/menu/menu_background2.png"));
+//
+//        finishDecoration = new Texture(Gdx.files.internal("textures/decoration/besedka.png"));
+//        deadPointDecoration = new Texture(Gdx.files.internal("textures/decoration/deadPoint.png"));
+//
+//        loadMonkAnimations(PreferencesManager.getArmour(), PreferencesManager.getWeapon());
+//
+//        monkStrikeSounds = new Array<Sound>();
+////        monkStrikeSound1 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya1.wav"));
+//        monkStrikeSound2 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya2.wav"));
+//        monkStrikeSound3 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya3.wav"));
+//        monkStrikeSound4 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya4.wav"));
+//        monkStrikeSound5 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya5.wav"));
+////        monkStrikeSounds.add(monkStrikeSound1);
+//        monkStrikeSounds.add(monkStrikeSound2);
+//        monkStrikeSounds.add(monkStrikeSound3);
+//        monkStrikeSounds.add(monkStrikeSound4);
+//        monkStrikeSounds.add(monkStrikeSound5);
 
-        finishDecoration = new Texture(Gdx.files.internal("textures/decoration/besedka.png"));
+//        monkWeaponStrikeSounds = new Array<Sound>();
+//
+//        Sound weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon1.mp3"));
+//        monkWeaponStrikeSounds.add(weaponStrikeSound);
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon2.mp3"));
+//        monkWeaponStrikeSounds.add(weaponStrikeSound);
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon3.mp3"));
+//        monkWeaponStrikeSounds.add(weaponStrikeSound);
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon4.mp3"));
+//        monkWeaponStrikeSounds.add(weaponStrikeSound);
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon5.mp3"));
+//        monkWeaponStrikeSounds.add(weaponStrikeSound);
+//
+//        monkArmourHitSounds = new Array<Sound>();
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/armour1.mp3"));
+//        monkArmourHitSounds.add(weaponStrikeSound);
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/armour2.mp3"));
+//        monkArmourHitSounds.add(weaponStrikeSound);
+
+//        enemyDeathSounds = new Array<Sound>();
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/2.wav"));
+//        enemyDeathSounds.add(weaponStrikeSound);
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/3.wav"));
+//        enemyDeathSounds.add(weaponStrikeSound);
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/4.wav"));
+//        enemyDeathSounds.add(weaponStrikeSound);
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/5.wav"));
+//        enemyDeathSounds.add(weaponStrikeSound);
+//        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/6.wav"));
+//        enemyDeathSounds.add(weaponStrikeSound);
+
+//        getBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/coin.wav"));
+//        balanceBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beep.wav"));
+//        retributionBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beat.wav"));
+//        deathSound = Gdx.audio.newSound(Gdx.files.internal("sound/death.mp3"));
+
+//        sGuiSkin = new Skin(Gdx.files.internal("gui/forskin/exp/gui_exp.json"));
+
+        monkAtlas = sAssetManager.get("textures/monk_textures/monk.atlas", TextureAtlas.class);
+        monkArmour1Atlas = sAssetManager.get("textures/monk_textures/armour/monk_armour1.atlas", TextureAtlas.class);
+        monkArmour2Atlas = sAssetManager.get("textures/monk_textures/armour/monk_armour2.atlas", TextureAtlas.class);
+        monkArmour3Atlas = sAssetManager.get("textures/monk_textures/armour/monk_armour3.atlas", TextureAtlas.class);
+        achieveAtlas = sAssetManager.get("achieve/achieve.atlas", TextureAtlas.class);
+        bonusesAtlas = sAssetManager.get("bonuses/bonuses.atlas", TextureAtlas.class);
+        lumpsAtlas = sAssetManager.get("lumps.atlas", TextureAtlas.class);
+        dragonAtlas = sAssetManager.get("textures/dragon.atlas", TextureAtlas.class);
+
+        itemsAtlas = sAssetManager.get("textures/items.atlas", TextureAtlas.class);
+
+        playerShell = sAssetManager.get("monkShell.png", Texture.class);
+        menuBackgroundTexture1 = sAssetManager.get("textures/menu/menu_background1.png", Texture.class);
+        menuBackgroundTexture2 = sAssetManager.get("textures/menu/menu_background2.png", Texture.class);
+
+        finishDecoration = sAssetManager.get("textures/decoration/besedka.png", Texture.class);
+        deadPointDecoration = sAssetManager.get("textures/decoration/deadPoint.png", Texture.class);
 
         loadMonkAnimations(PreferencesManager.getArmour(), PreferencesManager.getWeapon());
 
         monkStrikeSounds = new Array<Sound>();
 //        monkStrikeSound1 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya1.wav"));
-        monkStrikeSound2 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya2.wav"));
-        monkStrikeSound3 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya3.wav"));
-        monkStrikeSound4 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya4.wav"));
-        monkStrikeSound5 = Gdx.audio.newSound(Gdx.files.internal("sound/kiya5.wav"));
+        monkStrikeSound2 = sAssetManager.get("sound/kiya2.wav", Sound.class);
+        monkStrikeSound3 = sAssetManager.get("sound/kiya3.wav", Sound.class);
+        monkStrikeSound4 = sAssetManager.get("sound/kiya4.wav", Sound.class);
+        monkStrikeSound5 = sAssetManager.get("sound/kiya5.wav", Sound.class);
 //        monkStrikeSounds.add(monkStrikeSound1);
         monkStrikeSounds.add(monkStrikeSound2);
         monkStrikeSounds.add(monkStrikeSound3);
@@ -148,41 +283,42 @@ public class AssetLoader {
 
         monkWeaponStrikeSounds = new Array<Sound>();
 
-        Sound weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon1.mp3"));
+        Sound weaponStrikeSound = sAssetManager.get("sound/monksounds/weapon1.mp3", Sound.class);
         monkWeaponStrikeSounds.add(weaponStrikeSound);
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon2.mp3"));
+        weaponStrikeSound = sAssetManager.get("sound/monksounds/weapon2.mp3", Sound.class);
         monkWeaponStrikeSounds.add(weaponStrikeSound);
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon3.mp3"));
+        weaponStrikeSound = sAssetManager.get("sound/monksounds/weapon3.mp3", Sound.class);
         monkWeaponStrikeSounds.add(weaponStrikeSound);
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon4.mp3"));
+        weaponStrikeSound = sAssetManager.get("sound/monksounds/weapon4.mp3", Sound.class);
         monkWeaponStrikeSounds.add(weaponStrikeSound);
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/weapon5.mp3"));
+        weaponStrikeSound = sAssetManager.get("sound/monksounds/weapon5.mp3", Sound.class);
         monkWeaponStrikeSounds.add(weaponStrikeSound);
 
         monkArmourHitSounds = new Array<Sound>();
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/armour1.mp3"));
+        weaponStrikeSound = sAssetManager.get("sound/monksounds/armour1.mp3", Sound.class);
         monkArmourHitSounds.add(weaponStrikeSound);
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/monksounds/armour2.mp3"));
+        weaponStrikeSound = sAssetManager.get("sound/monksounds/armour2.mp3", Sound.class);
         monkArmourHitSounds.add(weaponStrikeSound);
 
         enemyDeathSounds = new Array<Sound>();
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/2.wav"));
+        weaponStrikeSound = sAssetManager.get("sound/enemy/2.wav", Sound.class);
         enemyDeathSounds.add(weaponStrikeSound);
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/3.wav"));
+        weaponStrikeSound = sAssetManager.get("sound/enemy/3.wav", Sound.class);
         enemyDeathSounds.add(weaponStrikeSound);
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/4.wav"));
+        weaponStrikeSound = sAssetManager.get("sound/enemy/4.wav", Sound.class);
         enemyDeathSounds.add(weaponStrikeSound);
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/5.wav"));
+        weaponStrikeSound = sAssetManager.get("sound/enemy/5.wav", Sound.class);
         enemyDeathSounds.add(weaponStrikeSound);
-        weaponStrikeSound = Gdx.audio.newSound(Gdx.files.internal("sound/enemy/6.wav"));
+        weaponStrikeSound = sAssetManager.get("sound/enemy/6.wav", Sound.class);
         enemyDeathSounds.add(weaponStrikeSound);
 
-        getBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/coin.wav"));
-        balanceBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beep.wav"));
-        retributionBonusSound = Gdx.audio.newSound(Gdx.files.internal("sound/beat.wav"));
-        deathSound = Gdx.audio.newSound(Gdx.files.internal("sound/death.mp3"));
 
-        sGuiSkin = new Skin(Gdx.files.internal("gui/forskin/exp/gui_exp.json"));
+        getBonusSound = sAssetManager.get("sound/coin.wav", Sound.class);
+        balanceBonusSound = sAssetManager.get("sound/beep.wav", Sound.class);
+        retributionBonusSound = sAssetManager.get("sound/beat.wav", Sound.class);
+        deathSound = sAssetManager.get("sound/death.mp3", Sound.class);
+
+        sGuiSkin = sAssetManager.get("gui/forskin/exp/gui_exp.json", Skin.class);
 
         broadbord = new NinePatch(sGuiSkin.getAtlas().createPatch("broadbord"));
 
@@ -345,17 +481,41 @@ public class AssetLoader {
 
     }
 
+    public static void initLevelManager(String levelName, boolean finishedLoad) {
+        sAssetManager.load(("textures/" + levelName + "/environment.atlas"),TextureAtlas.class);
+        sAssetManager.load(("textures/" + levelName + "/enemies.atlas"),TextureAtlas.class);
+        sAssetManager.load(("textures/" + levelName + "/obstacles.atlas"),TextureAtlas.class);
+
+        sAssetManager.load( ("music/" + levelName + "/music.mp3") , Music.class);
+
+        if (Gdx.files.internal("textures/" + levelName + "/decorations.atlas").exists()) {
+            sAssetManager.load(("textures/" + levelName + "/decorations.atlas"),TextureAtlas.class);
+        } else {
+            decorationsAtlas = null;
+        }
+
+        if (finishedLoad) {
+            sAssetManager.finishLoading();
+        }
+    }
+
     //Инициализация ресурсов уровня
     public static void initLevel(String levelName) {
 
-        environmentAtlas = new TextureAtlas(Gdx.files.internal("textures/" + levelName + "/environment.atlas"));
-        enemiesAtlas = new TextureAtlas(Gdx.files.internal("textures/" + levelName + "/enemies.atlas"));
-        obstaclesAtlas = new TextureAtlas(Gdx.files.internal("textures/" + levelName + "/obstacles.atlas"));
+        environmentAtlas = sAssetManager.get(("textures/" + levelName + "/environment.atlas"),TextureAtlas.class);
+        enemiesAtlas = sAssetManager.get(("textures/" + levelName + "/enemies.atlas"),TextureAtlas.class);
+        obstaclesAtlas = sAssetManager.get(("textures/" + levelName + "/obstacles.atlas"),TextureAtlas.class);
 
         if (levelMusic==null||!levelMusic.isPlaying()) {
-            levelMusic = Gdx.audio.newMusic(Gdx.files.internal("music/" + levelName + "/music.mp3"));
+            levelMusic = sAssetManager.get( ("music/" + levelName + "/music.mp3") , Music.class);
             levelMusic.setLooping(true);
             levelMusic.setVolume(SoundSystem.getMusicValue());
+        }
+
+        if (Gdx.files.internal("textures/" + levelName + "/decorations.atlas").exists()) {
+            sAssetManager.get(("textures/" + levelName + "/decorations.atlas"),TextureAtlas.class);
+        } else {
+            decorationsAtlas = null;
         }
     }
 
@@ -419,6 +579,7 @@ public class AssetLoader {
         menuBackgroundTexture2.dispose();
 
         finishDecoration.dispose();
+        deadPointDecoration.dispose();
 
         itemsAtlas.dispose();
 
@@ -473,6 +634,8 @@ public class AssetLoader {
 
         sSnowParticle.dispose();
         sSnowParticleBack.dispose();
+
+        sAssetManager.dispose();
     }
 
     public static void disposeLevel() {
@@ -480,6 +643,11 @@ public class AssetLoader {
         obstaclesAtlas.dispose();
         environmentAtlas.dispose();
 
-        levelMusic.dispose();
+        if (decorationsAtlas!=null) {
+            decorationsAtlas.dispose();
+        }
+        if (levelMusic!=null) {
+            levelMusic.dispose();
+        }
     }
 }

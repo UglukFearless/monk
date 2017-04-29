@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
 import net.uglukfearless.monk.actors.gameplay.Enemy;
+import net.uglukfearless.monk.actors.gameplay.GameDecoration;
 import net.uglukfearless.monk.actors.gameplay.Lump;
 import net.uglukfearless.monk.actors.gameplay.Obstacle;
 import net.uglukfearless.monk.actors.gameplay.RunnerShell;
@@ -27,6 +28,8 @@ public class PoolsHandler {
     public static Pool<RunnerShell> sRunnerShellPool;
     public static HashMap<String, Pool<Enemy>> sEnemiesPools;
     public static HashMap<String, Pool<Obstacle>> sObstaclePools;
+
+    public static Pool<GameDecoration> sDecorationPool;
 
     public static void initPools(final World world) {
 
@@ -93,6 +96,13 @@ public class PoolsHandler {
                 pool.freeAll(obstacles);
             }
         }
+
+        sDecorationPool = new Pool<GameDecoration>(20, 40) {
+            @Override
+            protected GameDecoration newObject() {
+                return new GameDecoration();
+            }
+        };
 
     }
 }

@@ -39,6 +39,16 @@ public class Constants {
     public static final float GROUND_DENSITY = 10f;
     public static final Vector2 GROUND_LINEAR_VELOCITY = WORLD_STATIC_VELOCITY_INIT;
 
+    public static float DECORATION_ONE_OFFSET_INIT = 0f;
+    public static float DECORATION_TWO_OFFSET_INIT = 0f;
+    public static float DECORATION_NEAR_SPEED_INIT = 1f;
+    public static float DECORATION_FURTHER_SPEED_INIT = 0.75f;
+
+    public static float DECORATION_NEAR_STEP_INIT;
+    public static float DECORATION_NEAR_STEP_MIN_INIT;
+    public static float DECORATION_FURTHER_STEP_INIT;
+    public static float DECORATION_FURTHER_STEP_MIN_INIT;
+
     public static final int PRIORITY_GROUND = 15;
     public static final int PRIORITY_PIT = 20;
     public static final int PRIORITY_COLUMNS = 12;
@@ -162,5 +172,15 @@ public class Constants {
         STEP_OF_DANGERS = (GROUND_WIDTH_INIT - DANGERS_START_OFFSET)/2f;
 
         GROUND_HEIGHT_FIX_INIT = levelConstants.GROUND_HEIGHT_FIX_INIT;
+
+        DECORATION_ONE_OFFSET_INIT = levelConstants.DECORATION_ONE_OFFSET_INIT;
+        DECORATION_TWO_OFFSET_INIT = levelConstants.DECORATION_TWO_OFFSET_INIT;
+        DECORATION_NEAR_SPEED_INIT = levelConstants.DECORATION_NEAR_SPEED_INIT;
+        DECORATION_FURTHER_SPEED_INIT = levelConstants.DECORATION_FURTHER_SPEED_INIT;
+
+        DECORATION_NEAR_STEP_INIT = levelConstants.DECORATION_NEAR_STEP_INIT;
+        DECORATION_NEAR_STEP_MIN_INIT = levelConstants.DECORATION_NEAR_STEP_MIN_INIT;
+        DECORATION_FURTHER_STEP_INIT = levelConstants.DECORATION_FURTHER_STEP_INIT;
+        DECORATION_FURTHER_STEP_MIN_INIT = levelConstants.DECORATION_FURTHER_STEP_MIN_INIT;
     }
 }

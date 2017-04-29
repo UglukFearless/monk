@@ -1,47 +1,47 @@
 
 obstacles.png
-format: RGBA4444
+format: RGBA8888
 filter: Linear,Linear
 repeat: none
-obstacle1_stay1
-  rotate: false
-  xy: 1, 224
-  size: 227, 221
-  orig: 227, 221
-  offset: 0, 0
-  index: 1
 obstacle2_stay1
   rotate: false
   xy: 1, 1
-  size: 227, 221
-  orig: 227, 221
+  size: 239, 229
+  orig: 239, 229
   offset: 0, 0
-  index: 1
+  index: -1
+obstacle1_stay1
+  rotate: false
+  xy: 242, 8
+  size: 232, 222
+  orig: 232, 222
+  offset: 0, 0
+  index: -1
 obstacle3_stay1
   rotate: false
-  xy: 230, 345
+  xy: 476, 130
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
-  index: 1
+  index: -1
 obstacle3_stay2
   rotate: false
-  xy: 230, 243
+  xy: 476, 28
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
-  index: 2
+  index: -1
 obstacle3_stay3
   rotate: false
-  xy: 332, 345
+  xy: 578, 130
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
-  index: 3
+  index: -1
 obstacle3_stay4
   rotate: false
-  xy: 230, 141
+  xy: 578, 28
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
-  index: 4
+  index: -1

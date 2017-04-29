@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 
 import net.uglukfearless.monk.enums.EnemyType;
 import net.uglukfearless.monk.enums.ObstacleType;
+import net.uglukfearless.monk.utils.gameplay.DeadPointsArray;
 import net.uglukfearless.monk.utils.gameplay.achievements.Achievement;
 import net.uglukfearless.monk.utils.gameplay.achievements.AdeptKunFu;
 import net.uglukfearless.monk.utils.gameplay.achievements.AdeptTamesivari;
@@ -54,6 +55,8 @@ public class ScoreCounter {
     private static HashMap<String, Integer> sKilledList;
     private static HashMap<String, Integer> sDestroyedList;
 
+    private static DeadPointsArray deadPoints;
+
     public static void createAchieveList() {
 
         sAchievementList = new Array<Achievement>();
@@ -73,6 +76,15 @@ public class ScoreCounter {
         sAchievementList.add(new Reborn());
         sAchievementList.add(new WheelOfSamsara());
         sAchievementList.add(new Ruthless());
+    }
+
+    //инициализация точек смерти
+    public static void initDeadPoints() {
+        if (deadPoints==null) {
+            deadPoints = new DeadPointsArray();
+        } else {
+            deadPoints.resetPoints();
+        }
     }
 
     //запись всех ключей разрешенных объектов
@@ -138,6 +150,10 @@ public class ScoreCounter {
         sDestroyedList.put(key, getDestroyedNumber(key) + 1);
     }
 
+    //доступ до списка точек смерти
+    public static DeadPointsArray getDeadPoints() {
+        return deadPoints;
+    }
 
     //возможно в будущем избавлюсь от вызова этого метода и буду его реализовывать иначе
     public static void increaseScore(int score) {
@@ -246,6 +262,9 @@ public class ScoreCounter {
     }
 
     public static void saveCalcStats(String currentKillerKey, String levelName) {
+
+        deadPoints.addPoint(time);
+
         saveCalcStats(levelName);
         PreferencesManager.setDeathCause(currentKillerKey);
     }
@@ -296,6 +315,8 @@ public class ScoreCounter {
             sKilledList.clear();
             sDestroyedList.clear();
         }
+
+        deadPoints.resetIndex();
     }
 
     public static Array<Achievement> getAchieveList() {

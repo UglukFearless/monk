@@ -10,7 +10,17 @@ mLevelConstants: {
   GROUND_WIDTH_INIT:45
   COLUMNS_WIDTH_INIT:0.5
   COLUMNS_PIT_INIT:1.8
-  GROUND_HEIGHT_FIX_INIT:1.125
+  GROUND_HEIGHT_FIX_INIT:1.187
+
+  DECORATION_ONE_OFFSET_INIT: -1.0
+  DECORATION_TWO_OFFSET_INIT: -0.2
+  DECORATION_NEAR_SPEED_INIT: 1
+  DECORATION_FURTHER_SPEED_INIT: 0.75
+  DECORATION_NEAR_STEP_INIT: 5
+  DECORATION_NEAR_STEP_MIN_INIT: 0
+  DECORATION_FURTHER_STEP_INIT: 5
+  DECORATION_FURTHER_STEP_MIN_INIT: 3
+
   COLUMNS_HEIGHT_INIT:8
   COLUMNS_QUANTITY_INIT:6
   GROUND_PIT_INIT:8
@@ -387,7 +397,7 @@ mEnemiesModels:
 		isContainer:true
 
     	textureScaleX:1
-    	textureScaleY:1
+    	textureScaleY:1.02
     	textureOffsetX:0
     	textureOffsetY:0
 
@@ -694,5 +704,83 @@ mEnemiesModels:
 			block:true
     	mNumber:10
 			},
+	]
+
+	mNearDecorationsModels: [
+		{
+			mWidth: 8
+			mHeight: 6
+			mGrade: 1
+			mNear: true
+		},
+		{
+			mWidth: 2
+			mHeight: 1.5
+			mGrade: 2
+			mNear: true
+		},
+		{
+			mWidth: 3
+			mHeight: 2
+			mGrade: 3
+			mNear: true
+		},
+		{
+			mWidth: 3.8
+			mHeight: 6
+			mGrade: 4
+			mNear: true
+		},
+		{
+			mWidth: 5
+			mHeight: 3
+			mGrade: 5
+			mNear: true
+		},
+		{
+			mWidth: 4.5
+			mHeight: 2.8
+			mGrade: 6
+			mNear: true
+		},
+		{
+			mWidth: 4.5
+			mHeight: 3
+			mGrade: 8
+			mNear: true
+		},
+		{
+			mWidth: 14.68
+			mHeight: 11.2
+			mGrade: 9
+			mNear: true
+		}
+	]
+
+	mFurtherDecorationsModels: [
+		{
+			mWidth: 14.68
+			mHeight: 15.2
+			mGrade: 7
+			mNear: false
+		},
+		{
+			mWidth: 14.68
+			mHeight: 15.2
+			mGrade: 7
+			mNear: false
+		},
+		{
+			mWidth: 14.68
+			mHeight: 15.2
+			mGrade: 7
+			mNear: false
+		},
+		{
+			mWidth: 10.68
+			mHeight: 15.2
+			mGrade: 10
+			mNear: false
+		}
 	]
 }

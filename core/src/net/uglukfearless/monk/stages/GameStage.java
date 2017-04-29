@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
@@ -164,7 +166,8 @@ public class GameStage extends Stage {
     private float startTime;
     private boolean mInfinityGame;
 
-    private Group mDecorationGroup;
+    private Group mDecorationGroupNear;
+    private Group mDecorationGroupFurther;
     private GameDecoration mFinishDecoration;
 
     private float deltaTime;
@@ -175,7 +178,6 @@ public class GameStage extends Stage {
                 new OrthographicCamera(VIEWPORT_WIDTH, yViewportHeight)));
 
         VIEWPORT_HEIGHT = yViewportHeight;
-
 
         this.screen = screen;
 
@@ -234,8 +236,9 @@ public class GameStage extends Stage {
         PoolsHandler.initPools(world);
 
         setUpBackground();
-        setUpDecoration();
+        setUpDecorationFurther();
         setUpGround();
+        setUpDecorationNear();
         setUpColumns();
         setUpPits();
         setUpRunner();
@@ -249,9 +252,14 @@ public class GameStage extends Stage {
 
     }
 
-    private void setUpDecoration() {
-        mDecorationGroup = new Group();
-        addActor(mDecorationGroup);
+    private void setUpDecorationNear() {
+        mDecorationGroupNear = new Group();
+        addActor(mDecorationGroupNear);
+    }
+
+    private void setUpDecorationFurther() {
+        mDecorationGroupFurther = new Group();
+        addActor(mDecorationGroupFurther);
     }
 
     private void setUpArmour() {
@@ -487,6 +495,7 @@ public class GameStage extends Stage {
                 Treasures treasures = new Treasures(this, VIEWPORT_HEIGHT);
                 treasures.setGui(mGameGuiStage);
                 mBonuses.add(treasures);
+                addMovable(treasures);
                 mAddedTreasures = true;
             }
         }
@@ -498,6 +507,7 @@ public class GameStage extends Stage {
 //        ground2.setZIndex(100);
 //        if (mState!=PAUSE) {
         super.draw();
+//        System.out.println("render Calls - " + ((SpriteBatch) getBatch()).renderCalls);
         getBatch().begin();
 //        effect.draw(getBatch());
         for (ParticleEffect effect : AssetLoader.sWorkParticleBlood) {
@@ -1058,12 +1068,31 @@ public class GameStage extends Stage {
         mLevelModel.secondStart();
     }
 
-    public void addDecoration(GameDecoration decoration, boolean isFinish) {
-        mDecorationGroup.addActor(decoration);
+    public void addDecoration(GameDecoration decoration, boolean isFinish, boolean isNear) {
+        if (isNear) {
+            mDecorationGroupNear.addActor(decoration);
+        } else {
+            mDecorationGroupFurther.addActor(decoration);
+        }
+        addMovable(decoration);
 
         if (isFinish) {
             mFinishDecoration = decoration;
         }
+    }
+
+    public void addToDecorationLayout(Actor actor) {
+        mDecorationGroupNear.addActor(actor);
+    }
+
+    public void removeDecoration(GameDecoration decoration, boolean isNear) {
+        if (isNear) {
+            mDecorationGroupNear.removeActor(decoration);
+        } else {
+            mDecorationGroupFurther.removeActor(decoration);
+        }
+        mMovableArray.removeValue(decoration, true);
+        PoolsHandler.sDecorationPool.free(decoration);
     }
 
     public float getDeltaTime() {

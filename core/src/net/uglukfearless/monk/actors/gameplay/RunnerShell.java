@@ -43,8 +43,8 @@ public class RunnerShell extends GameActor implements Pool.Poolable{
     }
 
     public void init(Stage stage, Vector2 position, int thunderFistLevel) {
-        body.setTransform(position.x + 1f, position.y + 1f, 0);
-        body.setLinearVelocity(28f, 0);
+        body.setTransform(position.x + 1.3f, position.y + 1f, 0);
+        body.setLinearVelocity(42f, 0);
         if (thunderFistLevel==1) {
             getUserData().setPiercing1(true);
         }

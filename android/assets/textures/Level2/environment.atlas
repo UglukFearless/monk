@@ -5,23 +5,37 @@ filter: Linear,Linear
 repeat: none
 background1
   rotate: false
-  xy: 1, 483
-  size: 800, 480
-  orig: 800, 480
+  xy: 1, 446
+  size: 802, 534
+  orig: 802, 534
   offset: 0, 0
   index: -1
 background2
   rotate: false
   xy: 1, 1
-  size: 800, 480
-  orig: 800, 480
+  size: 802, 443
+  orig: 802, 443
+  offset: 0, 0
+  index: -1
+pitLeft
+  rotate: false
+  xy: 805, 743
+  size: 81, 237
+  orig: 81, 237
+  offset: 0, 0
+  index: -1
+pitRight
+  rotate: false
+  xy: 805, 504
+  size: 81, 237
+  orig: 81, 237
   offset: 0, 0
   index: -1
 column
   rotate: false
-  xy: 803, 742
-  size: 54, 221
-  orig: 54, 221
+  xy: 888, 758
+  size: 55, 222
+  orig: 55, 222
   offset: 0, 0
   index: -1
 
@@ -32,7 +46,7 @@ repeat: none
 ground
   rotate: false
   xy: 1, 1
-  size: 1020, 216
-  orig: 1020, 216
+  size: 1020, 237
+  orig: 1020, 237
   offset: 0, 0
   index: -1

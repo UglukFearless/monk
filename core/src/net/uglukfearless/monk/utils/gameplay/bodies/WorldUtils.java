@@ -440,7 +440,7 @@ public class WorldUtils {
         CircleShape shape = new CircleShape();
         shape.setRadius(0.6f);
         Body body = world.createBody(bodyDef);
-        body.createFixture(shape, Constants.RUNNER_DENSITY);
+        body.createFixture(shape, Constants.RUNNER_DENSITY*12f);
         body.setGravityScale(0);
         body.getFixtureList().get(0).setFilterData(FilterConstants.FILTER_ENEMY_STRIKE_FLIP);
         body.resetMassData();

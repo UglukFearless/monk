@@ -29,6 +29,8 @@ public class LevelModel {
     public int mDangersProbability;
     private EnemyModel[] mEnemiesModels;
     private ObstacleModel[] mObstaclesModels;
+    private DecorationModel[] mNearDecorationsModels;
+    private DecorationModel[] mFurtherDecorationsModels;
 
 
     public LevelModel() {
@@ -40,6 +42,10 @@ public class LevelModel {
         mPriorityColumns = 1;
 
         mDangersProbability = 0;
+    }
+
+    public void initAssets(boolean finishedLoad) {
+        AssetLoader.initLevelManager(LEVEL_NAME, finishedLoad);
     }
 
     public void init() {
@@ -86,6 +92,14 @@ public class LevelModel {
 
     public ObstacleModel[] getObstaclesModels() {
         return mObstaclesModels;
+    }
+
+    public DecorationModel[] getNearDecorationsModels() {
+        return mNearDecorationsModels;
+    }
+
+    public DecorationModel[] getFurtherDecorationsModels() {
+        return mFurtherDecorationsModels;
     }
 
     public DifficultyHandler getDifficultyHandler() {

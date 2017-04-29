@@ -33,11 +33,11 @@ public class BodyUtils {
                         &&(body.getPosition().y + mUserData.getHeight()/2f > 0);
             case GROUND:
             case PIT:
-                return (body.getPosition().x + mUserData.getWidth()/2f > 0);
+                return (body.getPosition().x + mUserData.getWidth()/2f + 2.5f > 0);
             case RUNNER_STRIKE:
             case SHELL:
                 return (body.getPosition().x + mUserData.getWidth()/2f > 0
-                        &&body.getPosition().x - mUserData.getWidth()/2f < Constants.GAME_WIDTH + 5f
+                        &&body.getPosition().x - mUserData.getWidth()/2f < Constants.GAME_WIDTH + 1f
                         &&body.getPosition().y + mUserData.getHeight()/2f > 0);
         }
 

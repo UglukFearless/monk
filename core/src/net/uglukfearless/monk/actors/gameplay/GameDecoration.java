@@ -21,8 +21,9 @@ public class GameDecoration extends Actor implements Movable, Pool.Poolable {
     private Sprite mSprite;
 
     private GameStage mStage;
+    private boolean mNear;
 
-    public GameDecoration(GameStage stage, Texture region, float width, float height) {
+    public GameDecoration(GameStage stage, Texture region, float width, float height, boolean near) {
 
         mStage = stage;
 
@@ -31,9 +32,43 @@ public class GameDecoration extends Actor implements Movable, Pool.Poolable {
         mSprite = new Sprite(region);
         mSprite.setSize(getWidth(), getHeight());
 
+        mNear = near;
+
+    }
+
+    //дефолтный конструктор для пула
+    public GameDecoration() {}
+
+    public GameDecoration(GameStage stage, TextureRegion region, float width, float height, boolean near) {
+
+        mStage = stage;
+
+        setSize(width, height);
+
+        mSprite = new Sprite(region);
+        mSprite.setSize(getWidth(), getHeight());
+
+        mNear = near;
+
     }
 
     public void init(float moveSpeed, float x, float y) {
+        mMoveSpeed = moveSpeed*mSpeedCof;
+        setPosition(x,y);
+        mStage.addMovable(this);
+    }
+
+    //расширенный инит для объектоа полученных из пула
+    public void init(GameStage stage, TextureRegion region, float width, float height, boolean near, float moveSpeed, float x, float y) {
+        mStage = stage;
+
+        setSize(width, height);
+
+        mSprite = new Sprite(region);
+        mSprite.setSize(getWidth(), getHeight());
+
+        mNear = near;
+
         mMoveSpeed = moveSpeed*mSpeedCof;
         setPosition(x,y);
         mStage.addMovable(this);
@@ -45,6 +80,9 @@ public class GameDecoration extends Actor implements Movable, Pool.Poolable {
 
         if (inBounds()) {
             setX(getX() + mMoveSpeed*delta);
+        } else {
+            ((GameStage)getStage()).removeDecoration(this, mNear);
+            this.remove();
         }
     }
 
@@ -69,5 +107,13 @@ public class GameDecoration extends Actor implements Movable, Pool.Poolable {
             mStage.removeMovable(this);
         }
         this.remove();
+    }
+
+    public boolean isNear() {
+        return mNear;
+    }
+
+    public void setSpeedCof(float speedCof) {
+        mSpeedCof = speedCof;
     }
 }

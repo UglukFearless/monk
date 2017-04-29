@@ -60,7 +60,7 @@ public class MainMenuScreen implements Screen {
     public void newGame(LevelModel levelModel) {
         this.dispose();
         stage.dispose();
-        game.setScreen(new GameScreen(game, levelModel));
+        game.setScreen(new LoadingScreen(game, levelModel));
     }
 
     @Override

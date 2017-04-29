@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -216,7 +217,10 @@ public class ShopStage extends Stage {
         for (final ArmourType armourType : ArmourType.values()) {
             Table tableArmour = new Table();
             Image imageArmour = new Image(armourType.getImage());
-            tableArmour.add(imageArmour);
+            Cell cell = tableArmour.add(imageArmour);
+            cell.prefWidth(cell.getPrefWidth()*VIEWPORT_WIDTH/Constants.APP_WIDTH);
+            cell.prefHeight(cell.getPrefHeight()*VIEWPORT_HEIGHT/Constants.APP_HEIGHT);
+//            imageArmour.setSize(3, 3);
             Label labelArmour = new Label(String.valueOf(armourType.getPrice()), AssetLoader.sGuiSkin);
             tableArmour.add(labelArmour);
             Image imageTreasures = new Image(AssetLoader.bonusesAtlas.findRegion("rupee"));
@@ -247,7 +251,9 @@ public class ShopStage extends Stage {
             mBalanceLabel.setText("x".concat(String.valueOf(mCash)));
             mCurrentArmour = armourType;
             mArmourCell.clearChildren();
-            mArmourCell.add(new Image(armourType.getImage()));
+            Cell cell = mArmourCell.add(new Image(armourType.getImage()));
+            cell.prefWidth(cell.getPrefWidth()*VIEWPORT_WIDTH/Constants.APP_WIDTH);
+            cell.prefHeight(cell.getPrefHeight()*VIEWPORT_HEIGHT/Constants.APP_HEIGHT);
         }
     }
 
@@ -264,7 +270,9 @@ public class ShopStage extends Stage {
         for (final WeaponType weaponType : WeaponType.values()) {
             Table tableWeapon = new Table();
             Image imageWeapon = new Image(weaponType.getImage());
-            tableWeapon.add(imageWeapon);
+            Cell cell = tableWeapon.add(imageWeapon);
+            cell.prefWidth(cell.getPrefWidth()*VIEWPORT_WIDTH/Constants.APP_WIDTH);
+            cell.prefHeight(cell.getPrefHeight()*VIEWPORT_HEIGHT/Constants.APP_HEIGHT);
             Label labelWeapon = new Label(String.valueOf(weaponType.getPrice()), AssetLoader.sGuiSkin);
             tableWeapon.add(labelWeapon);
             Image imageTreasures = new Image(AssetLoader.bonusesAtlas.findRegion("rupee"));
@@ -296,7 +304,9 @@ public class ShopStage extends Stage {
             mBalanceLabel.setText("x".concat(String.valueOf(mCash)));
             mCurrentWeapon = weaponType;
             mWeaponCell.clearChildren();
-            mWeaponCell.add(new Image(weaponType.getImage()));
+            Cell cell = mWeaponCell.add(new Image(weaponType.getImage()));
+            cell.prefWidth(cell.getPrefWidth()*VIEWPORT_WIDTH/Constants.APP_WIDTH);
+            cell.prefHeight(cell.getPrefHeight()*VIEWPORT_HEIGHT/Constants.APP_HEIGHT);
         }
     }
 

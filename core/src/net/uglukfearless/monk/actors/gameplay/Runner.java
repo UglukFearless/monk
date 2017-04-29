@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -88,6 +89,8 @@ public class Runner extends GameActor {
 
     private WeaponType mWeaponType;
 
+    private ShaderProgram mBuddhaShader;
+
 
     public Runner(Body body) {
         super(body);
@@ -120,6 +123,27 @@ public class Runner extends GameActor {
         changeClothes(PreferencesManager.getArmour());
 
         mRand = new Random();
+
+        setupShader();
+    }
+
+    private void setupShader() {
+        String VERTEX = Gdx.files.internal("shader/vert1.glsl").readString();
+        String FRAGMENT = Gdx.files.internal("shader/frag1.glsl").readString();
+
+        //отключаем стандартный набор атрибутов
+        ShaderProgram.pedantic = false;
+
+        mBuddhaShader = new ShaderProgram(VERTEX, FRAGMENT);
+
+        if (!mBuddhaShader.isCompiled()) {
+            System.err.println(mBuddhaShader.getLog());
+            System.exit(0);
+        }
+
+        if (mBuddhaShader.getLog().length()!=0) {
+            System.out.println(mBuddhaShader.getLog());
+        }
     }
 
     @Override
@@ -132,17 +156,55 @@ public class Runner extends GameActor {
         mColor = batch.getColor();
         batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
 
-//        stateTime += Gdx.graphics.getDeltaTime();
         stateTime += ((GameStage) getStage()).getDeltaTime();
 
-        batch.draw(mCurrentAnimation.getKeyFrame(stateTime),
-                x,
-                y,
-                getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
-                data.getWidth() *3.2f, data.getHeight() * 1.84f
-                , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+        if (isBuddha()) {
+            float color_value = getColorValue();
+            mBuddhaShader.begin();
+            mBuddhaShader.setUniformf("ourColor", color_value, color_value, 0f, 1.0f);
+            mBuddhaShader.end();
+            batch.setShader(mBuddhaShader);
+            batch.setColor(mColor.r,mColor.g,mColor.b, 0.2f);
+            batch.draw(mCurrentAnimation.getKeyFrame(stateTime),
+                    x - 0.6f,
+                    y,
+                    getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
+                    data.getWidth() *3.2f, data.getHeight() * 1.84f
+                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+            batch.setColor(mColor.r,mColor.g,mColor.b, 0.4f);
+            batch.draw(mCurrentAnimation.getKeyFrame(stateTime),
+                    x - 0.3f,
+                    y,
+                    getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
+                    data.getWidth() *3.2f, data.getHeight() * 1.84f
+                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+
+            batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
+            batch.draw(mCurrentAnimation.getKeyFrame(stateTime),
+                    x,
+                    y,
+                    getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
+                    data.getWidth() *3.2f, data.getHeight() * 1.84f
+                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+
+            batch.setShader(null);
+        } else {
+            batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
+            batch.draw(mCurrentAnimation.getKeyFrame(stateTime),
+                    x,
+                    y,
+                    getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
+                    data.getWidth() *3.2f, data.getHeight() * 1.84f
+                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+        }
+
 
         batch.setColor(mColor);
+
+    }
+
+    private float getColorValue() {
+        return (float) ((0.1f*(Math.sin(30*stateTime + Math.random()) / 2f) + 0.05f) + 0.9f);
     }
 
     @Override
@@ -230,7 +292,6 @@ public class Runner extends GameActor {
                 case DIE:
                     dead(delta);
                     if (mBuddha&&!mUseBuddhaThreshold) {
-                        System.out.println("runner death change speed " + (Constants.WORLD_STATIC_VELOCITY_INIT.x));
                         ((GameStage) getStage()).changingSpeed(((GameStage) getStage()).getCurrentVelocity().x/Constants.BUDDHA_SPEED_SCALE);
                         mBuddha = false;
                     }
@@ -349,6 +410,8 @@ public class Runner extends GameActor {
             ((GameStage) getStage()).setWingsBuffer(mWingsRevival);
             ((GameStage) getStage()).gameOver(mCurrentKillerKey);
             this.remove();
+
+            mBuddhaShader.dispose();
         }
     }
 
@@ -840,4 +903,6 @@ public class Runner extends GameActor {
             mCurrentAnimation.setPlayMode(Animation.PlayMode.NORMAL);
         }
     }
+
+
 }

@@ -17,23 +17,9 @@ background2
   orig: 802, 443
   offset: 0, 0
   index: -1
-pitLeft
-  rotate: false
-  xy: 805, 743
-  size: 81, 237
-  orig: 81, 237
-  offset: 0, 0
-  index: -1
-pitRight
-  rotate: false
-  xy: 805, 504
-  size: 81, 237
-  orig: 81, 237
-  offset: 0, 0
-  index: -1
 column
   rotate: false
-  xy: 888, 758
+  xy: 805, 758
   size: 55, 222
   orig: 55, 222
   offset: 0, 0
@@ -45,8 +31,16 @@ filter: Linear,Linear
 repeat: none
 ground
   rotate: false
-  xy: 1, 1
+  xy: 1, 240
   size: 1020, 237
   orig: 1020, 237
+  offset: 0, 0
+  index: -1
+pit
+  rotate: false
+  xy: 1, 1
+  size: 221, 237
+  split: 81, 82, 0, 0
+  orig: 221, 237
   offset: 0, 0
   index: -1

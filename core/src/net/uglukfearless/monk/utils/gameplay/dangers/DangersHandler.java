@@ -1,8 +1,6 @@
 package net.uglukfearless.monk.utils.gameplay.dangers;
 
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 
 import net.uglukfearless.monk.actors.gameplay.Columns;
@@ -17,9 +15,12 @@ import net.uglukfearless.monk.actors.gameplay.bonuses.WingsBonus;
 import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.constants.PlacingCategory;
 import net.uglukfearless.monk.enums.EnemyType;
+import net.uglukfearless.monk.enums.GameState;
 import net.uglukfearless.monk.enums.ObstacleType;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
+import net.uglukfearless.monk.utils.file.ScoreCounter;
+import net.uglukfearless.monk.utils.gameplay.models.DecorationModel;
 import net.uglukfearless.monk.utils.gameplay.models.LevelModel;
 import net.uglukfearless.monk.utils.gameplay.pools.PoolsHandler;
 
@@ -135,23 +136,37 @@ public class DangersHandler {
             }
 
             fillGround();
-        } else
-        if (stage.getFinishCount()==0)
-        {
+        } else {
+            checkFinish();
+        }
 
-            GameDecoration gameDecoration = new GameDecoration(stage, AssetLoader.finishDecoration, 10f, 10f);
+        checkDead();
+
+    }
+
+    private void checkDead() {
+        while (ScoreCounter.getDeadPoints().checkPoint((int)stage.getRunTime())&&stage.getState() != GameState.GAME_OVER) {
+            GameDecoration gameDecoration = new GameDecoration(stage, AssetLoader.deadPointDecoration, 1.75f, 5f, true);
+            gameDecoration.init(stage.getCurrentVelocity().x,
+                    Constants.GAME_WIDTH + ScoreCounter.getDeadPoints().getCurrentPointOffset((int)stage.getRunTime()),
+                    Constants.GROUND_HEIGHT*(Constants.GROUND_HEIGHT_FIX_INIT - 1)/2f + Constants.LAYOUT_Y_ONE);
+            stage.addDecoration(gameDecoration, false, gameDecoration.isNear());
+            ScoreCounter.getDeadPoints().nextPoint();
+        }
+    }
+
+    private void checkFinish() {
+        if (stage.getFinishCount()==0) {
+            GameDecoration gameDecoration = new GameDecoration(stage, AssetLoader.finishDecoration, 10f, 10f, false);
             gameDecoration.init(stage.getCurrentVelocity().x, Constants.GROUND_WIDTH_INIT + finishOffset + Constants.GAME_WIDTH
                     , Constants.LAYOUT_Y_ONE - 1.3f);
-            stage.addDecoration(gameDecoration, true);
+            stage.addDecoration(gameDecoration, true, gameDecoration.isNear());
         }
     }
 
     private void fillGround() {
 
-//        GameDecoration gameDecoration = new GameDecoration(stage, AssetLoader.finishDecoration, 12f, 12f);
-//        gameDecoration.init(stage.getCurrentVelocity().x, startX
-//                , Constants.LAYOUT_Y_ONE - 1.5f);
-//        stage.addDecoration(gameDecoration, false);
+        addDecorations();
 
         for (int i = 0;i<prohibitionsMap.length-1;i++) {
             for (int j = 0; j < prohibitionsMap[0].length-1; j++) {
@@ -218,6 +233,70 @@ public class DangersHandler {
         for (int ii=1;ii<prohibitionsMap.length;ii++) {
             for (int jj=1;jj<prohibitionsMap[ii].length;jj++) {
                 prohibitionsMap[ii][jj] = 0;
+            }
+        }
+    }
+
+    private void addDecorations() {
+
+        if (AssetLoader.decorationsAtlas!=null) {
+
+            if (mLevelModel.getNearDecorationsModels()!=null) {
+                locateDecoration(mLevelModel.getNearDecorationsModels());
+            }
+
+            if (mLevelModel.getFurtherDecorationsModels()!=null) {
+                locateDecoration(mLevelModel.getFurtherDecorationsModels());
+            }
+        }
+    }
+
+    private void locateDecoration(DecorationModel[] decorationsModels) {
+
+        boolean stopDecor = false;
+        float currentX = startX - Constants.DANGERS_START_OFFSET;
+        DecorationModel currentModel;
+        float y = 0f;
+        GameDecoration gameDecoration;
+        float x_step;
+        float x_min;
+
+        if (decorationsModels[0].isNear()) {
+            x_step = Constants.DECORATION_NEAR_STEP_INIT;
+            x_min = Constants.DECORATION_NEAR_STEP_MIN_INIT;
+        } else {
+            x_step = Constants.DECORATION_FURTHER_STEP_INIT;
+            x_min = Constants.DECORATION_FURTHER_STEP_MIN_INIT;
+        }
+
+        while (!stopDecor) {
+
+            currentModel = decorationsModels[Constants.RANDOM.nextInt(decorationsModels.length)];
+            currentX += Constants.RANDOM.nextFloat() * x_step + x_min;
+
+            if (startX + Constants.GROUND_WIDTH_INIT - Constants.DANGERS_START_OFFSET > currentX + currentModel.getWidth()) {
+
+                gameDecoration = PoolsHandler.sDecorationPool.obtain();
+
+                if (currentModel.isNear()) {
+                    y = Constants.GROUND_HEIGHT * Constants.GROUND_HEIGHT_FIX_INIT -
+                            (Constants.GROUND_HEIGHT / 2 - Constants.GROUND_HEIGHT * (Constants.GROUND_HEIGHT_FIX_INIT - 1) / 2f)
+                            + Constants.DECORATION_ONE_OFFSET_INIT;
+                    gameDecoration.setSpeedCof(Constants.DECORATION_NEAR_SPEED_INIT);
+                } else {
+                    y = Constants.DECORATION_TWO_OFFSET_INIT;
+                    gameDecoration.setSpeedCof(Constants.DECORATION_FURTHER_SPEED_INIT);
+                }
+
+                gameDecoration.init(stage, AssetLoader.decorationsAtlas.findRegion("decoration" + currentModel.getGrade())
+                        , currentModel.getWidth(), currentModel.getHeight(), currentModel.isNear()
+                        , stage.getCurrentVelocity().x, currentX, y);
+
+                stage.addDecoration(gameDecoration, false, gameDecoration.isNear());
+
+                currentX += currentModel.getWidth() / 3;
+            } else {
+                stopDecor = true;
             }
         }
     }
@@ -387,7 +466,7 @@ public class DangersHandler {
                 mPit = stage.getColumnsPit();
                 mPit.setPosition(secondGround.getBody().getPosition().x +
                         Constants.GROUND_WIDTH_INIT /2);
-                stage.addActor(mPit);
+                stage.addToDecorationLayout(mPit);
 
                 if (!mColumns1.get(Constants.COLUMNS_QUANTITY_INIT -1).getBody().isActive()) {
                     placingColumns(mColumns1, secondGround);
@@ -399,7 +478,7 @@ public class DangersHandler {
                 mPit = stage.getSimplePit();
                 mPit.setPosition(secondGround.getBody().getPosition().x +
                                 Constants.GROUND_WIDTH_INIT /2);
-                stage.addActor(mPit);
+                stage.addToDecorationLayout(mPit);
             }
         } else {
             pitLength = 0;

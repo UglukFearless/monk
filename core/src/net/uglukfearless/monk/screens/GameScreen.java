@@ -52,6 +52,8 @@ public class GameScreen implements Screen {
 
         mLevelModel = levelModel;
 
+        ScoreCounter.initDeadPoints();
+
         initGame(true, null);
     }
 
@@ -59,6 +61,11 @@ public class GameScreen implements Screen {
 
         if (!newGame) {
             AssetLoader.levelMusic.dispose();
+            ScoreCounter.initDeadPoints();
+        }
+
+        if (!newGame) {
+            mLevelModel.initAssets(true);
         }
         mLevelModel.init();
         AssetLoader.loadMonkAnimations(PreferencesManager.getArmour(), PreferencesManager.getWeapon());
@@ -105,10 +112,12 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        AssetLoader.levelMusic.setVolume(SoundSystem.getMusicValue());
-        SoundSystem.registrationMusic(AssetLoader.levelMusic);
-        AssetLoader.levelMusic.setLooping(true);
-        AssetLoader.levelMusic.play();
+        if (AssetLoader.levelMusic!=null) {
+            AssetLoader.levelMusic.setVolume(SoundSystem.getMusicValue());
+            SoundSystem.registrationMusic(AssetLoader.levelMusic);
+            AssetLoader.levelMusic.setLooping(true);
+            AssetLoader.levelMusic.play();
+        }
         System.out.print("GameScreenShow");
     }
 
@@ -178,8 +187,10 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        AssetLoader.levelMusic.stop();
-        SoundSystem.removeMusic(AssetLoader.levelMusic);
+        if (AssetLoader.levelMusic!=null) {
+            AssetLoader.levelMusic.stop();
+            SoundSystem.removeMusic(AssetLoader.levelMusic);
+        }
         AssetLoader.disposeGame();
         if (mGameStage.getState() == GameState.RUN
                 ||mGameStage.getState() == GameState.PAUSE

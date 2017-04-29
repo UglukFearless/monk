@@ -166,8 +166,13 @@ public abstract class GameBonus extends Actor implements Movable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        if (inBounds()) {
+            batch.draw(mRegion, getX(), getY(), getWidth(), getHeight());
+        }
+    }
 
-        batch.draw(mRegion, getX(), getY(), getWidth(), getHeight());
+    protected boolean inBounds() {
+        return (getX()+getWidth()>0)&&(getX()<Constants.GAME_WIDTH);
     }
 
     public boolean isActive() {
@@ -183,7 +188,6 @@ public abstract class GameBonus extends Actor implements Movable {
     }
 
     public void changingStaticSpeed(float speedScale) {
-
         mSpeed = speedScale;
     }
 }
