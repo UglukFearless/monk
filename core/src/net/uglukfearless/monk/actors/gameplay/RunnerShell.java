@@ -65,11 +65,13 @@ public class RunnerShell extends GameActor implements Pool.Poolable{
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(mRegion,
-                body.getPosition().x - getUserData().getWidth()/2,
-                body.getPosition().y -getUserData().getHeight()/2,
-                getUserData().getWidth() * 0.5f, getUserData().getHeight() * 0.5f,
-                getUserData().getWidth(), getUserData().getHeight()
-                , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+        if (inFrame()) {
+            batch.draw(mRegion,
+                    body.getPosition().x - getUserData().getWidth()/2,
+                    body.getPosition().y -getUserData().getHeight()/2,
+                    getUserData().getWidth() * 0.5f, getUserData().getHeight() * 0.5f,
+                    getUserData().getWidth(), getUserData().getHeight()
+                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+        }
     }
 }

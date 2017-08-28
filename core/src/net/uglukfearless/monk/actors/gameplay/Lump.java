@@ -62,16 +62,18 @@ public class Lump extends GameActor implements Pool.Poolable, Movable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
+        if (inFrame()) {
+            super.draw(batch, parentAlpha);
 
-        LumpUserData data = getUserData();
+            LumpUserData data = getUserData();
 
-        batch.draw(mRegion,
-                body.getPosition().x - data.getWidth()*1.2f / 2,
-                body.getPosition().y - data.getHeight()*1.2f / 2,
-                data.getWidth() * 0.6f, data.getHeight() * 0.6f,
-                data.getWidth() * 1.2f, data.getHeight() * 1.2f
-                , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+            batch.draw(mRegion,
+                    body.getPosition().x - data.getWidth()*1.2f / 2,
+                    body.getPosition().y - data.getHeight()*1.2f / 2,
+                    data.getWidth() * 0.6f, data.getHeight() * 0.6f,
+                    data.getWidth() * 1.2f, data.getHeight() * 1.2f
+                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+        }
     }
 
     @Override

@@ -279,8 +279,7 @@ public class DangersHandler {
                 gameDecoration = PoolsHandler.sDecorationPool.obtain();
 
                 if (currentModel.isNear()) {
-                    y = Constants.GROUND_HEIGHT * Constants.GROUND_HEIGHT_FIX_INIT -
-                            (Constants.GROUND_HEIGHT / 2 - Constants.GROUND_HEIGHT * (Constants.GROUND_HEIGHT_FIX_INIT - 1) / 2f)
+                    y = Constants.GROUND_HEIGHT * Constants.GROUND_HEIGHT_FIX_INIT - Constants.GROUND_HEIGHT/2
                             + Constants.DECORATION_ONE_OFFSET_INIT;
                     gameDecoration.setSpeedCof(Constants.DECORATION_NEAR_SPEED_INIT);
                 } else {
@@ -502,11 +501,16 @@ public class DangersHandler {
 
             //добавить врага, если колона достаточно толстая
             if (Constants.COLUMNS_WIDTH_INIT>=2&&(rand.nextInt(100)>Constants.DANGERS_PROBABILITY)) {
-                if (allColumnsEnemies.size()>0) {
+//                if (allColumnsEnemies.size()>0) {
+                if (allEnemies.size()>0) {
                     Enemy enemy;
-                    EnemyType enemyType = allColumnsEnemies.get(rand.nextInt(allColumnsEnemies.size()));
+//                    EnemyType enemyType = allColumnsEnemies.get(rand.nextInt(allColumnsEnemies.size()));
+                    EnemyType enemyType = allEnemies.get(rand.nextInt(allEnemies.size()));
                     enemy = PoolsHandler.sEnemiesPools.get(enemyType.name()).obtain();
                     enemy.init(stage, x + Constants.COLUMNS_WIDTH_INIT / 2, Constants.COLUMNS_HEIGHT_INIT/2 + 1);
+                    if (enemy.getUserData().getGravityScale()!=0) {
+                        enemy.setGuard(true);
+                    }
                     stage.addActor(enemy);
                 }
             }

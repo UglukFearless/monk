@@ -39,4 +39,5 @@ public class GameProgressModel {
     public void setCurrentGrade(int currentGrade) {
         mCurrentGrade = currentGrade;
     }
+
 }

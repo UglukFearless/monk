@@ -42,8 +42,9 @@ public class LoadingScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
-        batch.draw(AssetLoader.sLoadingImage, 10, Gdx.graphics.getHeight() / 2 - AssetLoader.sLoadingImage.getHeight() / 2,
-                Gdx.graphics.getWidth() - 20, AssetLoader.sLoadingImage.getHeight());
+        batch.draw(AssetLoader.sLoadingImage, Gdx.graphics.getWidth()/2f - AssetLoader.sLoadingImage.getWidth()/2f
+                , Gdx.graphics.getHeight() / 2f - AssetLoader.sLoadingImage.getHeight() / 2f
+                , AssetLoader.sLoadingImage.getWidth(), AssetLoader.sLoadingImage.getHeight());
         batch.end();
 
         if (AssetLoader.sAssetManager.update()) {

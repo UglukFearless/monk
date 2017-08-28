@@ -73,64 +73,67 @@ public class Dragon extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
 
-        mColor = batch.getColor();
-        batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
+        if (mStage.getRunner()!=null&&mStage.getRunner().isDragon()) {
+            super.draw(batch, parentAlpha);
 
-        stateTime += Gdx.graphics.getDeltaTime();
+//            mColor = batch.getColor();
+//            batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
 
-        float x;
-        float y;
-        UserData data;
+            stateTime += Gdx.graphics.getDeltaTime();
 
-        //сегменты по порядку
-        for (Body body : mDragonBody.getSpine()) {
-            data = (UserData) body.getUserData();
+            float x;
+            float y;
+            UserData data;
 
-            x = body.getPosition().x - data.getWidth()*1.5f/2f;
-            y = body.getPosition().y - data.getHeight()* 1.2f/2f;
+            //сегменты по порядку
+            for (Body body : mDragonBody.getSpine()) {
+                data = (UserData) body.getUserData();
 
-            batch.draw(mSegmentRegion, x, y,
+                x = body.getPosition().x - data.getWidth()*1.5f/2f;
+                y = body.getPosition().y - data.getHeight()* 1.2f/2f;
+
+                batch.draw(mSegmentRegion, x, y,
+                        data.getWidth()  * 0.5f, data.getHeight()  * 0.5f,
+                        data.getWidth() *1.5f, data.getHeight() * 1.4f
+                        , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+
+            }
+
+            //первый сегмент
+            data = (UserData) mDragonBody.getFirstSegment().getUserData();
+            x = mDragonBody.getFirstSegment().getPosition().x - data.getWidth()*1.6f/2f;
+            y = mDragonBody.getFirstSegment().getPosition().y - data.getHeight()* 1.2f/2f;
+            batch.draw(mFirstRegion, x, y,
                     data.getWidth()  * 0.5f, data.getHeight()  * 0.5f,
-                    data.getWidth() *1.5f, data.getHeight() * 1.4f
-                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+                    data.getWidth() *1.6f, data.getHeight() * 1.4f
+                    , 1f, 1f, (float) Math.toDegrees(mDragonBody.getFirstSegment().getAngle()));
 
+            //голова
+            data = (UserData) mDragonBody.getHead().getUserData();
+            x = mDragonBody.getHead().getPosition().x - data.getWidth()*1.7f/2f;
+            y = mDragonBody.getHead().getPosition().y - data.getHeight()*1.5f/2f;
+
+            batch.draw((TextureRegion) mHeadAnimation.getKeyFrame(stateTime), x, y,
+                    data.getWidth()  * 0.5f, data.getHeight()  * 0.5f,
+                    data.getWidth() *1.6f, data.getHeight() * 1.5f
+                    , 1f, 1f, (float) Math.toDegrees(mDragonBody.getHead().getAngle()));
+
+
+//            batch.setColor(mColor);
         }
-
-        //первый сегмент
-        data = (UserData) mDragonBody.getFirstSegment().getUserData();
-        x = mDragonBody.getFirstSegment().getPosition().x - data.getWidth()*1.6f/2f;
-        y = mDragonBody.getFirstSegment().getPosition().y - data.getHeight()* 1.2f/2f;
-        batch.draw(mFirstRegion, x, y,
-                data.getWidth()  * 0.5f, data.getHeight()  * 0.5f,
-                data.getWidth() *1.6f, data.getHeight() * 1.4f
-                , 1f, 1f, (float) Math.toDegrees(mDragonBody.getFirstSegment().getAngle()));
-
-        //голова
-        data = (UserData) mDragonBody.getHead().getUserData();
-        x = mDragonBody.getHead().getPosition().x - data.getWidth()*1.7f/2f;
-        y = mDragonBody.getHead().getPosition().y - data.getHeight()*1.5f/2f;
-
-        batch.draw(mHeadAnimation.getKeyFrame(stateTime), x, y,
-                data.getWidth()  * 0.5f, data.getHeight()  * 0.5f,
-                data.getWidth() *1.6f, data.getHeight() * 1.5f
-                , 1f, 1f, (float) Math.toDegrees(mDragonBody.getHead().getAngle()));
-
-
-        batch.setColor(mColor);
     }
 
     public void takeShape() {
         mDragonBody.setFilter(FilterConstants.FILTER_DRAGON);
         mState = DragonState.AVATAR;
-        setAlpha(1f);
+//        setAlpha(1f);
     }
 
     public void trend() {
         mDragonBody.setFilter(FilterConstants.FILTER_GHOST);
         mState = DragonState.TREND;
-        setAlpha(0f);
+//        setAlpha(0f);
     }
 
     public float getDragonY() {

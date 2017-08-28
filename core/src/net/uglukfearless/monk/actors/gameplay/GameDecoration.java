@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Pool;
 
+import net.uglukfearless.monk.constants.Constants;
 import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.gameplay.Movable;
 
@@ -92,8 +93,14 @@ public class GameDecoration extends Actor implements Movable, Pool.Poolable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        mSprite.setPosition(getX(), getY());
-        mSprite.draw(batch);
+        if (inFrame()) {
+            mSprite.setPosition(getX(), getY());
+            mSprite.draw(batch);
+        }
+    }
+
+    private boolean inFrame() {
+        return (getX()+getWidth()>0)&&(getX()< Constants.GAME_WIDTH);
     }
 
     @Override

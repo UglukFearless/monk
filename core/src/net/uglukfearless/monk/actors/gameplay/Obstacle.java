@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -79,18 +80,19 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable, Retri
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
+        if (inFrame()) {
+            super.draw(batch, parentAlpha);
 
-        ObstacleUserData data = getUserData();
+            ObstacleUserData data = getUserData();
 
-
-        stateTime += Gdx.graphics.getDeltaTime();
-        batch.draw(mAnimation.getKeyFrame(stateTime,true),
-                body.getPosition().x - (data.getWidth()*data.getScaleX()/2) + data.getOffsetX() ,
-                body.getPosition().y - (data.getHeight()/2) + data.getOffsetY(),
-                getUserData().getWidth()*0.5f,getUserData().getHeight()*0.5f,
-                data.getWidth()*data.getScaleX(), data.getHeight()*data.getScaleY()
-                , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+            stateTime += Gdx.graphics.getDeltaTime();
+            batch.draw((TextureRegion) mAnimation.getKeyFrame(stateTime,true),
+                    body.getPosition().x - (data.getWidth()*data.getScaleX()/2) + data.getOffsetX() ,
+                    body.getPosition().y - (data.getHeight()/2) + data.getOffsetY(),
+                    getUserData().getWidth()*0.5f,getUserData().getHeight()*0.5f,
+                    data.getWidth()*data.getScaleX(), data.getHeight()*data.getScaleY()
+                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+        }
     }
 
     @Override

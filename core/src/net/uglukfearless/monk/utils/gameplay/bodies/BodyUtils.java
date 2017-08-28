@@ -26,8 +26,7 @@ public class BodyUtils {
             case RUNNER:
             case OBSTACLE:
             case COLUMNS:
-                return (body.getPosition().x + mUserData.getWidth()/2f > 0)
-                        &&(body.getPosition().y + mUserData.getHeight()/2f > 0);
+                return (body.getPosition().x + mUserData.getWidth()/2f > 0);
             case LUMP:
                 return (body.getPosition().x + mUserData.getWidth()/2f + 4f > 0)
                         &&(body.getPosition().y + mUserData.getHeight()/2f > 0);

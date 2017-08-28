@@ -85,8 +85,8 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void dispose() {
-        AssetLoader.menuMusic.stop();
-        SoundSystem.removeMusic(AssetLoader.menuMusic);
+//        AssetLoader.menuMusic.stop();
+//        SoundSystem.removeMusic(AssetLoader.menuMusic);
         AssetLoader.disposeMenu();
     }
 

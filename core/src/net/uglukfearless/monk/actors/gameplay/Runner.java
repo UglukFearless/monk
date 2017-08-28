@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -61,7 +62,10 @@ public class Runner extends GameActor {
 
     private Color mColor;
     private float mAlpha;
+
     private boolean mWings;
+//    private float mWingsTimer;
+//    private float mWingsThreshold;
 
     private boolean mRetribution;
     private int mRetributionLevel;
@@ -106,6 +110,9 @@ public class Runner extends GameActor {
 
         mAlpha = 1f;
         mWings = false;
+//        mWingsTimer = mWingsThreshold + 1;
+//        mWingsThreshold = 2;
+
         mRetribution = false;
         mBuddhaTimer = 0;
         mBuddhaThreshold = 0;
@@ -165,14 +172,14 @@ public class Runner extends GameActor {
             mBuddhaShader.end();
             batch.setShader(mBuddhaShader);
             batch.setColor(mColor.r,mColor.g,mColor.b, 0.2f);
-            batch.draw(mCurrentAnimation.getKeyFrame(stateTime),
+            batch.draw((TextureRegion) mCurrentAnimation.getKeyFrame(stateTime),
                     x - 0.6f,
                     y,
                     getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
                     data.getWidth() *3.2f, data.getHeight() * 1.84f
                     , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
             batch.setColor(mColor.r,mColor.g,mColor.b, 0.4f);
-            batch.draw(mCurrentAnimation.getKeyFrame(stateTime),
+            batch.draw((TextureRegion) mCurrentAnimation.getKeyFrame(stateTime),
                     x - 0.3f,
                     y,
                     getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
@@ -180,7 +187,7 @@ public class Runner extends GameActor {
                     , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
 
             batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
-            batch.draw(mCurrentAnimation.getKeyFrame(stateTime),
+            batch.draw((TextureRegion) mCurrentAnimation.getKeyFrame(stateTime),
                     x,
                     y,
                     getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
@@ -190,7 +197,7 @@ public class Runner extends GameActor {
             batch.setShader(null);
         } else {
             batch.setColor(mColor.r,mColor.g,mColor.b, mAlpha);
-            batch.draw(mCurrentAnimation.getKeyFrame(stateTime),
+            batch.draw((TextureRegion) mCurrentAnimation.getKeyFrame(stateTime),
                     x,
                     y,
                     getUserData().getWidth()  * 0.5f, getUserData().getHeight()  * 0.5f,
@@ -233,8 +240,7 @@ public class Runner extends GameActor {
                 if (mBuddha) {
                     mBuddhaTimer += delta;
                     if (mBuddhaTimer > mBuddhaThreshold && !mUseBuddhaThreshold) {
-                        System.out.println("runner stop buddha change speed " + ((GameStage) getStage()).getCurrentVelocity().x
-                                / Constants.BUDDHA_SPEED_SCALE);
+
                         ((GameStage) getStage()).changingSpeed(((GameStage) getStage()).getCurrentVelocity().x
                                 / Constants.BUDDHA_SPEED_SCALE);
                         mUseBuddhaThreshold = true;
@@ -242,18 +248,27 @@ public class Runner extends GameActor {
 
                 }
 
+//                if (mWingsTimer<mWingsThreshold) {
+//                    mWingsTimer += delta;
+//                }
+//
+//                mWings = mWingsTimer<mWingsThreshold;
+
                 if (BodyUtils.runnerIsFallDown(body)) {
                     if (mWings) {
                         body.setTransform(Constants.RUNNER_X, Constants.RUNNER_Y, 0);
-                        ((GameStage) getStage()).StartRebutRunner();
+                        ((GameStage) getStage()).startRebutRunner();
                     } else if (mWingsLanding && startGround()) {
                         body.setTransform(Constants.RUNNER_X, Constants.RUNNER_Y, 0);
-                        ((GameStage) getStage()).StartRebutRunner();
+                        ((GameStage) getStage()).startRebutRunner();
                         mWingsLanding = false;
+                        System.out.println("Крылья сработали!");
                     } else if (mWingsRevival > 0 && !mWingsLanding) {
                         mWingsRevival--;
                         mWingsLanding = true;
                         ((GameStage) getStage()).checkWingsRevival(mWingsRevival);
+//                        mWings = true;
+//                        mWingsTimer = 0;
                     } else if (!mWingsLanding) {
                         hit(PreferencesConstants.STATS_CRASHED_DEATH_KEY);
                         if (mArmour) {
@@ -267,11 +282,12 @@ public class Runner extends GameActor {
                 } else if (BodyUtils.runnerIsBehind(body)) {
                     if (mWings) {
                         body.setTransform(Constants.RUNNER_X, Constants.RUNNER_Y, 0);
-                        ((GameStage) getStage()).StartRebutRunner();
+                        ((GameStage) getStage()).startRebutRunner();
                     } else if (mWingsLanding && startGround()) {
                         body.setTransform(Constants.RUNNER_X, Constants.RUNNER_Y, 0);
-                        ((GameStage) getStage()).StartRebutRunner();
+                        ((GameStage) getStage()).startRebutRunner();
                         mWingsLanding = false;
+                        System.out.println("Крылья сработали!");
                     } else if (mWingsRevival > 0 && !mWingsLanding) {
                         mWingsRevival--;
                         mWingsLanding = true;
@@ -386,8 +402,8 @@ public class Runner extends GameActor {
     }
 
     private boolean startGround() {
-        return ((mGround1.getPosition().x - mGround1.getWidth()/2<0.3f)
-                ||(mGround2.getPosition().x - mGround2.getWidth()/2<0.3f));
+        return ((mGround1.getPosition().x - mGround1.getWidth()/2f<0.3f&&mGround1.getPosition().x - mGround1.getWidth()/2f>-1f)
+                ||(mGround2.getPosition().x - mGround2.getWidth()/2f<0.3f&&mGround2.getPosition().x - mGround2.getWidth()/2f>-1f));
     }
 
     private void dead(float delta) {

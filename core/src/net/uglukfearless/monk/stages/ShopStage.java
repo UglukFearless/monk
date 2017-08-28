@@ -149,7 +149,9 @@ public class ShopStage extends Stage {
         mWeaponCell = new Table();
         mWeaponCell.background(new NinePatchDrawable(AssetLoader.broadbord));
         if (mCurrentWeapon!=null) {
-            mWeaponCell.add(new Image(mCurrentWeapon.getImage()));
+            Cell cell = mWeaponCell.add(new Image(mCurrentWeapon.getImage()));
+            cell.prefWidth(cell.getPrefWidth()*VIEWPORT_WIDTH/Constants.APP_WIDTH);
+            cell.prefHeight(cell.getPrefHeight()*VIEWPORT_HEIGHT/Constants.APP_HEIGHT);
         }
         mWeaponCell.addListener(new ClickListener() {
             @Override
@@ -186,7 +188,10 @@ public class ShopStage extends Stage {
         mArmourCell = new Table();
         mArmourCell.background(new NinePatchDrawable(AssetLoader.broadbord));
         if (mCurrentArmour!=null) {
-            mArmourCell.add(new Image(mCurrentArmour.getImage()));
+//            mArmourCell.add(new Image(mCurrentArmour.getImage()));
+            Cell cell = mArmourCell.add(new Image(mCurrentArmour.getImage()));
+            cell.prefWidth(cell.getPrefWidth()*VIEWPORT_WIDTH/Constants.APP_WIDTH);
+            cell.prefHeight(cell.getPrefHeight()*VIEWPORT_HEIGHT/Constants.APP_HEIGHT);
         }
         mArmourCell.addListener(new ClickListener() {
             @Override

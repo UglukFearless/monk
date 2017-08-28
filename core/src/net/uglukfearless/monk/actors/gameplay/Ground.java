@@ -46,14 +46,20 @@ public class Ground extends GameActor  implements Movable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
+        if (inFrame()) {
+            super.draw(batch, parentAlpha);
 
-        batch.draw(AssetLoader.environmentAtlas.findRegion("ground"), body.getPosition().x - userData.getWidth() * 1.01f / 2,
-                body.getPosition().y - userData.getHeight() / 2f + Constants.GROUND_HEIGHT*(Constants.GROUND_HEIGHT_FIX_INIT - 1)/2f,
-                userData.getWidth() * 1.01f, userData.getHeight()* Constants.GROUND_HEIGHT_FIX_INIT); //1.08 для травы
+//            batch.draw(AssetLoader.environmentAtlas.findRegion("ground"), body.getPosition().x - userData.getWidth() * 1.01f / 2,
+//                    body.getPosition().y - userData.getHeight() / 2f + Constants.GROUND_HEIGHT*(Constants.GROUND_HEIGHT_FIX_INIT - 1)/2f,
+//                    userData.getWidth() * 1.01f, userData.getHeight()* Constants.GROUND_HEIGHT_FIX_INIT);
+
+
+            batch.draw(AssetLoader.environmentAtlas.findRegion("ground"), body.getPosition().x - userData.getWidth() * 1.01f / 2,
+                    body.getPosition().y - userData.getHeight() / 2f,
+                    userData.getWidth() * 1.01f, userData.getHeight()* Constants.GROUND_HEIGHT_FIX_INIT);
+        }
 
     }
-
 
     public void setVelocity(Vector2 velocity) {
         body.setLinearVelocity(velocity);

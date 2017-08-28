@@ -63,15 +63,15 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
 
     public static Random mRand = new Random();
 
-    EnemyStateMain mMainState;
-    EnemyStateMove mMoveState;
-    EnemyStateFight mFightState;
+    private EnemyStateMain mMainState;
+    private EnemyStateMove mMoveState;
+    private EnemyStateFight mFightState;
 
-    float mCurrentSpeed;
-    float mBasicSpeed;
-    float mCanonSpeed;
+
+    private float mCurrentSpeed;
+    private float mBasicSpeed;
+    private float mCanonSpeed;
     private boolean mCryed;
-
 
     public Enemy(World world, EnemyType enemyType) {
         super(WorldUtils.createEnemy(world, enemyType));
@@ -121,6 +121,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
         getUserData().setDead(false);
         getUserData().setStruck(false);
         getUserData().setTerribleDeath(false);
+        getUserData().setGuard(false);
 
         if (mStayAnimation!=null) {
             mAnimation = mStayAnimation;
@@ -144,17 +145,20 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
-        stateTime += Gdx.graphics.getDeltaTime();
 
-        EnemyUserData data = getUserData();
+        if (inFrame()) {
+            super.draw(batch, parentAlpha);
+            stateTime += Gdx.graphics.getDeltaTime();
 
-        batch.draw(mAnimation.getKeyFrame(stateTime, true),
-                body.getPosition().x - (data.getWidth() * data.getScaleX() / 2) + data.getOffsetX(),
-                body.getPosition().y - (data.getHeight() / 2) + data.getOffsetY(),
-                getUserData().getWidth() * data.getScaleX() * 0.5f, getUserData().getHeight() * data.getScaleY() * 0.5f,
-                data.getWidth() * data.getScaleX(), data.getHeight() * data.getScaleY()
-                , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+            EnemyUserData data = getUserData();
+
+            batch.draw((TextureRegion) mAnimation.getKeyFrame(stateTime, true),
+                    body.getPosition().x - (data.getWidth() * data.getScaleX() / 2) + data.getOffsetX(),
+                    body.getPosition().y - (data.getHeight() / 2) + data.getOffsetY(),
+                    getUserData().getWidth() * data.getScaleX() * 0.5f, getUserData().getHeight() * data.getScaleY() * 0.5f,
+                    data.getWidth() * data.getScaleX(), data.getHeight() * data.getScaleY()
+                    , 1f, 1f, (float) Math.toDegrees(body.getAngle()));
+        }
 
     }
 
@@ -315,7 +319,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
     private void checkSpeed() {
         mCurrentSpeed = body.getLinearVelocity().x;
         mBasicSpeed = getUserData().getEnemyType().getBasicXVelocity();
-        mCanonSpeed = mStage.getCurrentVelocity().x + mBasicSpeed;
+        mCanonSpeed = getUserData().isGuard() ? mStage.getCurrentVelocity().x : mStage.getCurrentVelocity().x + mBasicSpeed ;
 
         if (mMoveState==EnemyStateMove.RUN) {
             if (mBasicSpeed>0&&mCurrentSpeed<mCanonSpeed) {
@@ -366,13 +370,16 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
     private void start(boolean first) {
         if (first||(mMoveState!=EnemyStateMove.JUMP&&mMoveState!=EnemyStateMove.FALL)) {
 
-            if (getUserData().getEnemyType().getBasicXVelocity()==0) {
+            if (getUserData().getEnemyType().getBasicXVelocity()==0||getUserData().isGuard()) {
                 mMoveState = EnemyStateMove.STAY;
+                body.setLinearVelocity(mStage.getCurrentVelocity().x,
+                        body.getLinearVelocity().y);
             } else {
                 mMoveState = EnemyStateMove.RUN;
+                body.setLinearVelocity(mStage.getCurrentVelocity().x + getUserData().getEnemyType().getBasicXVelocity(),
+                        body.getLinearVelocity().y);
             }
-            body.setLinearVelocity(mStage.getCurrentVelocity().x + getUserData().getEnemyType().getBasicXVelocity(),
-                    body.getLinearVelocity().y);
+
 
             if ((mStage.getRunner()!=null||!mStage.getRunner().getUserData().isDead())&&first) {
                 ScoreCounter.increaseEnemies();
@@ -421,7 +428,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
     }
 
     private void jump() {
-        if (getUserData().getEnemyType().isJumper()) {
+        if (getUserData().getEnemyType().isJumper()&&!getUserData().isGuard()) {
             body.applyLinearImpulse(jumpImpulse , body.getWorldCenter(), true);
             getUserData().setJumping(true);
 
@@ -514,6 +521,8 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
         getUserData().setStruck(false);
         getUserData().setTerribleDeath(false);
 
+        getUserData().setGuard(false);
+
         body.setActive(false);
         body.setAngularVelocity(0f);
         body.setGravityScale(getUserData().getEnemyType().getGravityScale());
@@ -529,7 +538,6 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
 
     @Override
     public void changingStaticSpeed(float speedScale) {
-
         body.setLinearVelocity(body.getLinearVelocity().x
                 + (speedScale-(mPreviousVelocity)), body.getLinearVelocity().y);
         mPreviousVelocity  = speedScale;
@@ -551,5 +559,9 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
                 getUserData().setTerribleDeath(true);
                 break;
         }
+    }
+
+    public void setGuard(boolean guard) {
+        getUserData().setGuard(guard);
     }
 }

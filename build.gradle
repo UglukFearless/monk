@@ -16,10 +16,10 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '0.667'
+    version = '0.673'
     ext {
         appName = "the-running-monk"
-        gdxVersion = '1.9.2'
+        gdxVersion = '1.9.6'
         roboVMVersion = '1.12.0'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'

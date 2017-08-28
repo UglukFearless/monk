@@ -17,25 +17,25 @@ background1
   orig: 800, 480
   offset: 0, 0
   index: 2
+column
+  rotate: false
+  xy: 803, 706
+  size: 200, 257
+  orig: 200, 257
+  offset: 0, 0
+  index: -1
 pitLeft
   rotate: false
-  xy: 803, 726
-  size: 81, 237
-  orig: 81, 237
+  xy: 803, 603
+  size: 70, 101
+  orig: 70, 101
   offset: 0, 0
   index: -1
 pitRight
   rotate: false
-  xy: 886, 726
-  size: 81, 237
-  orig: 81, 237
-  offset: 0, 0
-  index: -1
-column
-  rotate: false
-  xy: 803, 502
-  size: 55, 222
-  orig: 55, 222
+  xy: 803, 603
+  size: 70, 101
+  orig: 70, 101
   offset: 0, 0
   index: -1
 
@@ -65,7 +65,7 @@ repeat: none
 ground
   rotate: false
   xy: 1, 1
-  size: 947, 397
-  orig: 947, 397
+  size: 1020, 257
+  orig: 1020, 257
   offset: 0, 0
   index: -1

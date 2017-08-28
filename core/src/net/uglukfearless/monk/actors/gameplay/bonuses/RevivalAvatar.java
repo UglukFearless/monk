@@ -13,8 +13,9 @@ import net.uglukfearless.monk.utils.file.AssetLoader;
  */
 public class RevivalAvatar extends Actor {
 
-    TextureRegion mRegion;
-    GameStage mStage;
+    private TextureRegion mRegion;
+    private GameStage mStage;
+    private boolean mVisible;
 
     public RevivalAvatar(GameStage gameStage, float gameHeight) {
 
@@ -37,7 +38,14 @@ public class RevivalAvatar extends Actor {
     }
 
     @Override
+    public void setVisible(boolean visible) {
+        mVisible = visible;
+    }
+
+    @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(mRegion, getX(), getY(), getWidth(), getHeight());
+        if (mVisible) {
+            batch.draw(mRegion, getX(), getY(), getWidth(), getHeight());
+        }
     }
 }

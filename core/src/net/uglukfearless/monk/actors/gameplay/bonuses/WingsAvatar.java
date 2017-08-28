@@ -13,8 +13,9 @@ import net.uglukfearless.monk.utils.file.AssetLoader;
  */
 public class WingsAvatar extends Actor {
 
-    TextureRegion mRegion;
-    GameStage mStage;
+    private TextureRegion mRegion;
+    private GameStage mStage;
+    private boolean mVisible;
 
     public WingsAvatar(GameStage gameStage, float gameWidth, float gameHeight) {
 
@@ -37,8 +38,15 @@ public class WingsAvatar extends Actor {
     }
 
     @Override
+    public void setVisible(boolean visible) {
+        mVisible = visible;
+    }
+
+    @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(mRegion, getX(), getY(), getWidth(), getHeight());
+        if (mVisible) {
+            batch.draw(mRegion, getX(), getY(), getWidth(), getHeight());
+        }
     }
 
 

@@ -46,7 +46,7 @@ repeat: none
 ground
   rotate: false
   xy: 1, 1
-  size: 1020, 237
-  orig: 1020, 237
+  size: 1020, 256
+  orig: 1020, 256
   offset: 0, 0
   index: -1

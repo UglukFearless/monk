@@ -2,13 +2,10 @@ package net.uglukfearless.monk.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Json;
 
 import net.uglukfearless.monk.constants.Constants;
@@ -90,14 +87,29 @@ public class GameScreen implements Screen {
         mYViewportHeight = Constants.GAME_WIDTH / ((float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight());
         if (newGame) {
             ScoreCounter.resetStats();
+            mLevelModel.setOvertime(0);
             mGameStage = new GameStage(this, mYViewportHeight, mLevelModel, 0, 0);
         } else {
-            mGameStage = new GameStage(this, mYViewportHeight, mLevelModel, progressModel.getRevival(), progressModel.getWingsRevival());
+            mGameStage = new GameStage(this, mYViewportHeight, mLevelModel
+                    , progressModel.getRevival(), progressModel.getWingsRevival());
 
             AssetLoader.levelMusic.setVolume(SoundSystem.getMusicValue());
             SoundSystem.registrationMusic(AssetLoader.levelMusic);
             AssetLoader.levelMusic.setLooping(true);
             AssetLoader.levelMusic.play();
+
+            if (!AssetLoader.levelMusic.isPlaying()) {
+                SoundSystem.removeMusic(AssetLoader.levelMusic);
+                AssetLoader.levelMusic.dispose();
+                AssetLoader.levelMusic = Gdx.audio.newMusic(Gdx.files.internal( ("music/" + mLevelModel.getLEVEL_NAME() + "/music.ogg")));
+                SoundSystem.registrationMusic(AssetLoader.levelMusic);
+                AssetLoader.levelMusic.setVolume(SoundSystem.getMusicValue());
+                AssetLoader.levelMusic.setLooping(true);
+                AssetLoader.levelMusic.play();
+            }
+
+//            AssetLoader.levelMusic.play(SoundSystem.getMusicValue());
+//            AssetLoader.levelMusic.loop();
         }
         mGuiStage = new GameGuiStage(this, mGameStage, mYViewportHeight);
 
@@ -112,11 +124,24 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        if (AssetLoader.levelMusic!=null) {
+        if (AssetLoader.levelMusic !=null) {
             AssetLoader.levelMusic.setVolume(SoundSystem.getMusicValue());
             SoundSystem.registrationMusic(AssetLoader.levelMusic);
             AssetLoader.levelMusic.setLooping(true);
             AssetLoader.levelMusic.play();
+
+            if (!AssetLoader.levelMusic.isPlaying()) {
+                SoundSystem.removeMusic(AssetLoader.levelMusic);
+                AssetLoader.levelMusic.dispose();
+                AssetLoader.levelMusic = Gdx.audio.newMusic(Gdx.files.internal( ("music/" + mLevelModel.getLEVEL_NAME() + "/music.ogg")));
+                SoundSystem.registrationMusic(AssetLoader.levelMusic);
+                AssetLoader.levelMusic.setVolume(SoundSystem.getMusicValue());
+                AssetLoader.levelMusic.setLooping(true);
+                AssetLoader.levelMusic.play();
+            }
+
+//            AssetLoader.levelMusic.play(SoundSystem.getMusicValue());
+//            AssetLoader.levelMusic.loop(SoundSystem.getMusicValue());
         }
         System.out.print("GameScreenShow");
     }
@@ -158,6 +183,7 @@ public class GameScreen implements Screen {
 
         mLevelModel.getDifficultyHandler().applyStep(0);
 
+        mLevelModel.setOvertime(0);
         mGameStage = new GameStage(this, mYViewportHeight, mLevelModel, 0, 0);
         mGameStage.setGuiStage(mGuiStage);
         mMultiplexer.addProcessor(mGameStage);
@@ -187,9 +213,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        if (AssetLoader.levelMusic!=null) {
+        if (AssetLoader.levelMusic !=null) {
             AssetLoader.levelMusic.stop();
-            SoundSystem.removeMusic(AssetLoader.levelMusic);
+//            SoundSystem.removeMusic(AssetLoader.levelMusic);
         }
         AssetLoader.disposeGame();
         if (mGameStage.getState() == GameState.RUN
@@ -227,11 +253,15 @@ public class GameScreen implements Screen {
     public void loadNextLevel(GameProgressModel progress) {
         mJsonIn = new Json();
         try {
+            int overtime = mLevelModel.getOvertime();
             mFileLevel = Gdx.files.internal("levels/level".concat(String.valueOf(progress.getCurrentGrade())).concat(".json"));
             mLevelModel = mJsonIn.fromJson(LevelModel.class, mFileLevel);
+            mLevelModel.setOvertime(overtime);
         } catch (Exception e) {
+            int overtime = mLevelModel.getOvertime();
             mFileLevel = Gdx.files.internal("levels/level1.json");
             mLevelModel = mJsonIn.fromJson(LevelModel.class, mFileLevel);
+            mLevelModel.setOvertime(50 + overtime);
         }
 
         initGame(false, progress);

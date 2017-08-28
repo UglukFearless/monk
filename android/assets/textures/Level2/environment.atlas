@@ -5,35 +5,35 @@ filter: Linear,Linear
 repeat: none
 background1
   rotate: false
-  xy: 1, 446
-  size: 802, 534
-  orig: 802, 534
+  xy: 1, 483
+  size: 800, 480
+  orig: 800, 480
   offset: 0, 0
   index: -1
 background2
   rotate: false
   xy: 1, 1
-  size: 802, 443
-  orig: 802, 443
+  size: 800, 480
+  orig: 800, 480
   offset: 0, 0
   index: -1
 pitLeft
   rotate: false
-  xy: 805, 743
+  xy: 803, 726
   size: 81, 237
   orig: 81, 237
   offset: 0, 0
   index: -1
 pitRight
   rotate: false
-  xy: 805, 504
+  xy: 803, 487
   size: 81, 237
   orig: 81, 237
   offset: 0, 0
   index: -1
 column
   rotate: false
-  xy: 888, 758
+  xy: 886, 741
   size: 55, 222
   orig: 55, 222
   offset: 0, 0

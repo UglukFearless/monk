@@ -32,6 +32,8 @@ public class LevelModel {
     private DecorationModel[] mNearDecorationsModels;
     private DecorationModel[] mFurtherDecorationsModels;
 
+    private int mOvertime;
+
 
     public LevelModel() {
 
@@ -86,6 +88,10 @@ public class LevelModel {
         }
     }
 
+    public void setOvertime(int overtime) {
+        mOvertime = overtime;
+    }
+
     public EnemyModel[] getEnemiesModels() {
         return mEnemiesModels;
     }
@@ -127,7 +133,7 @@ public class LevelModel {
     }
 
     public float getDuration() {
-        return mLevelConstants.DURATION;
+        return mLevelConstants.DURATION + mOvertime;
     }
 
     public float getTimeBalance(float runTime) {
@@ -144,5 +150,9 @@ public class LevelModel {
 
     public void secondStart() {
         mDifficultyHandler.applyLastStep();
+    }
+
+    public int getOvertime() {
+        return mOvertime;
     }
 }

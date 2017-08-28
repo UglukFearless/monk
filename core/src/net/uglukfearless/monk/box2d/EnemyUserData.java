@@ -35,6 +35,8 @@ public class EnemyUserData extends UserData {
     private EnemyType  enemyType;
     private boolean mLanding;
 
+    private boolean mGuard;
+
 
     public EnemyUserData(EnemyType type) {
         super(type.getWidth(), type.getHeight());
@@ -234,5 +236,13 @@ public class EnemyUserData extends UserData {
 
     public void setTerribleDeath(boolean terribleDeath) {
         mTerribleDeath = terribleDeath;
+    }
+
+    public void setGuard(boolean guard) {
+        mGuard = guard;
+    }
+
+    public boolean isGuard() {
+        return mGuard;
     }
 }

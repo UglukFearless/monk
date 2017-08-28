@@ -922,7 +922,7 @@ public class GameStage extends Stage {
         }
     }
 
-    public void StartRebutRunner() {
+    public void startRebutRunner() {
 //        runner.getBody().getFixtureList().get(0).setFilterData(FilterConstants.FILTER_RUNNER_WINGS_GHOST);
         runner.setRevivalFilter();
         mReturnTimer = 0;
