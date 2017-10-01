@@ -61,6 +61,7 @@ public class Constants {
     public static float COLUMNS_WIDTH_INIT = 1f;
     public static float COLUMNS_PIT_INIT = 2f;
     public static float COLUMNS_HEIGHT_INIT = GROUND_HEIGHT;
+    public static float COLUMNS_HEIGHT_FIX_INIT = 1f;
     public static final float COLUMNS_DENSITY = GROUND_DENSITY;
     public static final Vector2 COLUMNS_LINEAR_VELOCITY = WORLD_STATIC_VELOCITY_INIT;
     public static int COLUMNS_QUANTITY_INIT = 4;
@@ -165,6 +166,7 @@ public class Constants {
         GROUND_PIT_INIT = levelConstants.GROUND_PIT_INIT;
         COLUMNS_WIDTH_INIT = levelConstants.COLUMNS_WIDTH_INIT;
         COLUMNS_HEIGHT_INIT = levelConstants.COLUMNS_HEIGHT_INIT;
+        COLUMNS_HEIGHT_FIX_INIT = levelConstants.COLUMNS_HEIGHT_FIX_INIT;
         COLUMNS_PIT_INIT = levelConstants.COLUMNS_PIT_INIT;
         COLUMNS_QUANTITY_INIT = levelConstants.COLUMNS_QUANTITY_INIT;
 

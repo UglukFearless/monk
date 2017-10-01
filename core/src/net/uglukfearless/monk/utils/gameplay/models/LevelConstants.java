@@ -12,6 +12,7 @@ public class LevelConstants {
     public float COLUMNS_WIDTH_INIT;
     public float COLUMNS_PIT_INIT;
     public float COLUMNS_HEIGHT_INIT;
+    public float COLUMNS_HEIGHT_FIX_INIT;
     public int COLUMNS_QUANTITY_INIT;
     public float GROUND_PIT_INIT;
     public  float GROUND_HEIGHT_FIX_INIT;

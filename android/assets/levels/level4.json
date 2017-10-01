@@ -12,16 +12,17 @@
     COLUMNS_PIT_INIT:3
     GROUND_HEIGHT_FIX_INIT:1.43
 
-    DECORATION_ONE_OFFSET_INIT: -6.0
+    DECORATION_ONE_OFFSET_INIT: -2
     DECORATION_TWO_OFFSET_INIT: -0.2
     DECORATION_NEAR_SPEED_INIT: 1
     DECORATION_FURTHER_SPEED_INIT: 0.75
-    DECORATION_NEAR_STEP_INIT: 8
+    DECORATION_NEAR_STEP_INIT: 2
     DECORATION_NEAR_STEP_MIN_INIT: 0
-    DECORATION_FURTHER_STEP_INIT: 5
-    DECORATION_FURTHER_STEP_MIN_INIT: 3
+    DECORATION_FURTHER_STEP_INIT: 6
+    DECORATION_FURTHER_STEP_MIN_INIT: 8
 
     COLUMNS_HEIGHT_INIT:8
+    COLUMNS_HEIGHT_FIX_INIT:1.43
     COLUMNS_QUANTITY_INIT:3
     GROUND_PIT_INIT:10
     FOREVER_UNLOCK: true
@@ -703,6 +704,45 @@
 
       block:true
       mNumber:10
+    }
+  ]
+
+  mFurtherDecorationsModels: [
+    {
+      mWidth: 15
+      mHeight: 15
+      mGrade: 1
+      mNear: false
+    },
+    {
+      mWidth: 7.97
+      mHeight: 15
+      mGrade: 2
+      mNear: false
+    },
+    {
+      mWidth: 7.8
+      mHeight: 13.6
+      mGrade: 3
+      mNear: false
+    },
+    {
+      mWidth: 6.25
+      mHeight: 16
+      mGrade: 4
+      mNear: false
+    },
+    {
+      mWidth: 7.8
+      mHeight: 13.6
+      mGrade: 5
+      mNear: false
+    },
+    {
+      mWidth: 12.5
+      mHeight: 16
+      mGrade: 6
+      mNear: false
     }
   ]
 }

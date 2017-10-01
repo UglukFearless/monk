@@ -1,6 +1,7 @@
 package net.uglukfearless.monk.actors.gameplay;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
@@ -18,10 +19,27 @@ public class Ground extends GameActor  implements Movable {
 
     private Vector2 mPosition;
 
+    private TextureRegion mRegionOne;
+    private TextureRegion mRegionTwo;
+
+    private boolean mTwoTexture;
+
     public Ground(Body body) {
         super(body);
 
         mPosition = new Vector2(body.getPosition());
+
+        TextureRegion textureRegion;
+
+        mRegionOne = AssetLoader.environmentAtlas.findRegion("ground");
+        textureRegion = AssetLoader.environmentAtlas.findRegion("ground", 2);
+
+        if (textureRegion!=null) {
+            mRegionTwo = textureRegion;
+            mTwoTexture = true;
+        } else {
+            mTwoTexture = false;
+        }
     }
 
     @Override
@@ -53,10 +71,19 @@ public class Ground extends GameActor  implements Movable {
 //                    body.getPosition().y - userData.getHeight() / 2f + Constants.GROUND_HEIGHT*(Constants.GROUND_HEIGHT_FIX_INIT - 1)/2f,
 //                    userData.getWidth() * 1.01f, userData.getHeight()* Constants.GROUND_HEIGHT_FIX_INIT);
 
+            if (mTwoTexture) {
+                batch.draw(mRegionOne, body.getPosition().x - userData.getWidth()/ 2,
+                        body.getPosition().y - userData.getHeight() / 2f,
+                        (userData.getWidth() + 0.03f)/2f, userData.getHeight()* Constants.GROUND_HEIGHT_FIX_INIT);
+                batch.draw(mRegionTwo, body.getPosition().x,
+                        body.getPosition().y - userData.getHeight() / 2f,
+                        (userData.getWidth() + 0.03f)/2f, userData.getHeight()* Constants.GROUND_HEIGHT_FIX_INIT);
+            } else {
+                batch.draw(mRegionOne, body.getPosition().x - userData.getWidth() * 1.01f / 2,
+                        body.getPosition().y - userData.getHeight() / 2f,
+                        (userData.getWidth() + 0.03f) , userData.getHeight()* Constants.GROUND_HEIGHT_FIX_INIT);
+            }
 
-            batch.draw(AssetLoader.environmentAtlas.findRegion("ground"), body.getPosition().x - userData.getWidth() * 1.01f / 2,
-                    body.getPosition().y - userData.getHeight() / 2f,
-                    userData.getWidth() * 1.01f, userData.getHeight()* Constants.GROUND_HEIGHT_FIX_INIT);
         }
 
     }

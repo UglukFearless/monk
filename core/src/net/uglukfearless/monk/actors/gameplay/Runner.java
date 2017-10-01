@@ -262,7 +262,7 @@ public class Runner extends GameActor {
                         body.setTransform(Constants.RUNNER_X, Constants.RUNNER_Y, 0);
                         ((GameStage) getStage()).startRebutRunner();
                         mWingsLanding = false;
-                        System.out.println("Крылья сработали!");
+//                        System.out.println("Крылья сработали!");
                     } else if (mWingsRevival > 0 && !mWingsLanding) {
                         mWingsRevival--;
                         mWingsLanding = true;
@@ -287,7 +287,7 @@ public class Runner extends GameActor {
                         body.setTransform(Constants.RUNNER_X, Constants.RUNNER_Y, 0);
                         ((GameStage) getStage()).startRebutRunner();
                         mWingsLanding = false;
-                        System.out.println("Крылья сработали!");
+//                        System.out.println("Крылья сработали!");
                     } else if (mWingsRevival > 0 && !mWingsLanding) {
                         mWingsRevival--;
                         mWingsLanding = true;

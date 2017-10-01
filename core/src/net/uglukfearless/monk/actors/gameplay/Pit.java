@@ -69,10 +69,10 @@ public class Pit extends GameActor implements Movable {
 //                    Constants.GROUND_Y - userData.getHeight() + Constants.GROUND_HEIGHT*(Constants.GROUND_HEIGHT_FIX_INIT - 1)/2f
 //                    , 2.5f , userData.getHeight()*2f*Constants.GROUND_HEIGHT_FIX_INIT);
 
-            batch.draw(pitRegionLeft, body.getPosition().x - userData.getWidth()/2f - 1f,
+            batch.draw(pitRegionLeft, body.getPosition().x - userData.getWidth()/2f - 0.01f,
                     Constants.GROUND_Y - userData.getHeight()
                     , 2.5f, userData.getHeight()*2f*Constants.GROUND_HEIGHT_FIX_INIT);
-            batch.draw(pitRegionRight, body.getPosition().x + userData.getWidth()/2f - 1.5f,
+            batch.draw(pitRegionRight, body.getPosition().x + userData.getWidth()/2f - 2.49f,
                     Constants.GROUND_Y - userData.getHeight()
                     , 2.5f , userData.getHeight()*2f*Constants.GROUND_HEIGHT_FIX_INIT);
         }

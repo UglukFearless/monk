@@ -75,7 +75,7 @@ public class DangersHandler {
         enemyTypes = EnemyType.values();
         obstacleTypes = ObstacleType.values();
         allEnemies = new ArrayList<EnemyType>();
-        allColumnsEnemies = new ArrayList<EnemyType>();
+//        allColumnsEnemies = new ArrayList<EnemyType>();
 
         allObstacles = new ArrayList<ObstacleType>();
 
@@ -93,7 +93,7 @@ public class DangersHandler {
     public void init() {
 
         allEnemies.clear();
-        allColumnsEnemies.clear();
+//        allColumnsEnemies.clear();
         allObstacles.clear();
         allDangers.clear();
 
@@ -101,9 +101,9 @@ public class DangersHandler {
             if (enemyType.getPriority()>0) {
                     allEnemies.add(enemyType);
 
-                if (enemyType.getBasicXVelocity()==0||enemyType.getGravityScale()==0) {
-                    allColumnsEnemies.add(enemyType);
-                }
+//                if (enemyType.getBasicXVelocity()==0||enemyType.getGravityScale()==0) {
+//                    allColumnsEnemies.add(enemyType);
+//                }
             }
         }
 
@@ -497,7 +497,8 @@ public class DangersHandler {
                     + Constants.COLUMNS_PIT_INIT * (i + 1) + Constants.COLUMNS_WIDTH_INIT *i;
             columns.get(i).getBody().setTransform(x + Constants.COLUMNS_WIDTH_INIT / 2, Constants.COLUMNS_Y, 0);
             columns.get(i).getBody().setActive(true);
-            stage.addActor(columns.get(i));
+//            stage.addActor(columns.get(i));
+            stage.addToDecorationLayout(columns.get(i));
 
             //добавить врага, если колона достаточно толстая
             if (Constants.COLUMNS_WIDTH_INIT>=2&&(rand.nextInt(100)>Constants.DANGERS_PROBABILITY)) {

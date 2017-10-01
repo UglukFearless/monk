@@ -20,22 +20,22 @@ background1
 column
   rotate: false
   xy: 803, 706
-  size: 200, 257
-  orig: 200, 257
+  size: 192, 257
+  orig: 192, 257
   offset: 0, 0
   index: -1
 pitLeft
   rotate: false
-  xy: 803, 603
-  size: 70, 101
-  orig: 70, 101
+  xy: 803, 448
+  size: 81, 256
+  orig: 81, 256
   offset: 0, 0
   index: -1
 pitRight
   rotate: false
-  xy: 803, 603
-  size: 70, 101
-  orig: 70, 101
+  xy: 803, 190
+  size: 81, 256
+  orig: 81, 256
   offset: 0, 0
   index: -1
 
@@ -64,8 +64,15 @@ filter: Linear,Linear
 repeat: none
 ground
   rotate: false
-  xy: 1, 1
-  size: 1020, 257
-  orig: 1020, 257
+  xy: 1, 260
+  size: 704, 257
+  orig: 704, 257
   offset: 0, 0
-  index: -1
+  index: 1
+ground
+  rotate: false
+  xy: 1, 1
+  size: 704, 257
+  orig: 704, 257
+  offset: 0, 0
+  index: 2

@@ -3,73 +3,115 @@ decorations.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-decoration7
-  rotate: false
-  xy: 1, 543
-  size: 473, 480
-  orig: 473, 480
-  offset: 0, 0
-  index: -1
-decoration9
-  rotate: false
-  xy: 1, 132
-  size: 473, 409
-  orig: 473, 409
-  offset: 0, 0
-  index: -1
-decoration10
-  rotate: false
-  xy: 476, 593
-  size: 277, 430
-  orig: 277, 430
-  offset: 0, 0
-  index: -1
 decoration1
   rotate: false
-  xy: 476, 459
-  size: 168, 132
-  orig: 168, 132
-  offset: 0, 0
-  index: -1
-decoration8
-  rotate: false
-  xy: 1, 30
-  size: 138, 100
-  orig: 138, 100
-  offset: 0, 0
-  index: -1
-decoration4
-  rotate: false
-  xy: 755, 882
-  size: 86, 141
-  orig: 86, 141
-  offset: 0, 0
-  index: -1
-decoration5
-  rotate: false
-  xy: 476, 361
-  size: 120, 96
-  orig: 120, 96
+  xy: 1, 525
+  size: 480, 480
+  orig: 480, 480
   offset: 0, 0
   index: -1
 decoration6
   rotate: false
-  xy: 141, 48
-  size: 115, 82
-  orig: 115, 82
-  offset: 0, 0
-  index: -1
-decoration3
-  rotate: false
-  xy: 141, 1
-  size: 80, 45
-  orig: 80, 45
+  xy: 1, 43
+  size: 400, 480
+  orig: 400, 480
   offset: 0, 0
   index: -1
 decoration2
   rotate: false
-  xy: 646, 545
-  size: 56, 46
-  orig: 56, 46
+  xy: 483, 570
+  size: 250, 435
+  orig: 250, 435
+  offset: 0, 0
+  index: -1
+decoration3
+  rotate: false
+  xy: 735, 570
+  size: 250, 435
+  orig: 250, 435
+  offset: 0, 0
+  index: -1
+decoration4
+  rotate: false
+  xy: 403, 43
+  size: 200, 480
+  orig: 200, 480
+  offset: 0, 0
+  index: -1
+decoration5
+  rotate: false
+  xy: 605, 133
+  size: 250, 435
+  orig: 250, 435
+  offset: 0, 0
+  index: -1
+decoration10
+  rotate: false
+  xy: 605, 64
+  size: 84, 67
+  orig: 84, 67
+  offset: 0, 0
+  index: -1
+decoration9
+  rotate: false
+  xy: 857, 501
+  size: 84, 67
+  orig: 84, 67
+  offset: 0, 0
+  index: -1
+decoration7
+  rotate: false
+  xy: 691, 64
+  size: 64, 67
+  orig: 64, 67
+  offset: 0, 0
+  index: -1
+decoration8
+  rotate: false
+  xy: 857, 432
+  size: 64, 67
+  orig: 64, 67
+  offset: 0, 0
+  index: -1
+decoration11
+  rotate: false
+  xy: 1, 1
+  size: 53, 40
+  orig: 53, 40
+  offset: 0, 0
+  index: -1
+decoration12
+  rotate: false
+  xy: 483, 528
+  size: 53, 40
+  orig: 53, 40
+  offset: 0, 0
+  index: -1
+decoration15
+  rotate: false
+  xy: 757, 100
+  size: 52, 31
+  orig: 52, 31
+  offset: 0, 0
+  index: -1
+decoration16
+  rotate: false
+  xy: 857, 399
+  size: 52, 31
+  orig: 52, 31
+  offset: 0, 0
+  index: -1
+decoration13
+  rotate: false
+  xy: 56, 11
+  size: 45, 30
+  orig: 45, 30
+  offset: 0, 0
+  index: -1
+decoration14
+  rotate: false
+  xy: 538, 538
+  size: 45, 30
+  orig: 45, 30
   offset: 0, 0
   index: -1
