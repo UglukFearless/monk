@@ -1,0 +1,9 @@
+TASK net.uglukfearless.monk id=3
+  ACTIVITY net.uglukfearless.monk/.AndroidLauncher 422f99d0 pid=1735
+    Local Activity 4164be90 State:
+      mResumed=true mStopped=false mFinished=false
+      mLoadersStarted=true
+      mChangingConfigurations=false
+      mCurrentConfig={1.0 0mcc0mnc ru_RU sw320dp w569dp h294dp nrml long land finger -keyb/v/h dpad/v fontPackageName = fontPath = skin=/system/framework/framework-res.apk s.8}
+    FragmentManager misc state:
+      mCurState=5 mStateSaved=false mDestroyed=false

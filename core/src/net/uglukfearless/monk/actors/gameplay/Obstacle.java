@@ -73,7 +73,7 @@ public class Obstacle extends GameActor implements Pool.Poolable, Movable, Retri
         getUserData().setLinearVelocity(((GameStage)stage).getCurrentVelocity());
         body.setLinearVelocity(getUserData().getLinearVelocity());
         body.setActive(true);
-        stage.addActor(this);
+//        stage.addActor(this);
         ((GameStage)stage).addMovable(this);
         ((GameStage)stage).addRetributable(this);
     }

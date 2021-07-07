@@ -96,7 +96,7 @@ public class Lump extends GameActor implements Pool.Poolable, Movable {
         body.setLinearVelocity(new Vector2(rand.nextFloat() * 20 - 10, rand.nextFloat() * 18 + 2));
         body.applyAngularImpulse(rand.nextFloat() * 0.5f, true);
         body.setActive(true);
-        stage.addActor(this);
+//        stage.addActor(this);
         mWind = mWindBasic*(((GameStage)stage).getCurrentVelocity().x/Constants.WORLD_STATIC_VELOCITY_INIT.x);
         ((GameStage)stage).addMovable(this);
     }

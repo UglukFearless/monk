@@ -49,14 +49,6 @@ public class Constants {
     public static float DECORATION_FURTHER_STEP_INIT;
     public static float DECORATION_FURTHER_STEP_MIN_INIT;
 
-    public static final int PRIORITY_GROUND = 15;
-    public static final int PRIORITY_PIT = 20;
-    public static final int PRIORITY_COLUMNS = 12;
-
-//    public static final int PRIORITY_GROUND = 3;
-//    public static final int PRIORITY_PIT = 3;
-//    public static final int PRIORITY_COLUMNS = 3;
-
     public static final float COLUMNS_Y = GROUND_Y + 2;
     public static float COLUMNS_WIDTH_INIT = 1f;
     public static float COLUMNS_PIT_INIT = 2f;
@@ -92,13 +84,6 @@ public class Constants {
     public static final int DANGERS_PRIORITY_NORMAL = 7;
     public static final int DANGERS_PRIORITY_OFTEN = 9;
     public static final int DANGERS_PRIORITY_VERY_OFTEN = 11;
-
-//    public static final int DANGERS_PRIORITY_NEVER = 0;
-//    public static final int DANGERS_PRIORITY_VERY_SELDOM = 0;
-//    public static final int DANGERS_PRIORITY_SELDOM = 0;
-//    public static final int DANGERS_PRIORITY_NORMAL = 0;
-//    public static final int DANGERS_PRIORITY_OFTEN = 0;
-//    public static final int DANGERS_PRIORITY_VERY_OFTEN = 0;
 
     public static final int DANGERS_PROBABILITY = 80;
     public static final int DANGERS_PROBABILITY_LIMIT = 100;

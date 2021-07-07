@@ -8,22 +8,22 @@ mLevelConstants: {
 		y:0
 	}
   GROUND_WIDTH_INIT:45
-  COLUMNS_WIDTH_INIT:0.5
-  COLUMNS_PIT_INIT:1.8
-  GROUND_HEIGHT_FIX_INIT:1.34
+  COLUMNS_WIDTH_INIT:4
+  COLUMNS_PIT_INIT:2.5
+  GROUND_HEIGHT_FIX_INIT:1.33
 
-  DECORATION_ONE_OFFSET_INIT: -1.0
-  DECORATION_TWO_OFFSET_INIT: -0.2
+  DECORATION_ONE_OFFSET_INIT: -1.2
+  DECORATION_TWO_OFFSET_INIT: -0.5
   DECORATION_NEAR_SPEED_INIT: 1
   DECORATION_FURTHER_SPEED_INIT: 0.75
   DECORATION_NEAR_STEP_INIT: 5
   DECORATION_NEAR_STEP_MIN_INIT: 0
-  DECORATION_FURTHER_STEP_INIT: 5
-  DECORATION_FURTHER_STEP_MIN_INIT: 3
+  DECORATION_FURTHER_STEP_INIT: 8
+  DECORATION_FURTHER_STEP_MIN_INIT: 5
 
-  COLUMNS_HEIGHT_INIT:8
+  COLUMNS_HEIGHT_INIT:3.2
   COLUMNS_HEIGHT_FIX_INIT:1
-  COLUMNS_QUANTITY_INIT:6
+  COLUMNS_QUANTITY_INIT:3
   GROUND_PIT_INIT:8
 	FOREVER_UNLOCK: true
 	GRADE:2
@@ -705,6 +705,75 @@ mEnemiesModels:
 			block:true
     	mNumber:10
 			}
+	],
+
+	mFurtherDecorationsModels: [
+		{
+			mWidth: 12.5
+			mHeight: 12.06
+			mGrade: 1
+			mNear: false
+		},
+		{
+			mWidth: 12.5
+			mHeight: 12.06
+			mGrade: 2
+			mNear: false
+		},
+		{
+			mWidth: 12.5
+			mHeight: 12.06
+			mGrade: 3
+			mNear: false
+		},
+		{
+			mWidth: 12.5
+			mHeight: 12.06
+			mGrade: 4
+			mNear: false
+		},
+		{
+			mWidth: 5.19
+			mHeight: 4.41
+			mGrade: 5
+			mNear: true
+		},
+		{
+			mWidth: 5.44
+			mHeight: 1.5
+			mGrade: 6
+			mNear: true
+		},
+		{
+			mWidth: 8.66
+			mHeight: 2.06
+			mGrade: 7
+			mNear: true
+		},
+		{
+			mWidth: 7.16
+			mHeight: 4.47
+			mGrade: 8
+			mNear: true
+		},
+		{
+			mWidth: 18.75
+			mHeight: 12.06
+			mGrade: 9
+			mNear: false
+		},
+		{
+			mWidth: 18.75
+			mHeight: 12.06
+			mGrade: 10
+			mNear: false
+		},
+		{
+			mWidth: 10.84
+			mHeight: 12.06
+			mGrade: 11
+			mNear: false
+		}
 	]
 
 }

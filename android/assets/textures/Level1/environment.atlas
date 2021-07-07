@@ -3,50 +3,135 @@ environment.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-background1
+column
   rotate: false
-  xy: 1, 446
-  size: 802, 534
-  orig: 802, 534
+  xy: 1, 827
+  size: 33, 196
+  orig: 33, 196
   offset: 0, 0
   index: -1
-background2
+frontdown
   rotate: false
-  xy: 1, 1
-  size: 802, 443
-  orig: 802, 443
+  xy: 36, 769
+  size: 800, 254
+  orig: 800, 254
   offset: 0, 0
-  index: -1
+  index: 1
 pitLeft
   rotate: false
-  xy: 805, 743
-  size: 81, 237
-  orig: 81, 237
+  xy: 838, 767
+  size: 81, 256
+  orig: 81, 256
   offset: 0, 0
   index: -1
 pitRight
   rotate: false
-  xy: 805, 504
-  size: 81, 237
-  orig: 81, 237
+  xy: 921, 767
+  size: 81, 256
+  orig: 81, 256
   offset: 0, 0
   index: -1
-column
+frontdown
   rotate: false
-  xy: 888, 758
-  size: 55, 222
-  orig: 55, 222
+  xy: 1, 513
+  size: 800, 254
+  orig: 800, 254
   offset: 0, 0
-  index: -1
+  index: 2
+frontdown
+  rotate: false
+  xy: 1, 257
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 3
+frontup
+  rotate: false
+  xy: 1, 1
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 1
 
 environment2.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
+background1
+  rotate: false
+  xy: 1, 483
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 1
+background1
+  rotate: false
+  xy: 1, 1
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 2
+
+environment3.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+background2
+  rotate: false
+  xy: 1, 483
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 1
+background2
+  rotate: false
+  xy: 1, 1
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 2
+
+environment4.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+front_light
+  rotate: false
+  xy: 1, 513
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: -1
+frontup
+  rotate: false
+  xy: 1, 257
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 2
+frontup
+  rotate: false
+  xy: 1, 1
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 3
+
+environment5.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+ground
+  rotate: false
+  xy: 1, 259
+  size: 704, 256
+  orig: 704, 256
+  offset: 0, 0
+  index: 1
 ground
   rotate: false
   xy: 1, 1
-  size: 1020, 256
-  orig: 1020, 256
+  size: 704, 256
+  orig: 704, 256
   offset: 0, 0
-  index: -1
+  index: 2

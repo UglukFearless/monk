@@ -22,8 +22,9 @@ public class AdeptTamesivari extends Achievement {
         mNew = false;
 
         mUpdateList = new HashMap<String, String>();
-        mUpdateList.put(Constants.BONUS_THUNDER_FIST_REGION, AssetLoader.sBundle.get("BONUS_UPGRADE_THUNDER_MODIFY1")
-                + "\n" + AssetLoader.sBundle.get("BONUS_UPGRADE_THUNDER_MODIFY2"));
+        mUpdateList.put(Constants.BONUS_THUNDER_FIST_REGION, AssetLoader.sBundle.get("BONUS_UPGRADE_THUNDER_MODIFY1"));
+//                + "\n" + AssetLoader.sBundle.get("BONUS_UPGRADE_THUNDER_MODIFY2"));
+        mUpdateList.put(Constants.BONUS_RETRIBUTION_REGION, AssetLoader.sBundle.get("BONUS_UPGRADE_RETRIBUTION_MODIFY1"));
 
         mRegion = Constants.ACHIEVE_AT_REGION;
     }

@@ -36,7 +36,7 @@ public class ThunderFistBonus extends GameBonus {
             mLevel = 1;
         }
 
-        if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_AT_KEY)) {
+        if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_MT_KEY)) {
             mLevel = 2;
         }
     }

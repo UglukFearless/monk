@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 import net.uglukfearless.monk.box2d.ArmourUserData;
 import net.uglukfearless.monk.box2d.BudhaUserData;
+import net.uglukfearless.monk.box2d.ColumnsUserData;
 import net.uglukfearless.monk.box2d.EnemyUserData;
 import net.uglukfearless.monk.box2d.ObstacleUserData;
 import net.uglukfearless.monk.box2d.RunnerStrikeUserData;
@@ -120,7 +121,7 @@ public class GameContactListener implements ContactListener {
                         >(a.getPosition().y + ((UserData)a.getUserData()).getHeight()/2) - 0.1f)
                         &&!((ObstacleUserData)a.getUserData()).isTrap()) {
                     stage.getRunner().landed();
-            } else if (!((ObstacleUserData)a.getUserData()).isDead()) {
+                } else if (!((ObstacleUserData)a.getUserData()).isDead()) {
                     stage.getRunner().hit(((ObstacleUserData)a.getUserData()).getKEY());
 
                     ((ObstacleUserData) a.getUserData()).hitExecution(b,false);
@@ -334,9 +335,18 @@ public class GameContactListener implements ContactListener {
 
         switch (((UserData)another.getUserData()).getUserDataType()) {
             case GROUND:
-            case COLUMNS:
             case RUNNER_STRIKE:
             case RUNNER:
+                break;
+            case COLUMNS:
+//                if (((buddha.getPosition().y - ((UserData)buddha.getUserData()).getHeight()/2)
+//                        <(another.getPosition().y + ((UserData)another.getUserData()).getHeight()/2) - 0.05f)) {
+//                    if (!stage.getWorld().isLocked()) {
+//                        another.setTransform( -10, -10, 0f);
+//                        System.out.println("Случилось!!");
+//                    }
+//
+//                }
                 break;
             case OBSTACLE:
                 if (!((ObstacleUserData)another.getUserData()).isDead()) {

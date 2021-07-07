@@ -1,0 +1,33 @@
+Applications Memory Usage (kB):
+Uptime: 186524 Realtime: 186524
+
+** MEMINFO in pid 1735 [net.uglukfearless.monk] **
+                         Shared  Private     Heap     Heap     Heap
+                   Pss    Dirty    Dirty     Size    Alloc     Free
+                ------   ------   ------   ------   ------   ------
+       Native       32        8       32    12228     7496        3
+       Dalvik     3702    11780     3312     9847     8907      940
+       Cursor        0        0        0                           
+       Ashmem        0        0        0                           
+    Other dev    15484     7916     1096                           
+     .so mmap     1525     2936      572                           
+    .jar mmap        0        0        0                           
+    .apk mmap       38        0        0                           
+    .ttf mmap        0        0        0                           
+    .dex mmap     1380        0        0                           
+   Other mmap      707      452      100                           
+      Unknown     6160      568     6148                           
+        TOTAL    29028    23660    11260    22075    16403      943
+ 
+ Objects
+               Views:        5         ViewRootImpl:        1
+         AppContexts:        2           Activities:        1
+              Assets:        3        AssetManagers:        3
+       Local Binders:        8        Proxy Binders:       14
+    Death Recipients:        0
+     OpenSSL Sockets:        0
+ 
+ SQL
+         MEMORY_USED:        0
+  PAGECACHE_OVERFLOW:        0          MALLOC_SIZE:        0
+ 

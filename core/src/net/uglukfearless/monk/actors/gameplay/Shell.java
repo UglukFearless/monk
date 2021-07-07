@@ -56,7 +56,7 @@ public class Shell extends GameActor implements Pool.Poolable, Movable, Retribut
         body.setTransform(position.x, position.y + 0.5f, 0);
         body.setAngularVelocity(15);
         body.setActive(true);
-        stage.addActor(this);
+        ((GameStage)stage).addToActionLayout(this);
         if (speed-10f>((GameStage)stage).getCurrentVelocity().x-14f) {
             body.setLinearVelocity(((GameStage)stage).getCurrentVelocity().x - 14f, 0);
         } else {
@@ -73,7 +73,7 @@ public class Shell extends GameActor implements Pool.Poolable, Movable, Retribut
         body.setTransform(position.x, position.y + 0.5f, 0);
         body.setAngularVelocity(15);
         body.setActive(true);
-        stage.addActor(this);
+        ((GameStage)stage).addToActionLayout(this);
         if (speed-10f>((GameStage)stage).getCurrentVelocity().x-14f) {
             body.setLinearVelocity(((GameStage)stage).getCurrentVelocity().x - 14f, 0);
         } else {

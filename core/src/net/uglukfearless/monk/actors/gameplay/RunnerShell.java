@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Pool;
 
 import net.uglukfearless.monk.box2d.RunnerStrikeUserData;
 import net.uglukfearless.monk.constants.FilterConstants;
+import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.gameplay.bodies.BodyUtils;
 import net.uglukfearless.monk.utils.gameplay.bodies.WorldUtils;
@@ -52,7 +53,7 @@ public class RunnerShell extends GameActor implements Pool.Poolable{
             getUserData().setPiercing2(true);
         }
         body.setActive(true);
-        stage.addActor(this);
+        ((GameStage)stage).addToActionLayout(this);
     }
 
     @Override

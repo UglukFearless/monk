@@ -3,73 +3,85 @@ decorations.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-decoration7
+decoration10
   rotate: false
-  xy: 1, 543
-  size: 473, 480
-  orig: 473, 480
+  xy: 1, 600
+  size: 600, 386
+  orig: 600, 386
   offset: 0, 0
   index: -1
 decoration9
   rotate: false
-  xy: 1, 132
-  size: 473, 409
-  orig: 473, 409
-  offset: 0, 0
-  index: -1
-decoration10
-  rotate: false
-  xy: 476, 593
-  size: 277, 430
-  orig: 277, 430
+  xy: 1, 212
+  size: 600, 386
+  orig: 600, 386
   offset: 0, 0
   index: -1
 decoration1
   rotate: false
-  xy: 476, 459
-  size: 168, 132
-  orig: 168, 132
-  offset: 0, 0
-  index: -1
-decoration8
-  rotate: false
-  xy: 1, 30
-  size: 138, 100
-  orig: 138, 100
-  offset: 0, 0
-  index: -1
-decoration4
-  rotate: false
-  xy: 755, 882
-  size: 86, 141
-  orig: 86, 141
-  offset: 0, 0
-  index: -1
-decoration5
-  rotate: false
-  xy: 476, 361
-  size: 120, 96
-  orig: 120, 96
-  offset: 0, 0
-  index: -1
-decoration6
-  rotate: false
-  xy: 141, 48
-  size: 115, 82
-  orig: 115, 82
-  offset: 0, 0
-  index: -1
-decoration3
-  rotate: false
-  xy: 141, 1
-  size: 80, 45
-  orig: 80, 45
+  xy: 603, 600
+  size: 400, 386
+  orig: 400, 386
   offset: 0, 0
   index: -1
 decoration2
   rotate: false
-  xy: 646, 545
-  size: 56, 46
-  orig: 56, 46
+  xy: 603, 212
+  size: 400, 386
+  orig: 400, 386
+  offset: 0, 0
+  index: -1
+decoration8
+  rotate: false
+  xy: 1, 67
+  size: 229, 143
+  orig: 229, 143
+  offset: 0, 0
+  index: -1
+decoration7
+  rotate: false
+  xy: 232, 144
+  size: 277, 66
+  orig: 277, 66
+  offset: 0, 0
+  index: -1
+decoration5
+  rotate: false
+  xy: 232, 1
+  size: 166, 141
+  orig: 166, 141
+  offset: 0, 0
+  index: -1
+decoration6
+  rotate: false
+  xy: 511, 162
+  size: 174, 48
+  orig: 174, 48
+  offset: 0, 0
+  index: -1
+
+decorations2.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+decoration3
+  rotate: false
+  xy: 1, 389
+  size: 400, 386
+  orig: 400, 386
+  offset: 0, 0
+  index: -1
+decoration4
+  rotate: false
+  xy: 1, 1
+  size: 400, 386
+  orig: 400, 386
+  offset: 0, 0
+  index: -1
+decoration11
+  rotate: false
+  xy: 403, 389
+  size: 347, 386
+  orig: 347, 386
   offset: 0, 0
   index: -1

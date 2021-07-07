@@ -419,7 +419,8 @@ public class DangersHandler {
         prohibitionsMap[i+1][j] = (short) (prohibitionsMap[i+1][j]
                 |obstacleType.getProhibitionsMap()[1][0]);
 
-        stage.addActor(obstacle);
+//        stage.addActor(obstacle);
+        stage.addToActionLayout(obstacle);
     }
 
     private void createEnemy(EnemyType enemyType,int i, int j, boolean overPit) {
@@ -452,7 +453,8 @@ public class DangersHandler {
         prohibitionsMap[i+1][j] = (short) (prohibitionsMap[i+1][j]
                 |enemyType.getProhibitionsMap()[1][0]);
 
-        stage.addActor(enemy);
+//        stage.addActor(enemy);
+        stage.addToActionLayout(enemy);
     }
 
     private void repositionGround(Ground firstGround, Ground secondGround, boolean finish) {
@@ -495,7 +497,11 @@ public class DangersHandler {
         for (int i=0; i<Constants.COLUMNS_QUANTITY_INIT; i++) {
             float x = ground.getBody().getPosition().x + Constants.GROUND_WIDTH_INIT /2
                     + Constants.COLUMNS_PIT_INIT * (i + 1) + Constants.COLUMNS_WIDTH_INIT *i;
-            columns.get(i).getBody().setTransform(x + Constants.COLUMNS_WIDTH_INIT / 2, Constants.COLUMNS_Y, 0);
+            float y = Constants.COLUMNS_Y;
+            if ( Constants.COLUMNS_HEIGHT_INIT  < 4 ) {
+                y = 0f + Constants.COLUMNS_HEIGHT_INIT / 2 - 0.2f;
+            }
+            columns.get(i).getBody().setTransform(x + Constants.COLUMNS_WIDTH_INIT / 2, y, 0);
             columns.get(i).getBody().setActive(true);
 //            stage.addActor(columns.get(i));
             stage.addToDecorationLayout(columns.get(i));
@@ -512,7 +518,8 @@ public class DangersHandler {
                     if (enemy.getUserData().getGravityScale()!=0) {
                         enemy.setGuard(true);
                     }
-                    stage.addActor(enemy);
+//                    stage.addActor(enemy);
+                    stage.addToActionLayout(enemy);
                 }
             }
         }

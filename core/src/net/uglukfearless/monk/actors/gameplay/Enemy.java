@@ -132,7 +132,7 @@ public class Enemy extends GameActor implements Pool.Poolable, Movable, Retribut
         body.setTransform(x, getUserData().getBasicY() + y + getUserData().getHeight() / 2f, 0);
         body.setLinearVelocity(mStage.getCurrentVelocity());
         body.setActive(true);
-        mStage.addActor(this);
+//        mStage.addActor(this);
         mPreviousVelocity = mStage.getCurrentVelocity().x;
         mStage.addMovable(this);
         mStage.addRetributable(this);

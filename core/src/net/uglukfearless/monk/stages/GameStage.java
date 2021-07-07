@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -24,9 +23,11 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import net.uglukfearless.monk.actors.gameplay.Armour;
 import net.uglukfearless.monk.actors.gameplay.Background;
+import net.uglukfearless.monk.actors.gameplay.BackgroundLight;
 import net.uglukfearless.monk.actors.gameplay.BuddhasBody;
 import net.uglukfearless.monk.actors.gameplay.Columns;
 import net.uglukfearless.monk.actors.gameplay.Dragon;
+import net.uglukfearless.monk.actors.gameplay.FrontLine;
 import net.uglukfearless.monk.actors.gameplay.GameDecoration;
 import net.uglukfearless.monk.actors.gameplay.Ground;
 import net.uglukfearless.monk.actors.gameplay.Lump;
@@ -166,9 +167,22 @@ public class GameStage extends Stage {
     private float startTime;
     private boolean mInfinityGame;
 
+    private Group mBackgroundGroup;
+    private Group mGroundGroup;
+
     private Group mDecorationGroupNear;
     private Group mDecorationGroupFurther;
     private GameDecoration mFinishDecoration;
+
+    private Group mActionGroup;
+    private Group mIconsGroup;
+
+    private Group mFrontLightGroup;
+    private Group mFrontGroup;
+
+    private Group mGuiGroup;
+
+    private FrontLine mFrontLine;
 
     private float deltaTime;
 
@@ -244,12 +258,43 @@ public class GameStage extends Stage {
         setUpRunner();
         setUpRunnerStrike();
         setUpArmour();
-        setUpBuddhaBody();
+        setUpBuddhaBodyAndDragon();
         setUpBonuses();
+        setUpFrontLight();
+        setUpFrontLine();
+        setUpGUI();
+
         setUpDangersHandler();
 
         setUpShake();
 
+    }
+
+    private void setUpGUI() {
+        mGuiGroup = new Group();
+        addActor(mGuiGroup);
+    }
+
+    private void setUpFrontLight() {
+        mFrontLightGroup = new Group();
+        if (AssetLoader.environmentAtlas.findRegion("front_light")!=null) {
+            mFrontLightGroup = new Group();
+            mFrontLightGroup.addActor(
+                    new BackgroundLight(this, AssetLoader.environmentAtlas.findRegion("front_light"), VIEWPORT_HEIGHT, true));
+            addActor(mFrontLightGroup);
+        }
+    }
+
+    private void setUpFrontLine() {
+        mFrontGroup = new Group();
+
+        if (AssetLoader.environmentAtlas.findRegion("frontup")!=null) {
+            mFrontLine = new FrontLine(VIEWPORT_HEIGHT);
+            addMovable(mFrontLine);
+
+            mFrontGroup.addActor(mFrontLine);
+        }
+        addActor(mFrontGroup);
     }
 
     private void setUpDecorationNear() {
@@ -279,13 +324,14 @@ public class GameStage extends Stage {
         ScoreCounter.levelInit();
     }
 
-    private void setUpBuddhaBody() {
+    private void setUpBuddhaBodyAndDragon() {
         mBuddhaBonus = new BuddhasBody(WorldUtils.createBuddhasBody(world), runner);
         addActor(mBuddhaBonus);
 
         mDragon = new Dragon(WorldUtils.createDragon(world), this);
         mDragon.trend();
-        addActor(mDragon);
+//        addActor(mDragon);
+        addToActionLayout(mDragon);
     }
 
     public void setGuiStage(GameGuiStage guiStage) {
@@ -301,6 +347,9 @@ public class GameStage extends Stage {
     }
 
     private void setUpBonuses() {
+
+        mIconsGroup = new Group();
+
         mBonuses = new Array<GameBonus>();
         mBonuses.add(new WingsBonus(this, VIEWPORT_HEIGHT));
         mBonuses.add(new GhostBonus(this, VIEWPORT_HEIGHT));
@@ -319,6 +368,7 @@ public class GameStage extends Stage {
             addMovable(gameBonus);
         }
 
+        addActor(mIconsGroup);
     }
 
     private void setUpRevival() {
@@ -414,28 +464,50 @@ public class GameStage extends Stage {
     }
 
     private void setUpBackground() {
+        mBackgroundGroup = new Group();
+
         background1 = new Background(world, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, Constants.BACKGROUND_VELOCITY_COF, true);
-        addActor(background1);
+        mBackgroundGroup.addActor(background1);
         addMovable(background1);
 
+        if (AssetLoader.environmentAtlas.findRegion("background_light")!=null) {
+            mBackgroundGroup.addActor(
+                    new BackgroundLight(this, AssetLoader.environmentAtlas.findRegion("background_light"), VIEWPORT_HEIGHT, false));
+        }
+
         background2 = new Background(world, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, Constants.BACKGROUND_VELOCITY_COF_2, false);
-        addActor(background2);
+        mBackgroundGroup.addActor(background2);
         addMovable(background2);
+
+        addActor(mBackgroundGroup);
     }
 
     private void setUpRunner() {
+        mActionGroup = new Group();
+
         runner = new Runner(WorldUtils.createRunner(world));
-        addActor(runner);
         runner.setGrounds(ground1, ground2);
+//        addActor(runner);
+        mActionGroup.addActor(runner);
+
+        addActor(mActionGroup);
     }
 
     private void setUpGround() {
+        mGroundGroup = new Group();
+
         ground1 = new Ground(WorldUtils.createGround(world, false));
         ground2 = new Ground(WorldUtils.createGround(world, true));
-        addActor(ground1);
-        addActor(ground2);
+//        addActor(ground1);
+//        addActor(ground2);
+//
+        mGroundGroup.addActor(ground1);
+        mGroundGroup.addActor(ground2);
+
         addMovable(ground1);
         addMovable(ground2);
+
+        addActor(mGroundGroup);
     }
 
     private void setupCamera() {
@@ -563,7 +635,8 @@ public class GameStage extends Stage {
             mArmour.setRunnerPassive(runner);
             runner.setArmour(mArmour);
             runner.start();
-            addActor(runner);
+//            addActor(runner);
+            mActionGroup.addActor(runner);
             mRevivalRunner = false;
             mReturnTimer = 0;
             mReturnFilter = true;
@@ -601,6 +674,7 @@ public class GameStage extends Stage {
             lump = PoolsHandler.sLumpsPool.obtain();
             if (lump!=null) {
                 lump.init(this, parent, textureRegion);
+                addToActionLayout(lump);
             }
         }
     }
@@ -718,7 +792,7 @@ public class GameStage extends Stage {
 
     public void deactivationBonuses() {
         for (GameBonus bonus:mBonuses) {
-            bonus.deactivation();
+            bonus.proDeactivation();
             bonus.disabling();
         }
     }
@@ -1095,7 +1169,24 @@ public class GameStage extends Stage {
         PoolsHandler.sDecorationPool.free(decoration);
     }
 
+    public void addToActionLayout(Actor actor) {
+        mActionGroup.addActor(actor);
+    }
+
+    public void addToIconsLayout(Actor actor) {
+        mIconsGroup.addActor(actor);
+    }
+
     public float getDeltaTime() {
         return deltaTime;
+    }
+
+    public void fromBonusToGui(Actor actor) {
+        mIconsGroup.removeActor(actor);
+        mGuiGroup.addActor(actor);
+    }
+    public void fromGuiToBonus(Actor actor) {
+        mGuiGroup.removeActor(actor);
+        mIconsGroup.addActor(actor);
     }
 }

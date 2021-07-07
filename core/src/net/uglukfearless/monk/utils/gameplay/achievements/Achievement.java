@@ -30,6 +30,7 @@ public abstract class Achievement {
     protected String mConditionKey;
 
     protected HashMap<String, String> mUpdateList;
+    protected HashMap<String, String> mUpdateSelf;
 
     protected boolean mNew;
 
@@ -70,6 +71,10 @@ public abstract class Achievement {
 
     public HashMap<String, String> getUpdateList() {
         return mUpdateList;
+    }
+
+    public HashMap<String, String> getUpdateSelf() {
+        return mUpdateSelf;
     }
 
     public void checkAchieve() {

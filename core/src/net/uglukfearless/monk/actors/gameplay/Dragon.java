@@ -16,7 +16,6 @@ import net.uglukfearless.monk.stages.GameStage;
 import net.uglukfearless.monk.utils.file.AssetLoader;
 import net.uglukfearless.monk.utils.gameplay.bodies.DragonBody;
 
-import static sun.management.snmp.util.JvmContextFactory.getUserData;
 
 /**
  * Created by Ugluk on 04.12.2016.

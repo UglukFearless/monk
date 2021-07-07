@@ -99,7 +99,7 @@ public abstract class GameBonus extends Actor implements Movable {
                 }
 
             } else if (!mAddsActions){
-                activation();
+                proActivation();
                 mGuiStage.setLabel(mActiveTitle, 2f);
                 AssetLoader.getBonusSound.play(SoundSystem.getSoundValue());
                 this.addAction(Actions.sequence(Actions.sizeBy(1.15f, 1.15f, 0.08f)
@@ -127,7 +127,7 @@ public abstract class GameBonus extends Actor implements Movable {
                     if (!mQuantum) {
                         AssetLoader.balanceBonusSound.play(SoundSystem.getSoundValue());
                     }
-                    deactivation();
+                    proDeactivation();
                     disabling();
                 }
             }
@@ -156,13 +156,23 @@ public abstract class GameBonus extends Actor implements Movable {
         mActive = true;
         this.setPosition(x + 1.5f, y + 1.5f);
         this.setVisible(true);
-        mStage.addActor(this);
+        mStage.addToIconsLayout(this);
         mSpeed = mStage.getCurrentVelocity().x;
     }
 
     public abstract void activation();
 
     public abstract void deactivation();
+
+    public void proActivation() {
+        mStage.fromBonusToGui(this);
+        activation();
+    }
+
+    public void proDeactivation() {
+        mStage.fromGuiToBonus(this);
+        deactivation();
+    }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {

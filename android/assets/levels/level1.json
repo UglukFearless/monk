@@ -12,17 +12,17 @@ mLevelConstants: {
   COLUMNS_PIT_INIT:2
   GROUND_HEIGHT_FIX_INIT:1.33
 
-  DECORATION_ONE_OFFSET_INIT: -1.0
+  DECORATION_ONE_OFFSET_INIT: -1.3
   DECORATION_TWO_OFFSET_INIT: -0.2
   DECORATION_NEAR_SPEED_INIT: 1
   DECORATION_FURTHER_SPEED_INIT: 0.7
-  DECORATION_NEAR_STEP_INIT: 8
-  DECORATION_NEAR_STEP_MIN_INIT: 0
+  DECORATION_NEAR_STEP_INIT: 10
+  DECORATION_NEAR_STEP_MIN_INIT: 5
   DECORATION_FURTHER_STEP_INIT: 5
   DECORATION_FURTHER_STEP_MIN_INIT: 3
 
   COLUMNS_HEIGHT_INIT:6
-  COLUMNS_HEIGHT_FIX_INIT:1
+  COLUMNS_HEIGHT_FIX_INIT:1.021
   COLUMNS_QUANTITY_INIT:6
   GROUND_PIT_INIT:8
 	FOREVER_UNLOCK: true
@@ -39,7 +39,7 @@ mDifficultyHandler: {
 			worldSpeed: -15
 			priorityGround: 3
 			priorityPit: 0
-			priorityColumns: 0
+			priorityColumns: 90
 			dangersProbability: 50
 			enemiesPriority: [ 10, 0, 10, 0, 5, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 25, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
@@ -49,7 +49,7 @@ mDifficultyHandler: {
 			worldSpeed: -16
 			priorityGround: 3
 			priorityPit: 2
-			priorityColumns: 0
+			priorityColumns: 90
 			dangersProbability: 60
 			enemiesPriority: [ 20, 0, 20, 10, 10, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 20, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
@@ -67,9 +67,9 @@ mDifficultyHandler: {
 		{
 			name: 4n
 			worldSpeed: -18
-			priorityGround: 3
+			priorityGround: 4
 			priorityPit: 7
-			priorityColumns: 0
+			priorityColumns: 2
 			dangersProbability: 80
 			enemiesPriority: [ 10, 10, 10, 10, 10, 0, 0, 0, 0, 0 ]
 			obstaclesPriority: [ 30, 30, 0, 0, 0, 0, 0, 0, 0, 0 ]
@@ -709,66 +709,79 @@ mEnemiesModels:
 
 	mNearDecorationsModels: [
 		{
-			mWidth: 8
-			mHeight: 6
-			mGrade: 1
-			mNear: true
-		},
-		{
-			mWidth: 2
-			mHeight: 1.5
-			mGrade: 2
-			mNear: true
-		},
-		{
-			mWidth: 3
-			mHeight: 2
-			mGrade: 3
-			mNear: true
-		},
-		{
-			mWidth: 3.8
-			mHeight: 6
-			mGrade: 4
-			mNear: true
-		},
-		{
-			mWidth: 4.5
-			mHeight: 3
+			mWidth: 7.66
+			mHeight: 1.25
 			mGrade: 8
 			mNear: true
 		},
 		{
-			mWidth: 14.68
-			mHeight: 12.2
+			mWidth: 6.34
+			mHeight: 7.09
 			mGrade: 9
 			mNear: true
+		},
+		{
+			mWidth: 1.125
+			mHeight: 4.31
+			mGrade: 10
+			mNear: true
+		},
+		{
+			mWidth: 6.5
+			mHeight: 9.22
+			mGrade: 11
+			mNear: true
+		},
+		{
+			mWidth: 0.97
+			mHeight: 5.09
+			mGrade: 12
+			mNear: true
 		}
+
 	]
 
 	mFurtherDecorationsModels: [
 		{
-			mWidth: 14.68
+			mWidth: 11.22
 			mHeight: 15.2
-			mGrade: 7
+			mGrade: 1
 			mNear: false
 		},
 		{
-			mWidth: 14.68
+			mWidth: 7.09
 			mHeight: 15.2
-			mGrade: 7
+			mGrade: 2
 			mNear: false
 		},
 		{
-			mWidth: 14.68
+			mWidth: 9.09
 			mHeight: 15.2
-			mGrade: 7
+			mGrade: 3
 			mNear: false
 		},
 		{
-			mWidth: 10.68
+			mWidth: 8.03
 			mHeight: 15.2
-			mGrade: 10
+			mGrade: 4
+			mNear: false
+		},
+		{
+			mWidth: 15.91
+			mHeight: 15.2
+			mGrade: 5
+			mNear: false
+		},
+		{
+			mWidth: 21.38
+			mHeight: 15.2
+			mGrade: 6
+			mNear: false
+		},
+		{
+			mWidth: 19.94
+			mHeight: 15.2
+			mGrade: 7
 			mNear: false
 		}
 	]

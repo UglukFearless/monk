@@ -19,25 +19,32 @@ background1
   index: 2
 pitLeft
   rotate: false
-  xy: 803, 726
-  size: 81, 237
-  orig: 81, 237
+  xy: 803, 707
+  size: 81, 256
+  orig: 81, 256
   offset: 0, 0
   index: -1
 pitRight
   rotate: false
-  xy: 886, 726
-  size: 81, 237
-  orig: 81, 237
+  xy: 803, 449
+  size: 81, 256
+  orig: 81, 256
   offset: 0, 0
   index: -1
 column
   rotate: false
-  xy: 803, 502
+  xy: 886, 741
   size: 55, 222
   orig: 55, 222
   offset: 0, 0
   index: -1
+frontup
+  rotate: false
+  xy: 803, 383
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
 
 environment2.png
 format: RGBA8888
@@ -62,10 +69,36 @@ environment3.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
+background_light
+  rotate: false
+  xy: 1, 513
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: -1
+frontdown
+  rotate: false
+  xy: 1, 257
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 1
+frontdown
+  rotate: false
+  xy: 1, 1
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 2
+
+environment4.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
 ground
   rotate: false
   xy: 1, 1
-  size: 947, 397
-  orig: 947, 397
+  size: 704, 256
+  orig: 704, 256
   offset: 0, 0
   index: -1

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.uglukfearless.monk"
     android:versionCode="1"
-    android:versionName="0.672"
+    android:versionName="0.683"
     android:installLocation="preferExternal">
 
     <uses-permission android:name="android.permission.INTERNET" />

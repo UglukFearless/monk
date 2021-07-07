@@ -3,41 +3,55 @@ environment.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-background1
-  rotate: false
-  xy: 1, 483
-  size: 800, 480
-  orig: 800, 480
-  offset: 0, 0
-  index: 1
-background1
-  rotate: false
-  xy: 1, 1
-  size: 800, 480
-  orig: 800, 480
-  offset: 0, 0
-  index: 2
 column
   rotate: false
-  xy: 803, 741
+  xy: 1, 801
   size: 55, 222
   orig: 55, 222
   offset: 0, 0
   index: -1
+frontdown
+  rotate: false
+  xy: 58, 769
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 1
 pitLeft
   rotate: false
-  xy: 860, 899
-  size: 64, 64
-  orig: 64, 64
+  xy: 860, 767
+  size: 81, 256
+  orig: 81, 256
   offset: 0, 0
   index: -1
+frontdown
+  rotate: false
+  xy: 1, 513
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 2
 pitRight
   rotate: false
-  xy: 860, 899
-  size: 64, 64
-  orig: 64, 64
+  xy: 803, 509
+  size: 81, 256
+  orig: 81, 256
   offset: 0, 0
   index: -1
+frontdown
+  rotate: false
+  xy: 1, 257
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 3
+frontup
+  rotate: false
+  xy: 1, 1
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 1
 
 environment2.png
 format: RGBA8888
@@ -45,16 +59,16 @@ filter: Linear,Linear
 repeat: none
 background2
   rotate: false
-  xy: 1, 483
-  size: 800, 480
-  orig: 800, 480
+  xy: 1, 257
+  size: 800, 560
+  orig: 800, 560
   offset: 0, 0
   index: 1
-background2
+frontup
   rotate: false
   xy: 1, 1
-  size: 800, 480
-  orig: 800, 480
+  size: 800, 254
+  orig: 800, 254
   offset: 0, 0
   index: 2
 
@@ -62,17 +76,62 @@ environment3.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
+background1
+  rotate: false
+  xy: 1, 483
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 1
+background1
+  rotate: false
+  xy: 1, 1
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 2
+
+environment4.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+background2
+  rotate: false
+  xy: 1, 483
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 2
+background_light
+  rotate: false
+  xy: 1, 1
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: -1
+
+environment5.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+frontup
+  rotate: false
+  xy: 1, 517
+  size: 800, 254
+  orig: 800, 254
+  offset: 0, 0
+  index: 3
 ground
   rotate: false
   xy: 1, 259
-  size: 704, 256
-  orig: 704, 256
+  size: 705, 256
+  orig: 705, 256
   offset: 0, 0
   index: 1
 ground
   rotate: false
   xy: 1, 1
-  size: 704, 256
-  orig: 704, 256
+  size: 705, 256
+  orig: 705, 256
   offset: 0, 0
   index: 2

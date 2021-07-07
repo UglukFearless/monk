@@ -31,7 +31,7 @@ public class RetributionBonus extends GameBonus {
             mWorkingTime +=5;
         }
 
-        if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_MT_KEY)) {
+        if (PreferencesManager.checkAchieve(PreferencesConstants.ACHIEVE_AT_KEY)) {
             mLevel = 1;
         }
 

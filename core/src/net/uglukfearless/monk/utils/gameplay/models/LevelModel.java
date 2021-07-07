@@ -67,7 +67,7 @@ public class LevelModel {
                 mStage.finishRetribution();
             } else if (mStage.getState()== GameState.SLOWDOWN) {
                 float velocity = mStage.getCurrentVelocity().x;
-                if (velocity<-12) {
+                if (velocity<-12&&mStage.getRunner()!=null&&!mStage.getRunner().isDragon()) {
                     float changeVelocity = 0.13f*delta;
                     mStage.changingSpeed(velocity - velocity*changeVelocity);
                 }
